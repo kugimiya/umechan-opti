@@ -1,0 +1,299 @@
+.alignItems_baseline {
+  align-items: baseline;
+}
+
+.alignItems_normal {
+  align-items: normal;
+}
+
+.alignItems_stretch {
+  align-items: stretch;
+}
+
+.alignItems_center {
+  align-items: center;
+}
+
+.alignItems_end {
+  align-items: end;
+}
+
+.alignItems_flex-end {
+  align-items: flex-end;
+}
+
+.alignItems_flex-start {
+  align-items: flex-start;
+}
+
+.alignItems_self-end {
+  align-items: self-end;
+}
+
+.alignItems_self-start {
+  align-items: self-start;
+}
+
+.alignItems_start {
+  align-items: start;
+}
+
+.alignItems_inherit {
+  align-items: inherit;
+}
+
+.alignItems_initial {
+  align-items: initial;
+}
+
+.alignItems_revert {
+  align-items: revert;
+}
+
+.alignItems_unset {
+  align-items: unset;
+}
+
+.justifyContent_left {
+  justify-content: left;
+}
+
+.justifyContent_normal {
+  justify-content: normal;
+}
+
+.justifyContent_right {
+  justify-content: right;
+}
+
+.justifyContent_center {
+  justify-content: center;
+}
+
+.justifyContent_end {
+  justify-content: end;
+}
+
+.justifyContent_flex-end {
+  justify-content: flex-end;
+}
+
+.justifyContent_flex-start {
+  justify-content: flex-start;
+}
+
+.justifyContent_start {
+  justify-content: start;
+}
+
+.justifyContent_space-around {
+  justify-content: space-around;
+}
+
+.justifyContent_space-between {
+  justify-content: space-between;
+}
+
+.justifyContent_space-evenly {
+  justify-content: space-evenly;
+}
+
+.justifyContent_stretch {
+  justify-content: stretch;
+}
+
+.justifyContent_inherit {
+  justify-content: inherit;
+}
+
+.justifyContent_initial {
+  justify-content: initial;
+}
+
+.justifyContent_revert {
+  justify-content: revert;
+}
+
+.justifyContent_unset {
+  justify-content: unset;
+}
+
+.display_contents {
+  display: contents;
+}
+
+.display_list-item {
+  display: list-item;
+}
+
+.display_none {
+  display: none;
+}
+
+.display_inline-block {
+  display: inline-block;
+}
+
+.display_inline-flex {
+  display: inline-flex;
+}
+
+.display_inline-grid {
+  display: inline-grid;
+}
+
+.display_inline-list-item {
+  display: inline-list-item;
+}
+
+.display_inline-table {
+  display: inline-table;
+}
+
+.display_flex {
+  display: flex;
+}
+
+.display_flow {
+  display: flow;
+}
+
+.display_flow-root {
+  display: flow-root;
+}
+
+.display_grid {
+  display: grid;
+}
+
+.display_ruby {
+  display: ruby;
+}
+
+.display_table {
+  display: table;
+}
+
+.display_ruby-base {
+  display: ruby-base;
+}
+
+.display_ruby-base-container {
+  display: ruby-base-container;
+}
+
+.display_ruby-text {
+  display: ruby-text;
+}
+
+.display_ruby-text-container {
+  display: ruby-text-container;
+}
+
+.display_table-caption {
+  display: table-caption;
+}
+
+.display_table-cell {
+  display: table-cell;
+}
+
+.display_table-column {
+  display: table-column;
+}
+
+.display_table-column-group {
+  display: table-column-group;
+}
+
+.display_table-footer-group {
+  display: table-footer-group;
+}
+
+.display_table-header-group {
+  display: table-header-group;
+}
+
+.display_table-row {
+  display: table-row;
+}
+
+.display_table-row-group {
+  display: table-row-group;
+}
+
+.display_inherit {
+  display: inherit;
+}
+
+.display_initial {
+  display: initial;
+}
+
+.display_revert {
+  display: revert;
+}
+
+.display_unset {
+  display: unset;
+}
+
+.flexDirection_column {
+  flex-direction: column;
+}
+
+.flexDirection_column-reverse {
+  flex-direction: column-reverse;
+}
+
+.flexDirection_row {
+  flex-direction: row;
+}
+
+.flexDirection_row-reverse {
+  flex-direction: row-reverse;
+}
+
+.flexDirection_inherit {
+  flex-direction: inherit;
+}
+
+.flexDirection_initial {
+  flex-direction: initial;
+}
+
+.flexDirection_revert {
+  flex-direction: revert;
+}
+
+.flexDirection_unset {
+  flex-direction: unset;
+}
+
+.flexWrap_nowrap {
+  flex-wrap: nowrap;
+}
+
+.flexWrap_wrap {
+  flex-wrap: wrap;
+}
+
+.flexWrap_wrap-reverse {
+  flex-wrap: wrap-reverse;
+}
+
+.flexWrap_inherit {
+  flex-wrap: inherit;
+}
+
+.flexWrap_initial {
+  flex-wrap: initial;
+}
+
+.flexWrap_revert {
+  flex-wrap: revert;
+}
+
+.flexWrap_unset {
+  flex-wrap: unset;
+}
