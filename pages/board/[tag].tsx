@@ -17,7 +17,7 @@ const Board = ({ boards, board }: Page<{ board: BoardData }>): JSX.Element => {
     <PageWrapper boards={boards}>
       <Box flexDirection="column" gap="8px">
         {board.threads.map(thread => (
-          <PostComponent key={thread.id} post={thread} isThread />
+          <PostComponent key={thread.id} post={thread} goToThreadLinkVisible />
         ))}
       </Box>
     </PageWrapper>
