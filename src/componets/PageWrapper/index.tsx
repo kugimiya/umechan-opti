@@ -8,7 +8,7 @@ export const PageWrapper = ({ boards, children }: { boards: Board[]; children: J
     <Box gap="16px" alignItems="flex-start">
       <Navbar boards={boards} links={LINKS} />
 
-      <Box padding="8px" width="100%" justifyContent="center">
+      <Box padding="8px" width="100%" justifyContent="center" styles={{ maxWidth: 'calc(100% - 280px)' }}>
         {children}
       </Box>
     </Box>

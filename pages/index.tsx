@@ -1,23 +1,23 @@
-import Box from '../src/componets/Box';
-import { PageWrapper } from '../src/componets/PageWrapper';
-import { PostComponent } from '../src/componets/PostComponent';
-import { Post } from '../src/types/post';
-import { Page } from '../src/types/utils/Page';
-import { withProps } from '../src/utils/withProps';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 
-export const getServerSideProps = withProps(async () => {});
+const Home = (): JSX.Element => {
+  const router = useRouter();
 
-const Home = ({ posts, boards }: Page<{ posts: Post[] }>): JSX.Element => {
-  return (
-    <PageWrapper boards={boards}>
-      <Box flexDirection="column" gap="8px">
-        {posts.map(post => (
-          <PostComponent key={post.id} post={post} goToThreadLinkVisible />
-        ))}
-      </Box>
+  useEffect(() => {
+    router.push('/board/b');
+  }, [router]);
 
-    </PageWrapper>
-  );
+  return <p>Sending you to &apos;/b&apos; in progress...</p>;
 }
+
+export const getServerSideProps = () => {
+  return {
+    redirect: {
+      destination: '/board/b',
+      permanent: false,
+    },
+  }
+};
 
 export default Home;

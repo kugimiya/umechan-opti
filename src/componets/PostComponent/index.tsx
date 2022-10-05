@@ -6,18 +6,9 @@ import styles from "./styles.module.css";
 
 const currentYear = getYear(new Date());
 
-export const PostComponent = ({ post, goToThreadLinkVisible: isThread }: { post: Post, goToThreadLinkVisible?: boolean }): JSX.Element => {
-  const date = fromUnixTime(+post.timestamp);
+export const PostComponent = ({ post }: { post: Post }): JSX.Element => {
+  const date = fromUnixTime(Number(post.timestamp));
   const time = format(date, currentYear === getYear(date) ? 'HH:MM LLLL dd' : 'HH:MM dd.LL.yyyy');
-
-  let isThreadPostAction = <></>;
-  if (isThread) {
-    isThreadPostAction = (
-      <Link href={`/thread/${post.parent_id ? post.parent_id : post.id}`}>
-        <a>[В тред]</a>
-      </Link>
-    );
-  }
 
   let scrollToPostLink = (
     <Link href={`/thread/${post.parent_id ? post.parent_id : post.id}#${post.id}`}>
@@ -26,7 +17,7 @@ export const PostComponent = ({ post, goToThreadLinkVisible: isThread }: { post:
   );
 
   return (
-    <Box flexDirection="column" width="768px" className={styles.root}>     
+    <Box flexDirection="column" width="100%" className={styles.root}>     
       <Box width="100%" justifyContent="space-between">
         <Box gap="12px">
           {Boolean(post.subject) && <span className={styles.subject}>{post.subject}</span>}
@@ -36,12 +27,23 @@ export const PostComponent = ({ post, goToThreadLinkVisible: isThread }: { post:
         </Box>
 
         <Box gap="12px">
-          {isThreadPostAction}
           {scrollToPostLink}
         </Box>
       </Box>
+
+      {Boolean(post.media) && (
+        <Box gap="16px" flexWrap="wrap">
+          {post.media?.images?.map((image) => (
+            <Box key={`${image.link}_${post.id}`} styles={{ maxWidth: '256px' }}>
+              <a href={image.link} target="_blank" rel="noreferrer">
+                <img src={image.preview} width="100%" />
+              </a>
+            </Box>
+          ))}
+        </Box>
+      )}
       
-      <p>{post.message}</p>
+      <p>{post.truncated_message}</p>
     </Box>
   );
 }

@@ -15,13 +15,13 @@ export const getServerSideProps = withProps(
 const Thread = ({ boards, thread }: Page<{ thread: ThreadData }>): JSX.Element => {
   return (
     <PageWrapper boards={boards}>
-      <Box flexDirection="column" gap="8px">
+      <Box flexDirection="column" gap="8px" styles={{ maxWidth: '100%' }}>
         <PostComponent post={thread} />
 
         <hr style={{ width: '512px' }} />
 
         {thread.replies.map(post => (
-          <PostComponent key={thread.id} post={post} />
+          <PostComponent key={post.id} post={post} />
         ))}
       </Box>
     </PageWrapper>

@@ -9,7 +9,7 @@ type Link = {
 
 export default function Navbar({ boards, links }: { boards: Board[], links: Link[] }) {
   return (
-    <Box width="256px" gap="32px" flexDirection="column" styles={{ position: 'sticky', top: 0 }}>
+    <Box width="256px" gap="32px" flexDirection="column" styles={{ minWidth: '256px', position: 'sticky', top: 0 }}>
       <Box gap="8px" flexDirection="column">
         <span>Boards</span>
 
