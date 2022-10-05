@@ -1,5 +1,5 @@
 import { GetServerSidePropsContext } from "next";
-import { getAll } from "./service";
+import { getAll } from "src/utils/service";
 
 export function withProps<T = unknown>(getter: (context: GetServerSidePropsContext) => Promise<T>) {
   return async (context: GetServerSidePropsContext) => ({

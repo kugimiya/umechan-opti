@@ -1,7 +1,7 @@
 import axios from "axios";
-import { API_URI } from "../constants";
-import { Board, BoardData } from "../types/board";
-import { Post, ThreadData } from "../types/post";
+import { API_URI } from "src/constants";
+import { Board, BoardData } from "src/types/board";
+import { Post, ThreadData } from "src/types/post";
 
 type ApiResponse<T> = {
     payload: T;
@@ -9,11 +9,9 @@ type ApiResponse<T> = {
     error: null;
 };
 
-export const apiCall = async <T,>(url: string): Promise<T> => {
+export const apiCall = async <T,>(url: string, params?: Record<string, string | number | undefined>): Promise<T> => {
     const uri = `${API_URI}${url}`;
-
-    const { data } = await axios.get<ApiResponse<T>>(uri);
-
+    const { data } = await axios.get<ApiResponse<T>>(uri, { params });
     return data.payload;
 }
 
@@ -21,8 +19,8 @@ export const getAll = async (): Promise<{ posts: Post[]; boards: Board[] }> => {
     return await apiCall<{ posts: Post[]; boards: Board[] }>('/board/all');
 }
 
-export const getBoard = async (tag?: string): Promise<BoardData> => {
-    return (await apiCall<{ board_data: BoardData }>(`/board/${tag || 'test'}`)).board_data;
+export const getBoard = async (tag?: string, offset?: number): Promise<BoardData> => {
+    return (await apiCall<{ board_data: BoardData }>(`/board/${tag || 'test'}`, { limit: 20, offset })).board_data;
 }
 
 export const getPost = async (id?: string): Promise<ThreadData> => {

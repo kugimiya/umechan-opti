@@ -16,10 +16,15 @@ export type Post = {
 
 export interface Media {
     images?: Image[];
-    youtubes?: any[];
+    youtubes?: YouTube[];
 }
 
 export interface Image {
+    link?: string;
+    preview?: string;
+}
+
+export interface YouTube {
     link?: string;
     preview?: string;
 }

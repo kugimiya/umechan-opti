@@ -1,6 +1,12 @@
 .root {
   padding: 8px;
   background-color: var(--theme_post_bg);
+
+  width: auto;
+  max-width: 720px;
+
+  max-height: 440px;
+  overflow: auto;
 }
 
 .infobar {

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Board } from "../../types/board";
-import Box from "../Box";
+import {Box} from "../Box";
 
 type Link = {
   text: string;
@@ -9,11 +9,11 @@ type Link = {
 
 export default function Navbar({ boards, links }: { boards: Board[], links: Link[] }) {
   return (
-    <Box width="256px" gap="32px" flexDirection="column" styles={{ minWidth: '256px', position: 'sticky', top: 0 }}>
-      <Box gap="8px" flexDirection="column">
-        <span>Boards</span>
+    <Box gap="4px" flexDirection="column" width="100%" style={{ border: '1px solid #CA927B' }}>
+      <Box gap="4px" flexDirection="column">
+        <span style={{ backgroundColor: '#CA927B', color: '#000', padding: '4px 8px' }}>Досочке</span>
 
-        <Box gap="4px" flexDirection="column" padding="0px 0px 0px 8px">
+        <Box gap="4px" flexDirection="column" padding="0px 4px 0px 4px">
           {boards.map(board => (
             <Box key={board.id}>
               <Link href={`/board/${board.tag}`}>
@@ -26,10 +26,10 @@ export default function Navbar({ boards, links }: { boards: Board[], links: Link
         </Box>
       </Box>
 
-      <Box gap="8px" flexDirection="column">
-        <span>Links</span>
+      <Box gap="4px" flexDirection="column">
+        <span style={{ backgroundColor: '#CA927B', color: '#000', padding: '4px 8px' }}>Ссылочке</span>
 
-        <Box gap="4px" flexDirection="column" padding="0px 0px 0px 8px">
+        <Box gap="4px" flexDirection="column" padding="0px 4px 0px 4px">
           {links.map(link => (
             <Box key={link.text}>
               <Link href={link.href}>

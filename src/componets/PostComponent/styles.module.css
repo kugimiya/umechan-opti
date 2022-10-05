@@ -1,7 +1,9 @@
 .root {
   padding: 8px;
   background-color: var(--theme_post_bg);
-  max-width: 100%;
+
+  width: auto;
+  max-width: 720px;
 }
 
 .infobar {

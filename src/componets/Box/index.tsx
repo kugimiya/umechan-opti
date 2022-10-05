@@ -1,98 +1,42 @@
-import classNames from 'classnames';
-import React from 'react';
+import { CSSProperties } from 'react';
+import styled from 'styled-components';
 
-import cls from './styles.module.css';
+interface Props {
+  display?: CSSProperties['display'];
 
-export type BoxProps = {
-  display?: React.CSSProperties['display'];
-  gap?: React.CSSProperties['gap'];
-  justifyContent?: React.CSSProperties['justifyContent'];
-  alignItems?: React.CSSProperties['alignItems'];
-  flexDirection?: React.CSSProperties['flexDirection'];
-  flexWrap?: React.CSSProperties['flexWrap'];
+  flexDirection?: CSSProperties['flexDirection'];
+  justifyContent?: CSSProperties['justifyContent'];
+  alignItems?: CSSProperties['alignItems'];
+  flexGrow?: CSSProperties['flexGrow'];
+  flexWrap?: CSSProperties['flexWrap'];
 
-  width?: React.CSSProperties['width'];
-  padding?: React.CSSProperties['padding'];
-  margin?: React.CSSProperties['margin'];
+  gap?: CSSProperties['gap'];
+  padding?: CSSProperties['padding'];
+  margin?: CSSProperties['margin'];
 
-  component?: React.ElementType;
-  styles?: React.CSSProperties;
-  children?: React.ReactNode;
-  className?: string;
+  width?: CSSProperties['width'];
+  minWidth?: CSSProperties['minWidth'];
+  maxWidth?: CSSProperties['maxWidth'];
 
-  onClick?: () => void;
-  customRef?: React.Ref<HTMLDivElement>;
-  id?: string;
-};
-
-export function Box(props: BoxProps): JSX.Element {
-  const {
-    alignItems,
-    justifyContent,
-    width,
-    flexDirection,
-    flexWrap,
-    display = 'flex',
-    className,
-    children,
-    onClick,
-    component,
-    padding,
-    margin,
-    gap,
-    styles = {},
-    customRef,
-    id,
-  } = props;
-
-  const completeClassName = classNames(
-    display ? cls[`display_${display}`] : '',
-    alignItems ? cls[`alignItems_${alignItems}`] : '',
-    justifyContent ? cls[`justifyContent_${justifyContent}`] : '',
-    flexWrap ? cls[`flexWrap_${flexWrap}`] : '',
-    flexDirection ? cls[`flexDirection_${flexDirection}`] : '',
-    className,
-  );
-
-  if (component) {
-    const Wrapper = component;
-
-    return (
-      <Wrapper
-        id={id}
-        className={completeClassName}
-        style={{
-          width,
-          padding,
-          margin,
-          gap,
-          ...styles,
-        }}
-        onClick={onClick}
-        ref={customRef}
-      >
-        {children}
-      </Wrapper>
-    );
-  }
-
-  return (
-    <div
-      id={id}
-      className={completeClassName}
-      style={{
-        width,
-        padding,
-        margin,
-        gap,
-        ...styles,
-      }}
-      onClick={onClick}
-      ref={customRef}
-    >
-      {children}
-    </div>
-  );
+  height?: CSSProperties['height'];
+  minHeight?: CSSProperties['minHeight'];
+  maxHeight?: CSSProperties['maxHeight'];
 }
 
-export default Box;
+export const Box = styled.div<Props>`
+  display: ${(props) => props.display || 'flex'};
+  flex-direction: ${(props) => props.flexDirection};
+  justify-content: ${(props) => props.justifyContent};
+  align-items: ${(props) => props.alignItems};
+  flex-grow: ${(props) => props.flexGrow};
+  flex-wrap: ${(props) => props.flexWrap};
+  gap: ${(props) => props.gap};
+  padding: ${(props) => props.padding};
+  margin: ${(props) => props.margin};
+  width: ${(props) => props.width};
+  min-width: ${(props) => props.minWidth};
+  max-width: ${(props) => props.maxWidth};
+  height: ${(props) => props.height};
+  min-height: ${(props) => props.minHeight};
+  max-height: ${(props) => props.maxHeight};
+`;
