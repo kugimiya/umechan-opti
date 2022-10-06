@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import {Box} from "src/componets/Box";
+import { Box } from "src/componets/Box";
+import { CreatePostForm } from "src/componets/CreatePostForm";
 import { PageWrapper } from "src/componets/PageWrapper";
 import { ThreadComponent } from "src/componets/ThreadComponent";
 import { PAGE_SIZE } from "src/constants";
@@ -29,6 +30,10 @@ const Board = ({ boards, board, allPages }: Page<{ board: BoardData, allPages: n
   return (
     <PageWrapper boards={boards}>
       <Box flexDirection="column" alignItems="flex-start" gap="32px">
+        <Box>
+          <CreatePostForm mode="thread" parentBoardId={board.tag} />
+        </Box>
+
         <Box gap="8px">
           Страница: {paged.map(item => <Link key={item.title} href={item.href} passHref><a>{item.title}</a></Link>)}
         </Box>

@@ -9,20 +9,30 @@ type ApiResponse<T> = {
     error: null;
 };
 
-export const apiCall = async <T,>(url: string, params?: Record<string, string | number | undefined>): Promise<T> => {
+export const apiGetCall = async <T,>(url: string, params?: Record<string, string | number | undefined>): Promise<T> => {
     const uri = `${API_URI}${url}`;
     const { data } = await axios.get<ApiResponse<T>>(uri, { params });
     return data.payload;
 }
 
+export const apiPostCall = async <T,>(url: string, callData: Record<string, unknown>): Promise<T> => {
+    const uri = `${API_URI}${url}`;
+    const { data } = await axios.post<ApiResponse<T>>(uri, callData);
+    return data.payload;
+}
+
 export const getAll = async (): Promise<{ posts: Post[]; boards: Board[] }> => {
-    return await apiCall<{ posts: Post[]; boards: Board[] }>('/board/all');
+    return await apiGetCall<{ posts: Post[]; boards: Board[] }>('/board/all');
 }
 
 export const getBoard = async (tag?: string, offset?: number): Promise<BoardData> => {
-    return (await apiCall<{ board_data: BoardData }>(`/board/${tag || 'test'}`, { limit: PAGE_SIZE, offset })).board_data;
+    return (await apiGetCall<{ board_data: BoardData }>(`/board/${tag || 'test'}`, { limit: PAGE_SIZE, offset })).board_data;
 }
 
 export const getPost = async (id?: string): Promise<ThreadData> => {
-    return (await apiCall<{ thread_data: ThreadData }>(`/post/${id || '0'}`)).thread_data;
+    return (await apiGetCall<{ thread_data: ThreadData }>(`/post/${id || '0'}`)).thread_data;
+}
+
+export const createPost = async (data: Record<string, unknown>) => {
+    return await apiPostCall('/post', data);
 }
