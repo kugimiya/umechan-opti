@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_URI } from "src/constants";
+import { API_URI, PAGE_SIZE } from "src/constants";
 import { Board, BoardData } from "src/types/board";
 import { Post, ThreadData } from "src/types/post";
 
@@ -20,7 +20,7 @@ export const getAll = async (): Promise<{ posts: Post[]; boards: Board[] }> => {
 }
 
 export const getBoard = async (tag?: string, offset?: number): Promise<BoardData> => {
-    return (await apiCall<{ board_data: BoardData }>(`/board/${tag || 'test'}`, { limit: 20, offset })).board_data;
+    return (await apiCall<{ board_data: BoardData }>(`/board/${tag || 'test'}`, { limit: PAGE_SIZE, offset })).board_data;
 }
 
 export const getPost = async (id?: string): Promise<ThreadData> => {

@@ -3,17 +3,16 @@ import { useRouter } from "next/router";
 import {Box} from "src/componets/Box";
 import { PageWrapper } from "src/componets/PageWrapper";
 import { ThreadComponent } from "src/componets/ThreadComponent";
+import { PAGE_SIZE } from "src/constants";
 import { BoardData } from "src/types/board";
 import { Page } from "src/types/utils/Page";
 import { getBoard } from "src/utils/service";
 import { withProps } from "src/utils/withProps";
 
-const PAGE_SIZE = 20;
-
 export const getServerSideProps = withProps(
   async (context) => {
     const page = Number(context.query.page) || 0;
-    const board = await getBoard(context?.params?.tag?.toString(), page * 20);
+    const board = await getBoard(context?.params?.tag?.toString(), page * PAGE_SIZE);
     const allPages = Math.ceil(board.threads_count / PAGE_SIZE);
     return { board, page, allPages };
   }
@@ -21,7 +20,6 @@ export const getServerSideProps = withProps(
 
 const Board = ({ boards, board, allPages }: Page<{ board: BoardData, allPages: number }>): JSX.Element => {
   const router = useRouter();
-  // const [page, setPage] = useState(router.query.page || '0');
 
   const paged = [] as { title: string; href: string }[];
   for (let i = 0; i < allPages; i += 1) {
