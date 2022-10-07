@@ -1,41 +1,65 @@
-import Link from 'next/link';
-import { Board } from "../../types/board";
-import {Box} from "../Box";
+import Link from "next/link";
 
-type Link = {
+import type { Board } from "../../types/board";
+import { Box } from "../Box";
+
+interface Link {
   text: string;
   href: string;
 }
 
-export default function Navbar({ boards, links }: { boards: Board[], links: Link[] }) {
+export default function Navbar({
+  boards,
+  links,
+}: {
+  boards: Board[];
+  links: Link[];
+}) {
   return (
-    <Box gap="4px" flexDirection="column" width="100%" style={{ border: '1px solid #CA927B' }}>
-      <Box gap="4px" flexDirection="column">
-        <span style={{ backgroundColor: '#CA927B', color: '#000', padding: '4px 8px' }}>Досочке</span>
+    <Box
+      flexDirection="column"
+      gap="4px"
+      style={{ border: "1px solid #CA927B" }}
+      width="100%"
+    >
+      <Box flexDirection="column" gap="4px">
+        <span
+          style={{
+            backgroundColor: "#CA927B",
+            color: "#000",
+            padding: "4px 8px",
+          }}
+        >
+          Досочке
+        </span>
 
-        <Box gap="4px" flexDirection="column" padding="0px 8px 0px 8px">
-          {boards.map(board => (
+        <Box flexDirection="column" gap="4px" padding="0px 8px 0px 8px">
+          {boards.map((board) => (
             <Box key={board.id}>
               <Link href={`/board/${board.tag}`}>
-                <a>
-                  {board.name}
-                </a>
+                <a>{board.name}</a>
               </Link>
             </Box>
           ))}
         </Box>
       </Box>
 
-      <Box gap="4px" flexDirection="column">
-        <span style={{ backgroundColor: '#CA927B', color: '#000', padding: '4px 8px' }}>Ссылочке</span>
+      <Box flexDirection="column" gap="4px">
+        <span
+          style={{
+            backgroundColor: "#CA927B",
+            color: "#000",
+            padding: "4px 8px",
+          }}
+        >
+          Ссылочке
+        </span>
 
-        <Box gap="4px" flexDirection="column" padding="0px 8px 0px 8px">
-          {links.map(link => (
+        <Box flexDirection="column" gap="4px" padding="0px 8px 0px 8px">
+          {links.map((link) => (
             <Box key={link.text}>
               <Link href={link.href}>
-                <a target="_blank">
-                  {link.text}
-                </a>
+                <a target="_blank">{link.text}</a>
               </Link>
             </Box>
           ))}

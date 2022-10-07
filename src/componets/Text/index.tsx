@@ -1,11 +1,11 @@
-import { CSSProperties } from 'react';
-import styled from 'styled-components';
+import type { CSSProperties } from "react";
+import styled from "styled-components";
 
 interface Props {
   color?: string;
   fontSize?: string;
-  fontStyle?: CSSProperties['fontStyle'];
-  fontWeight?: CSSProperties['fontWeight'];
+  fontStyle?: CSSProperties["fontStyle"];
+  fontWeight?: CSSProperties["fontWeight"];
 }
 
 export const Text = styled.span<Props>`

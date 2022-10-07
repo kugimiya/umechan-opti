@@ -1,9 +1,10 @@
-import 'src/styles/variables.css'
-import 'src/styles/globals.css'
+import "src/styles/variables.css";
+import "src/styles/globals.css";
 
-import type { AppProps } from 'next/app';
-import { theme } from 'src/theme';
-import { ThemeProvider } from 'styled-components';
+import type { AppProps } from "next/app";
+import { ThemeProvider } from "styled-components";
+
+import { theme } from "src/theme";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

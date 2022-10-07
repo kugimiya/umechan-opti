@@ -1,3 +1,5 @@
-import { Board } from "../board";
+import type { Board } from "../board";
 
-export type Page<T = unknown> = T & { boards: Board[] };
+export type Page<T> = {
+  boards: Board[];
+} & T;

@@ -1,30 +1,30 @@
-import { CSSProperties } from 'react';
-import styled from 'styled-components';
+import type { CSSProperties } from "react";
+import styled from "styled-components";
 
 interface Props {
-  display?: CSSProperties['display'];
+  display?: CSSProperties["display"];
 
-  flexDirection?: CSSProperties['flexDirection'];
-  justifyContent?: CSSProperties['justifyContent'];
-  alignItems?: CSSProperties['alignItems'];
-  flexGrow?: CSSProperties['flexGrow'];
-  flexWrap?: CSSProperties['flexWrap'];
+  flexDirection?: CSSProperties["flexDirection"];
+  justifyContent?: CSSProperties["justifyContent"];
+  alignItems?: CSSProperties["alignItems"];
+  flexGrow?: CSSProperties["flexGrow"];
+  flexWrap?: CSSProperties["flexWrap"];
 
-  gap?: CSSProperties['gap'];
-  padding?: CSSProperties['padding'];
-  margin?: CSSProperties['margin'];
+  gap?: CSSProperties["gap"];
+  padding?: CSSProperties["padding"];
+  margin?: CSSProperties["margin"];
 
-  width?: CSSProperties['width'];
-  minWidth?: CSSProperties['minWidth'];
-  maxWidth?: CSSProperties['maxWidth'];
+  width?: CSSProperties["width"];
+  minWidth?: CSSProperties["minWidth"];
+  maxWidth?: CSSProperties["maxWidth"];
 
-  height?: CSSProperties['height'];
-  minHeight?: CSSProperties['minHeight'];
-  maxHeight?: CSSProperties['maxHeight'];
+  height?: CSSProperties["height"];
+  minHeight?: CSSProperties["minHeight"];
+  maxHeight?: CSSProperties["maxHeight"];
 }
 
 export const Box = styled.div<Props>`
-  display: ${(props) => props.display || 'flex'};
+  display: ${(props) => props.display || "flex"};
   flex-direction: ${(props) => props.flexDirection};
   justify-content: ${(props) => props.justifyContent};
   align-items: ${(props) => props.alignItems};

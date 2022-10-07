@@ -1,31 +1,62 @@
-import { Post } from "src/types/post";
+import type { Post } from "src/types/post";
+
 import { Box } from "../Box";
 
-export const PostMedia = ({ post }:{ post: Post }) => {
-  if (!Boolean(post.media)) {
+export function PostMedia({ post }: { post: Post }) {
+  if (!post.media) {
     return <></>;
   }
 
   return (
     <>
-      {Boolean(post.media?.images?.length) && (
-        <Box gap="16px" flexWrap="wrap">
-          {post.media?.images?.map((media) => (
-            <Box key={`${media.link}_${post.id}`} style={{ maxWidth: '100%' }}>
-              <a href={media.link} target="_blank" rel="noreferrer" style={{ position: 'relative', width: 'auto', maxWidth: '100%', height: '248px' }}>
-                <img src={media.preview || ''} alt={media.preview} height="248px" style={{ maxWidth: '100%' }} />
+      {Boolean(post.media.images?.length) && (
+        <Box flexWrap="wrap" gap="16px">
+          {post.media.images?.map((media) => (
+            <Box key={`${media.link}_${post.id}`} style={{ maxWidth: "100%" }}>
+              <a
+                href={media.link}
+                rel="noreferrer"
+                style={{
+                  position: "relative",
+                  width: "auto",
+                  maxWidth: "100%",
+                  height: "248px",
+                }}
+                target="_blank"
+              >
+                <img
+                  alt={media.preview}
+                  height="248px"
+                  src={media.preview || ""}
+                  style={{ maxWidth: "100%" }}
+                />
               </a>
             </Box>
           ))}
         </Box>
       )}
 
-      {Boolean(post.media?.youtubes?.length) && (
-        <Box gap="16px" flexWrap="wrap">
-          {post.media?.youtubes?.map((media) => (
-            <Box key={`${media.link}_${post.id}`} style={{ maxWidth: '100%' }}>
-              <a href={media.link} target="_blank" rel="noreferrer" style={{ position: 'relative', width: 'auto', maxWidth: '100%', height: '248px' }}>
-                <img src={media.preview || ''} alt={media.preview} height="248px" style={{ maxWidth: '100%' }} />
+      {Boolean(post.media.youtubes?.length) && (
+        <Box flexWrap="wrap" gap="16px">
+          {post.media.youtubes?.map((media) => (
+            <Box key={`${media.link}_${post.id}`} style={{ maxWidth: "100%" }}>
+              <a
+                href={media.link}
+                rel="noreferrer"
+                style={{
+                  position: "relative",
+                  width: "auto",
+                  maxWidth: "100%",
+                  height: "248px",
+                }}
+                target="_blank"
+              >
+                <img
+                  alt={media.preview}
+                  height="248px"
+                  src={media.preview || ""}
+                  style={{ maxWidth: "100%" }}
+                />
               </a>
             </Box>
           ))}
@@ -33,4 +64,4 @@ export const PostMedia = ({ post }:{ post: Post }) => {
       )}
     </>
   );
-};
+}

@@ -1,12 +1,12 @@
-import { Post } from "./post";
+import type { Post } from "./post";
 
-export type Board = {
-    id: number;
-    tag: string;
-    name: string;
-    threads_count: number;
-};
+export interface Board {
+  id: number;
+  tag: string;
+  name: string;
+  threads_count: number;
+}
 
-export type BoardData = Board & {
-    threads: Post[];
-};
+export interface BoardData extends Board {
+  threads: Post[];
+}
