@@ -40,10 +40,15 @@ function Home({
         >
           Добро ??? пожаловать на Шизач;
         </h1>
+
         <h4>Новости этого клиента чана:</h4>
-        {news.replies.reverse().map((post) => (
-          <NewsPostComponent key={post.id} post={post} />
-        ))}
+        {news.replies
+          .reverse()
+          .filter((post) => NEWS_THREAD.whitelist.includes(Number(post.id).toString()))
+          .map((post) => (
+            <NewsPostComponent key={post.id} post={post} />
+          ))}
+
         <h4>Новости чана:</h4>
         {allNews.threads
           .filter((post) => post.id !== Number(NEWS_THREAD.threadId))
