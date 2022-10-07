@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RADIOS_LINKS } from "src/constants";
 
 import type { Board } from "../../types/board";
 import { Box } from "../Box";
@@ -65,6 +66,22 @@ export default function Navbar({
           ))}
         </Box>
       </Box>
+
+      {RADIOS_LINKS.map((item) => (
+        <Box key={item.name} flexDirection="column">
+          <span
+            style={{
+              backgroundColor: "#CA927B",
+              color: "#000",
+              padding: "4px 8px",
+            }}
+          >
+            Радио {item.name}
+          </span>
+
+          <audio src={item.link} controls autoPlay />
+        </Box>
+      ))}
     </Box>
   );
 }
