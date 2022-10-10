@@ -8,6 +8,7 @@ import { Board } from 'src/services';
 import { isServer } from 'src/utils/isServer';
 import { randomInteger } from 'src/utils/randomInteger';
 
+import { RadioPlayer } from '../RadioPlayer';
 import { Tab } from '../Tab';
 
 const bannersHrefs = [
@@ -98,6 +99,16 @@ export const Navbar = memo(function NavbarMemoized({ boards }: NavbarProps): JSX
         overflow='hidden'
       >
         <Image alt='Banner' height={100} src={bannerSrc} width={300} />
+      </Box>
+
+      <Box
+        justifyContent='center'
+        width='100%'
+        border='colorBgSecondary'
+        borderRadius='4px'
+        overflow='hidden'
+      >
+        <RadioPlayer mount='neformat' url='http://kugi.club:8000/neformat.mp3' />
       </Box>
     </Box>
   );
