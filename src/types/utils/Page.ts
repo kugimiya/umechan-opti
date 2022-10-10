@@ -1,4 +1,4 @@
-import type { Board } from "../board";
+import type { Board } from '../board';
 
 export type Page<T> = {
   boards: Board[];

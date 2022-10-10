@@ -1,10 +1,9 @@
-import type { AxiosError } from "axios";
-import type { NextApiRequest, NextApiResponse } from "next";
-
-import { createPost } from "src/utils/service";
+import type { AxiosError } from 'axios';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { BoardService } from 'src/services';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  createPost(req.body)
+  BoardService.createPost(req.body)
     .then((p) => {
       res.status(200).json(p);
     })

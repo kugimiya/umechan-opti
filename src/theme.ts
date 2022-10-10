@@ -1,6 +1,12 @@
-import type { DefaultTheme } from "styled-components";
+import { DefaultTheme } from 'styled-components';
 
 export const theme: DefaultTheme = {
-  pageBackground: "#ddd",
-  defaultFontSize: "14px",
+  colors: {
+    colorTextPrimary: '#282C4A',
+    colorTextLink: '#9E402C',
+    colorButtonPrimary: '#FFFFFF',
+    colorBgSecondary: '#D9AF9E',
+    colorBgPrimary: '#EDDAD2',
+    colorGreen: '#60834B',
+  },
 };

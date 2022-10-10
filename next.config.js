@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   compiler: {
@@ -13,7 +13,11 @@ module.exports = {
     buildActivityPosition: 'bottom-right',
   },
   output: 'standalone',
-  images: {
-    domains: ['filestore.scheoble.xyz']
-  }
-}
+  rewrites: async () => ({
+    beforeFiles: [
+      { source: '/back-api/:path*', destination: 'http://pissykaka.scheoble.xyz/:path*' },
+    ],
+  }),
+};
+
+module.exports = nextConfig;
