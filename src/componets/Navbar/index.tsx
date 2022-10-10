@@ -79,7 +79,7 @@ export default function Navbar({
             Радио {item.name}
           </span>
 
-          <audio src={item.link} controls autoPlay />
+          <audio src={item.link} controls />
         </Box>
       ))}
     </Box>
