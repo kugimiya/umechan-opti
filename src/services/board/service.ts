@@ -2,11 +2,11 @@ import axios from 'axios';
 import { NEWS_THREAD, PAGE_SIZE } from 'src/constants';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
-import { Board, BoardData, ThreadData } from './types';
+import { Board, BoardData, Post, ThreadData } from './types';
 
 export const BoardService = {
   async getAllBoards() {
-    return (await axios.get<ApiResponse<{ boards: Board[] }>>('/board/all')).data;
+    return (await axios.get<ApiResponse<{ boards: Board[]; posts: Post[] }>>('/v2/board')).data;
   },
 
   async getBoard(tag: string, page = 0) {
