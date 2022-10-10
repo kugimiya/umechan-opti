@@ -13,7 +13,7 @@ const currentYear = getYear(new Date());
 
 export function BoardThread({ post }: { post: Post }): JSX.Element {
   const date = fromUnixTime(Number(post.timestamp));
-  const time = format(date, currentYear === getYear(date) ? 'HH:MM LLLL dd' : 'HH:MM dd.LL.yyyy');
+  const time = format(date, currentYear === getYear(date) ? 'HH:mm LLLL dd' : 'HH:mm dd.LL.yyyy');
 
   const isThreadPostAction = (
     <Link href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}`}>
