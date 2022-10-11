@@ -2,42 +2,66 @@ import { useState } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 import { useRadioData } from 'src/services';
+import styled from 'styled-components';
+
+const RotatingBox = styled(Box)`
+  animation: rotation 20s infinite linear;
+  transition: 1s all;
+
+  &:hover {
+    animation: none;
+    border-radius: 4px;
+  }
+
+  @keyframes rotation {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const Img = styled('img')`
+  max-width: 128px;
+  transition: 1s all;
+
+  &:hover {
+    max-width: 256px;
+  }
+`;
 
 export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
   const radioData = useRadioData();
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const Comp = isPlaying ? RotatingBox : Box;
+
   const content = radioData.data?.streaming ? (
     <>
-      <Box gap='8px' width='100%'>
-        <Box borderRadius='4px' overflow='hidden'>
-          <img
+      <Box flexDirection='column' alignItems='center'>
+        <Text variant={TextVariant.textBody1}>
+          <Text variant={TextVariant.textBodyBold1}>{mount}</Text> [
+          {radioData.data?.playlistData?.name}]
+        </Text>
+      </Box>
+
+      <Box gap='8px' width='100%' justifyContent='center'>
+        <Comp borderRadius='100%' overflow='hidden'>
+          <Img
             src={`/back-api/radio/thumb/${radioData.data.currentFile}`}
             alt={radioData.data?.fileData?.id3Artist}
-            style={{ width: '100%', maxWidth: '64px', height: 'auto' }}
+            style={{ width: '100%', height: 'auto' }}
           />
-        </Box>
+        </Comp>
+      </Box>
 
-        <Box flexDirection='column'>
-          <Text variant={TextVariant.textInput}>
-            mount: <Text variant={TextVariant.textButton}>{mount}</Text>
-          </Text>
-
-          <Text variant={TextVariant.textInput}>
-            playlist:{' '}
-            <Text variant={TextVariant.textButton}>{radioData.data?.playlistData?.name}</Text>
-          </Text>
-
-          <Text variant={TextVariant.textInput}>
-            artist:{' '}
-            <Text variant={TextVariant.textButton}>{radioData.data?.fileData?.id3Artist}</Text>
-          </Text>
-
-          <Text variant={TextVariant.textInput}>
-            title:{' '}
-            <Text variant={TextVariant.textButton}>{radioData.data?.fileData?.id3Title}</Text>
-          </Text>
-        </Box>
+      <Box flexDirection='column' alignItems='center'>
+        <Text variant={TextVariant.textBodyBold1}>
+          {radioData.data?.fileData?.id3Artist} - {radioData.data?.fileData?.id3Title}
+        </Text>
       </Box>
 
       <audio src={url} id={`radio_${mount}`} />
@@ -84,7 +108,7 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
   return (
     <Box
       flexDirection='column'
-      alignItems='flex-start'
+      alignItems='center'
       justifyContent='flex-start'
       padding='8px'
       gap='8px'
