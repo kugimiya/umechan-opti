@@ -44,6 +44,14 @@ export function BoardThread({ post }: { post: Post }): JSX.Element {
       <PostMedia post={post} />
       <PostText post={post} />
 
+      {Boolean(post.estimate) && (
+        <Box margin='10px 0'>
+          <Text variant={TextVariant.textBodyBold1}>
+            Пропущено {post.estimate} постов. {isThreadPostAction}
+          </Text>
+        </Box>
+      )}
+
       {Boolean(post.replies) &&
         post.replies?.map((reply) => <PostComponent key={reply.id} post={reply} />)}
     </Box>
