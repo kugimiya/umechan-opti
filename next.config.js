@@ -12,6 +12,7 @@ const nextConfig = {
   devIndicators: {
     buildActivityPosition: 'bottom-right',
   },
+  output: 'standalone',
   rewrites: async () => ({
     beforeFiles: [
       { source: '/back-api/radio/status', destination: 'http://buk:3001/api/status' },
