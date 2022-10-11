@@ -7,8 +7,8 @@ const FormData = require('form-data');
 
 const formidableConfig = {
   keepExtensions: true,
-  maxFileSize: 100_000_000,
-  maxFieldsSize: 100_000_000,
+  maxFileSize: 500_000_000,
+  maxFieldsSize: 500_000_000,
   maxFields: 15,
   allowEmptyFiles: true,
   multiples: true,
@@ -71,6 +71,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
   },
 };
