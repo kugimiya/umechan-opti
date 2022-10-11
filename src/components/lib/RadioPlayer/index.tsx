@@ -26,7 +26,7 @@ const RotatingBox = styled(Box)`
 `;
 
 const HoveredBox = styled(Box)`
-  border-radius: 100%;
+  border-radius: 4px;
   transition: 0.1s all;
 
   &:hover {
