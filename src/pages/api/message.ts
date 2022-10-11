@@ -7,8 +7,8 @@ const FormData = require('form-data');
 
 const formidableConfig = {
   keepExtensions: true,
-  maxFileSize: 10_000_000,
-  maxFieldsSize: 10_000_000,
+  maxFileSize: 100_000_000,
+  maxFieldsSize: 100_000_000,
   maxFields: 15,
   allowEmptyFiles: true,
   multiples: true,
