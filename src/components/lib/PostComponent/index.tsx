@@ -25,8 +25,14 @@ export function PostComponent({ post }: { post: Post }): JSX.Element {
       <Box justifyContent='space-between' width='100%'>
         <Box alignItems='baseline' gap='10px'>
           {Boolean(post.subject) && <Text variant={TextVariant.textBodyBold1}>{post.subject}</Text>}
-          <Text variant={TextVariant.textBodyBold1}>{post.poster || 'Anon'}</Text>
+
+          <Text variant={TextVariant.textBodyBold1}>
+            {post.is_verify && <Text title='Имеет паспорт вакцинации'>🔰 </Text>}
+            {post.poster || 'Anon'}
+          </Text>
+
           <Text>{time}</Text>
+
           <Link href={`/thread/${post.parent_id || post.id}#post_${post.id}`} passHref>
             <A>#{post.id}</A>
           </Link>
