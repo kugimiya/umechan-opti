@@ -55,6 +55,7 @@ export const BoardPage = memo(function BoardPageMemoized(): JSX.Element {
                 mode='thread'
                 parentBoardId={rolter.query.tag?.toString() || ''}
                 onCreate={() => boardData.refetch()}
+                changeVisibility={setCreateFormVisible}
               />
             )}
             <Pager pages={pages} />

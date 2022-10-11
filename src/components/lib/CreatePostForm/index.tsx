@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Box } from 'src/components/common/Box';
 import { Text } from 'src/components/common/Text';
@@ -27,11 +28,13 @@ export function CreatePostForm({
   parentPostId,
   parentBoardId,
   onCreate,
+  changeVisibility,
 }: {
   mode: 'post' | 'thread';
   parentPostId?: string;
   parentBoardId?: string;
   onCreate: () => void;
+  changeVisibility: (flag: boolean) => void;
 }) {
   const form = useForm<FormStruct>();
   const handler = async (data: FormStruct) => {
@@ -60,6 +63,21 @@ export function CreatePostForm({
     onCreate();
     isSendState = false;
   };
+
+  useEffect(() => {
+    const evHandler = ({ postId }: { postId: number }) => {
+      console.log(postId);
+      form.setValue(
+        'text',
+        `${form.getValues('text')}${form.getValues('text').length ? '\n\n' : ''}>>${postId}\n`,
+      );
+    };
+
+    // @ts-ignore
+    window.addEventListener('reply_at_post', evHandler);
+    // @ts-ignore
+    return () => window.removeEventListener('reply_at_post', evHandler);
+  }, []);
 
   return (
     <Form
@@ -103,7 +121,10 @@ export function CreatePostForm({
         />
       </Box>
 
-      <Box>
+      <Box justifyContent='flex-end' gap='10px'>
+        <button type='button' onClick={() => changeVisibility(false)}>
+          Скрыть
+        </button>
         <button type='submit'>{mode === 'thread' ? 'Создать тред' : 'Ответить'}</button>
       </Box>
     </Form>

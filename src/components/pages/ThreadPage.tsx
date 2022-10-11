@@ -19,6 +19,18 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
     return <Text>Грузим</Text>;
   }
 
+  const handleReply = (id: number | string) => {
+    setCreateFormVisible(true);
+
+    setTimeout(() => {
+      const event = new Event('reply_at_post');
+      // @ts-ignore потому что лень ебаться с тем чтобы положить в глобальный интерфейс Event поле postId
+      event.postId = id;
+
+      window.dispatchEvent(event);
+    }, 250);
+  };
+
   return (
     <>
       <Head>
@@ -37,13 +49,14 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
                 parentBoardId={rolter.query.tag?.toString() || ''}
                 parentPostId={rolter.query.id?.toString() || ''}
                 onCreate={() => threadData.refetch()}
+                changeVisibility={setCreateFormVisible}
               />
             )}
 
-            <PostComponent post={thread} />
+            <PostComponent post={thread} onReply={(id) => handleReply(id)} />
 
             {thread.replies?.map((post) => (
-              <PostComponent key={post.id} post={post} />
+              <PostComponent key={post.id} post={post} onReply={(id) => handleReply(id)} />
             ))}
           </Box>
         </Tab>

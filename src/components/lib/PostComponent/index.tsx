@@ -1,6 +1,4 @@
 import { format, fromUnixTime, getYear } from 'date-fns';
-import Link from 'next/link';
-import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 import { Post } from 'src/services';
@@ -10,7 +8,13 @@ import { PostText } from '../PostText';
 
 const currentYear = getYear(new Date());
 
-export function PostComponent({ post }: { post: Post }): JSX.Element {
+export function PostComponent({
+  post,
+  onReply,
+}: {
+  post: Post;
+  onReply?: (postId: string | number) => void;
+}): JSX.Element {
   const date = fromUnixTime(Number(post.timestamp));
   const time = format(date, currentYear === getYear(date) ? 'HH:mm LLLL dd' : 'HH:mm dd.LL.yyyy');
 
@@ -33,9 +37,18 @@ export function PostComponent({ post }: { post: Post }): JSX.Element {
 
           <Text>{time}</Text>
 
-          <Link href={`/thread/${post.parent_id || post.id}#post_${post.id}`} passHref>
-            <A>#{post.id}</A>
-          </Link>
+          <Text
+            onClick={() => {
+              if (onReply) {
+                onReply(post.id || '');
+              }
+            }}
+            style={{ cursor: 'pointer' }}
+            color='colorTextLink'
+            variant={TextVariant.textBodyBold1}
+          >
+            #{post.id}
+          </Text>
         </Box>
       </Box>
 
