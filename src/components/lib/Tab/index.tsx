@@ -13,9 +13,18 @@ export const Tab = memo(function TabMemoized({
 }): JSX.Element {
   return (
     <Box width='100%' flexDirection='column'>
-      <Box padding='12px 8px' backgroundColor='colorBgSecondary' justifyContent='space-between'>
+      <Box
+        padding='12px 8px'
+        backgroundColor='colorBgSecondary'
+        justifyContent='space-between'
+        maxHeight='40px'
+      >
         <Text variant={TextVariant.textBodyBold1}>{title}</Text>
-        {Boolean(action) && <button onClick={() => action?.on()}>{action?.title}</button>}
+        {Boolean(action) && (
+          <button onClick={() => action?.on()} style={{ padding: '0 10px', lineHeight: '0' }}>
+            {action?.title}
+          </button>
+        )}
       </Box>
 
       <Box flexDirection='column' padding='12px' gap='6px'>
