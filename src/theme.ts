@@ -9,4 +9,5 @@ export const theme: DefaultTheme = {
     colorBgPrimary: '#EDDAD2',
     colorGreen: '#60834B',
   },
+  mobileBreakpoint: `(max-width: 768px)`,
 };

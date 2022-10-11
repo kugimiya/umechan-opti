@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Box } from 'src/components/common/Box';
 import { Text } from 'src/components/common/Text';
+import { theme } from 'src/theme';
+import styled from 'styled-components';
 
 interface FormStruct {
   nickname: string;
@@ -9,6 +11,19 @@ interface FormStruct {
   text: string;
   file: FileList;
 }
+
+const Container = styled(Box)`
+  position: fixed;
+  top: 70px;
+  right: 50px;
+
+  @media ${theme.mobileBreakpoint} {
+    right: 0;
+    left: 0;
+    bottom: 0;
+    top: unset;
+  }
+`;
 
 const Form = Box.withComponent('form');
 let isSendState = false;
@@ -103,64 +118,65 @@ export function CreatePostForm({
   }, []);
 
   return (
-    <Form
-      flexDirection='column'
-      gap='16px'
-      onSubmit={form.handleSubmit(handler, () => {
-        alert('Чот ты не то заполнил в форме, братка; наверн текст забыл');
-      })}
-      padding='8px'
-      border='colorBgSecondary'
-      backgroundColor='colorBgPrimary'
-      borderRadius='4px'
-      style={{ position: 'fixed', top: '70px', right: '50px' }}
-      width='460px'
-    >
-      <Box gap='16px'>
-        <Box minWidth='50px' width='50px'>
-          <Text>Ник</Text>
-        </Box>
-        <input {...form.register('nickname', { required: false })} />
-      </Box>
-
-      <Box gap='16px'>
-        <Box minWidth='50px' width='50px'>
-          <Text>Тема</Text>
-        </Box>
-        <input {...form.register('subject', { required: false })} />
-      </Box>
-
-      <Box gap='16px'>
-        <Box minWidth='50px' width='50px'>
-          <Text>Текст</Text>
-        </Box>
-        <textarea
-          style={{
-            minWidth: 'calc(100% - 66px)',
-            width: '100%',
-            height: '128px',
-          }}
-          {...form.register('text', { required: true })}
-        />
-      </Box>
-
-      <Box gap='16px'>
-        <Box minWidth='50px' width='50px'>
-          <Text>Пикчи</Text>
+    <Container>
+      <Form
+        flexDirection='column'
+        gap='16px'
+        onSubmit={form.handleSubmit(handler, () => {
+          alert('Чот ты не то заполнил в форме, братка; наверн текст забыл');
+        })}
+        padding='8px'
+        border='colorBgSecondary'
+        backgroundColor='colorBgPrimary'
+        borderRadius='4px'
+        width='460px'
+      >
+        <Box gap='16px'>
+          <Box minWidth='50px' width='50px'>
+            <Text>Ник</Text>
+          </Box>
+          <input {...form.register('nickname', { required: false })} />
         </Box>
 
-        <input type='file' accept='image/*' multiple {...form.register('file')} />
-      </Box>
+        <Box gap='16px'>
+          <Box minWidth='50px' width='50px'>
+            <Text>Тема</Text>
+          </Box>
+          <input {...form.register('subject', { required: false })} />
+        </Box>
 
-      <Box justifyContent='flex-end' gap='10px'>
-        <button type='button' onClick={() => changeVisibility(false)} disabled={sending}>
-          Скрыть
-        </button>
+        <Box gap='16px'>
+          <Box minWidth='50px' width='50px'>
+            <Text>Текст</Text>
+          </Box>
+          <textarea
+            style={{
+              minWidth: 'calc(100% - 66px)',
+              width: '100%',
+              height: '128px',
+            }}
+            {...form.register('text', { required: true })}
+          />
+        </Box>
 
-        <button type='submit' disabled={sending}>
-          {sending ? 'Отправка...' : mode === 'thread' ? 'Создать тред' : 'Ответить'}
-        </button>
-      </Box>
-    </Form>
+        <Box gap='16px'>
+          <Box minWidth='50px' width='50px'>
+            <Text>Пикчи</Text>
+          </Box>
+
+          <input type='file' accept='image/*' multiple {...form.register('file')} />
+        </Box>
+
+        <Box justifyContent='flex-end' gap='10px'>
+          <button type='button' onClick={() => changeVisibility(false)} disabled={sending}>
+            Скрыть
+          </button>
+
+          <button type='submit' disabled={sending}>
+            {sending ? 'Отправка...' : mode === 'thread' ? 'Создать тред' : 'Ответить'}
+          </button>
+        </Box>
+      </Form>
+    </Container>
   );
 }
