@@ -6,7 +6,8 @@ import styled from 'styled-components';
 
 const RotatingBox = styled(Box)`
   animation: rotation 20s infinite linear;
-  transition: 1s all;
+  transition: 0.1s all;
+  border-radius: 100%;
 
   &:hover {
     animation: none;
@@ -24,9 +25,19 @@ const RotatingBox = styled(Box)`
   }
 `;
 
+const HoveredBox = styled(Box)`
+  border-radius: 100%;
+  transition: 0.1s all;
+
+  &:hover {
+    animation: none;
+    border-radius: 4px;
+  }
+`;
+
 const Img = styled('img')`
   max-width: 128px;
-  transition: 1s all;
+  transition: 0.1s all;
 
   &:hover {
     max-width: 256px;
@@ -37,7 +48,7 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
   const radioData = useRadioData();
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const Comp = isPlaying ? RotatingBox : Box;
+  const Comp = isPlaying ? RotatingBox : HoveredBox;
 
   const content = radioData.data?.streaming ? (
     <>
