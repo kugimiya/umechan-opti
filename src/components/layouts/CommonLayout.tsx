@@ -21,7 +21,7 @@ export const CommonLayout = memo(function CommonLayoutMemoized({
       backgroundColor='colorBgPrimary'
       alignItems='flex-start'
     >
-      <Box width='100%' maxWidth='256px'>
+      <Box width='100%' maxWidth='256px' style={{ position: 'sticky', top: '10px' }}>
         <Navbar boards={allBoardsData.data?.payload?.boards || []} />
       </Box>
 
