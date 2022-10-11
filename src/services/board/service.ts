@@ -35,7 +35,7 @@ export const BoardService = {
   },
 
   async createPost(data: Record<string, unknown>) {
-    return axios.post('/post', data, { baseURL: 'http://pissykaka.scheoble.xyz/' });
+    await axios.post('/post', data, { baseURL: 'http://pissykaka.scheoble.xyz/' });
   },
 
   async getRadioStatus() {

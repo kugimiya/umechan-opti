@@ -1,27 +1,45 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Box } from 'src/components/common/Box';
 import { Text } from 'src/components/common/Text';
-import { theme } from 'src/theme';
 
 interface FormStruct {
   nickname: string;
   subject: string;
   text: string;
+  file: FileList;
 }
 
 const Form = Box.withComponent('form');
 let isSendState = false;
 
-const createPost = async (data: unknown) =>
-  await fetch('/api/message', {
-    method: 'POST',
-    body: JSON.stringify(data),
+const createPost = async (data: {
+  tag?: string;
+  parent_id?: string;
+  subject?: string;
+  poster?: string;
+  message?: string;
+  file?: FileList;
+}) => {
+  const formData = new FormData();
 
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(async (r) => await r.json());
+  [...(data.file || [])].forEach((element, index) => {
+    formData.append(`file[${index}]`, element);
+  });
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (key === 'file') {
+      return;
+    }
+
+    formData.append(key, value as string);
+  });
+
+  return await fetch('/api/message', {
+    method: 'POST',
+    body: formData,
+  });
+};
 
 export function CreatePostForm({
   mode,
@@ -36,12 +54,14 @@ export function CreatePostForm({
   onCreate: () => void;
   changeVisibility: (flag: boolean) => void;
 }) {
+  const [sending, setSending] = useState(false);
   const form = useForm<FormStruct>();
   const handler = async (data: FormStruct) => {
     if (isSendState) {
       return;
     }
 
+    setSending(true);
     isSendState = true;
 
     await (mode === 'post'
@@ -51,17 +71,20 @@ export function CreatePostForm({
           message: data.text,
           tag: parentBoardId,
           parent_id: parentPostId,
+          file: data.file,
         })
       : createPost({
           poster: data.nickname,
           subject: data.subject,
           message: data.text,
           tag: parentBoardId,
+          file: data.file,
         }));
 
     form.reset();
     onCreate();
     isSendState = false;
+    setSending(false);
   };
 
   useEffect(() => {
@@ -121,11 +144,22 @@ export function CreatePostForm({
         />
       </Box>
 
+      <Box gap='16px'>
+        <Box minWidth='50px' width='50px'>
+          <Text>Пикчи</Text>
+        </Box>
+
+        <input type='file' accept='image/*' multiple {...form.register('file')} />
+      </Box>
+
       <Box justifyContent='flex-end' gap='10px'>
-        <button type='button' onClick={() => changeVisibility(false)}>
+        <button type='button' onClick={() => changeVisibility(false)} disabled={sending}>
           Скрыть
         </button>
-        <button type='submit'>{mode === 'thread' ? 'Создать тред' : 'Ответить'}</button>
+
+        <button type='submit' disabled={sending}>
+          {sending ? 'Отправка...' : mode === 'thread' ? 'Создать тред' : 'Ответить'}
+        </button>
       </Box>
     </Form>
   );
