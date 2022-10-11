@@ -29,3 +29,10 @@ export const useThreadData = (threadId: string) => {
     enabled: true,
   });
 };
+
+export const useRadioData = () => {
+  return useQuery(['radio status'], () => BoardService.getRadioStatus(), {
+    enabled: true,
+    refetchInterval: 2500,
+  });
+};

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { NEWS_THREAD, PAGE_SIZE } from 'src/constants';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
-import { Board, BoardData, Post, ThreadData } from './types';
+import { Board, BoardData, Post, RadioStatus, ThreadData } from './types';
 
 export const BoardService = {
   async getAllBoards() {
@@ -36,5 +36,9 @@ export const BoardService = {
 
   async createPost(data: Record<string, unknown>) {
     return axios.post('/post', data, { baseURL: 'http://pissykaka.scheoble.xyz/' });
+  },
+
+  async getRadioStatus() {
+    return (await axios.get<RadioStatus>(`/radio/status`)).data;
   },
 };
