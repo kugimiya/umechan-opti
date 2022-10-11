@@ -53,7 +53,7 @@ export const Navbar = memo(function NavbarMemoized({ boards }: NavbarProps): JSX
       setBannerSrc(bannersHrefs[randomInteger(0, bannersHrefs.length)] || bannersHrefs[0]);
     }, 30000);
 
-    return clearInterval(timer);
+    return () => clearInterval(timer);
   }, []);
 
   return (
