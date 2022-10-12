@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { memo, useState } from 'react';
 import { Text } from 'src/components/common/Text';
+import { PostsContext } from 'src/hooks/usePostsContext';
 import { useThreadData } from 'src/services';
 
 import { Box } from '../common/Box';
@@ -37,30 +38,32 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
         <title>Юмечан :: {thread.subject}</title>
       </Head>
 
-      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>
-        <Tab
-          title={`Тред: ${thread.subject}`}
-          action={{ title: 'Ответить', on: () => setCreateFormVisible((_) => !_) }}
-        >
-          <Box gap='10px' flexDirection='column' alignItems='flex-start'>
-            {createFormVisible && (
-              <CreatePostForm
-                mode='post'
-                parentBoardId={rolter.query.tag?.toString() || ''}
-                parentPostId={rolter.query.id?.toString() || ''}
-                onCreate={() => threadData.refetch()}
-                changeVisibility={setCreateFormVisible}
-              />
-            )}
+      <PostsContext.Provider value={{ posts: thread.replies || [] }}>
+        <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>
+          <Tab
+            title={`Тред: ${thread.subject}`}
+            action={{ title: 'Ответить', on: () => setCreateFormVisible((_) => !_) }}
+          >
+            <Box gap='10px' flexDirection='column' alignItems='flex-start'>
+              {createFormVisible && (
+                <CreatePostForm
+                  mode='post'
+                  parentBoardId={rolter.query.tag?.toString() || ''}
+                  parentPostId={rolter.query.id?.toString() || ''}
+                  onCreate={() => threadData.refetch()}
+                  changeVisibility={setCreateFormVisible}
+                />
+              )}
 
-            <PostComponent post={thread} onReply={(id) => handleReply(id)} />
+              <PostComponent post={thread} onReply={(id) => handleReply(id)} />
 
-            {thread.replies?.map((post) => (
-              <PostComponent key={post.id} post={post} onReply={(id) => handleReply(id)} />
-            ))}
-          </Box>
-        </Tab>
-      </Box>
+              {thread.replies?.map((post) => (
+                <PostComponent key={post.id} post={post} onReply={(id) => handleReply(id)} />
+              ))}
+            </Box>
+          </Tab>
+        </Box>
+      </PostsContext.Provider>
     </>
   );
 });
