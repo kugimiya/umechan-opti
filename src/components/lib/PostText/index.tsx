@@ -1,9 +1,13 @@
 import { parse, Syntax } from '@textlint/markdown-to-ast';
 import Link from 'next/link';
+import { useMemo } from 'react';
 import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
+import { usePostsContext } from 'src/hooks/usePostsContext';
 import { Post } from 'src/services';
+
+import { ReplyTreeItem } from '../ReplyTreeItem';
 
 const getKey = (root: ReturnType<typeof parse>) => {
   if (!root.loc) {
@@ -31,14 +35,28 @@ const fixText = (text: string): string => {
 };
 
 export function PostText({ post }: { post: Post }) {
+  const postsInThread = usePostsContext();
+
   return (
     <Box gap='8px' flexDirection='column' justifyContent='flex-start' alignItems='flex-start'>
-      <MD root={parse(fixText(post?.truncated_message || ''))} />
+      <MD
+        root={parse(fixText(post?.truncated_message || ''))}
+        post={post}
+        postsInThread={postsInThread.posts}
+      />
     </Box>
   );
 }
 
-function MD({ root }: { root: ReturnType<typeof parse> }) {
+function MD({
+  post,
+  postsInThread,
+  root,
+}: {
+  post: Post;
+  postsInThread: Post[];
+  root: ReturnType<typeof parse>;
+}) {
   const children = root.children as ReturnType<typeof parse>[];
 
   switch (root.type) {
@@ -51,9 +69,17 @@ function MD({ root }: { root: ReturnType<typeof parse> }) {
           <Text color='colorGreen' variant={TextVariant.textBody1}>
             {'>'}
             {children.map((subRoot) => (
-              <MD key={getKey(subRoot)} root={subRoot} />
+              <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
             ))}
           </Text>
+        );
+      }
+
+      const replyPost = postsInThread.find((p) => String(p.id) === String(num));
+
+      if (replyPost) {
+        return (
+          <ReplyTreeItem replyPost={replyPost} variant={TextVariant.textBody1} color='colorGreen' />
         );
       }
 
@@ -70,7 +96,7 @@ function MD({ root }: { root: ReturnType<typeof parse> }) {
       return (
         <Text variant={TextVariant.textBody1}>
           {children.map((subRoot) => (
-            <MD key={getKey(subRoot)} root={subRoot} />
+            <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
         </Text>
       );
@@ -82,7 +108,7 @@ function MD({ root }: { root: ReturnType<typeof parse> }) {
       return (
         <Text variant={TextVariant.textBody1} fontStyle='italic'>
           {children.map((subRoot) => (
-            <MD key={getKey(subRoot)} root={subRoot} />
+            <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
         </Text>
       );
@@ -91,7 +117,7 @@ function MD({ root }: { root: ReturnType<typeof parse> }) {
       return (
         <Text variant={TextVariant.textBodyBold1}>
           {children.map((subRoot) => (
-            <MD key={getKey(subRoot)} root={subRoot} />
+            <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
         </Text>
       );
@@ -105,7 +131,7 @@ function MD({ root }: { root: ReturnType<typeof parse> }) {
           }}
         >
           {children.map((subRoot) => (
-            <MD key={getKey(subRoot)} root={subRoot} />
+            <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
         </Text>
       );
@@ -114,7 +140,7 @@ function MD({ root }: { root: ReturnType<typeof parse> }) {
       return (
         <ul>
           {children.map((subRoot) => (
-            <MD key={getKey(subRoot)} root={subRoot} />
+            <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
         </ul>
       );
@@ -123,7 +149,7 @@ function MD({ root }: { root: ReturnType<typeof parse> }) {
       return (
         <li>
           {children.map((subRoot) => (
-            <MD key={getKey(subRoot)} root={subRoot} />
+            <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
         </li>
       );
@@ -169,7 +195,7 @@ function MD({ root }: { root: ReturnType<typeof parse> }) {
           color='colorTextLink'
         >
           {children.map((subRoot) => (
-            <MD key={getKey(subRoot)} root={subRoot} />
+            <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
         </A>
       );
@@ -178,7 +204,7 @@ function MD({ root }: { root: ReturnType<typeof parse> }) {
       return (
         <>
           {children?.map((subRoot) => (
-            <MD key={getKey(subRoot)} root={subRoot} />
+            <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
         </>
       );

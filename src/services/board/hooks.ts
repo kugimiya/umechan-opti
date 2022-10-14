@@ -33,6 +33,6 @@ export const useThreadData = (threadId: string) => {
 export const useRadioData = () => {
   return useQuery(['radio status'], () => BoardService.getRadioStatus(), {
     enabled: true,
-    refetchInterval: 2500,
+    refetchInterval: 5000,
   });
 };

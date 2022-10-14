@@ -44,10 +44,11 @@ export function BoardThread({ post }: { post: Post }): JSX.Element {
       <PostMedia post={post} />
       <PostText post={post} />
 
-      {Boolean(post.estimate) && (
+      {Boolean(Number(post.replies_count) - Number(post.replies?.length)) && (
         <Box margin='10px 0'>
           <Text variant={TextVariant.textBodyBold1}>
-            Пропущено {post.estimate} постов. {isThreadPostAction}
+            Пропущено {Number(post.replies_count) - Number(post.replies?.length)} постов.{' '}
+            {isThreadPostAction}
           </Text>
         </Box>
       )}

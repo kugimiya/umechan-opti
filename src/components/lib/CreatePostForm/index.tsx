@@ -17,6 +17,8 @@ const Container = styled(Box)`
   top: 70px;
   right: 50px;
 
+  z-index: 10;
+
   @media ${theme.mobileBreakpoint} {
     right: 0;
     left: 0;
@@ -73,6 +75,11 @@ export function CreatePostForm({
   const form = useForm<FormStruct>();
   const handler = async (data: FormStruct) => {
     if (isSendState) {
+      return;
+    }
+
+    if (!Boolean(data.text) && !Boolean(data.file?.length)) {
+      alert('Чот ты не то заполнил в форме, братка; наверн текст забыл или файлик');
       return;
     }
 
@@ -155,7 +162,7 @@ export function CreatePostForm({
               width: '100%',
               height: '128px',
             }}
-            {...form.register('text', { required: true })}
+            {...form.register('text', { required: false })}
           />
         </Box>
 
