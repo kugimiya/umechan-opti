@@ -1,9 +1,11 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Text } from 'src/components/common/Text';
 import { PostsContext } from 'src/hooks/usePostsContext';
+import { useSubscriptions } from 'src/hooks/useSubscriptions';
 import { useThreadData } from 'src/services';
+import { isServer } from 'src/utils/isServer';
 
 import { Box } from '../common/Box';
 import { CreatePostForm } from '../lib/CreatePostForm';
@@ -15,11 +17,25 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
   const rolter = useRouter();
   const threadData = useThreadData(rolter.query.id?.toString() || 'null');
   const thread = threadData.data?.payload.thread_data;
+  const subs = useSubscriptions();
+
+  useEffect(() => {
+    if (!thread) {
+      return;
+    }
+
+    if (!isServer() && Object.keys(subs.subsIds).includes(thread.id?.toString() || '__')) {
+      if (String(thread.replies.at(-1)?.id) !== subs.subsIds[rolter.query.id?.toString() || '']) {
+        subs.subscribe(thread.id?.toString() || '', String(thread.replies.at(-1)?.id));
+      }
+    }
+  }, [thread?.id, thread, subs.subsIds, subs]);
 
   if (!thread) {
     return <Text>Грузим</Text>;
   }
 
+  // TODO: вытащить в хук
   const handleReply = (id: number | string) => {
     setCreateFormVisible(true);
 
@@ -50,7 +66,10 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
                   mode='post'
                   parentBoardId={rolter.query.tag?.toString() || ''}
                   parentPostId={rolter.query.id?.toString() || ''}
-                  onCreate={() => threadData.refetch()}
+                  onCreate={() => {
+                    subs.subscribe(thread.id?.toString() || '', String(thread.replies.at(-1)?.id));
+                    threadData.refetch();
+                  }}
                   changeVisibility={setCreateFormVisible}
                 />
               )}

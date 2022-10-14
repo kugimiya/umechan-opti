@@ -36,3 +36,14 @@ export const useRadioData = () => {
     refetchInterval: 10000,
   });
 };
+
+export const useSubsData = (cursors: Record<string, string>) => {
+  return useQuery(
+    ['subs status', ...Object.values(cursors)],
+    () => BoardService.getSubsNewCursors(cursors),
+    {
+      enabled: true,
+      refetchInterval: 20000,
+    },
+  );
+};

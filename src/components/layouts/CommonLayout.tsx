@@ -5,6 +5,8 @@ import { useAllBoards } from 'src/services';
 import { theme } from 'src/theme';
 import styled from 'styled-components';
 
+import { SubsContainer } from '../lib/SubsContainer';
+
 const MainContainer = styled(Box)`
   @media ${theme.mobileBreakpoint} {
     flex-direction: column;
@@ -47,6 +49,8 @@ export const CommonLayout = memo(function CommonLayoutMemoized({
       <Box width='100%' maxWidth='1024px' flexDirection='column' flexGrow='1'>
         {children}
       </Box>
+
+      <SubsContainer boards={allBoardsData.data?.payload.boards || []} />
     </MainContainer>
   );
 });

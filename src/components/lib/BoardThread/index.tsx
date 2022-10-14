@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
+import { useSubscriptions } from 'src/hooks/useSubscriptions';
 import { Post } from 'src/services';
 
 import { CreatePostForm } from '../CreatePostForm';
@@ -23,6 +24,7 @@ export function BoardThread({
   const [createFormVisible, setCreateFormVisible] = useState(false);
   const date = fromUnixTime(Number(post.timestamp));
   const time = format(date, currentYear === getYear(date) ? 'HH:mm LLLL dd' : 'HH:mm dd.LL.yyyy');
+  const subs = useSubscriptions();
 
   const isThreadPostAction = (
     <Link href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}`}>
@@ -36,6 +38,20 @@ export function BoardThread({
     </Link>
   );
 
+  const subscribeAction = (
+    <Text
+      onClick={() =>
+        subs.subscribe(post.id?.toString() || '', post.replies?.at(-1)?.id?.toString() || '')
+      }
+      color='colorTextLink'
+      variant={TextVariant.textBodyBold1}
+      style={{ cursor: 'pointer' }}
+    >
+      Подписаться
+    </Text>
+  );
+
+  // TODO: вытащить в хук
   const handleReply = (id: number | string) => {
     setCreateFormVisible(true);
 
@@ -60,6 +76,7 @@ export function BoardThread({
         </Box>
 
         <Box>{isThreadPostAction}</Box>
+        <Box>{subscribeAction}</Box>
       </Box>
 
       <PostMedia post={post} />

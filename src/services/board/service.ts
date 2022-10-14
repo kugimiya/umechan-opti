@@ -41,4 +41,16 @@ export const BoardService = {
   async getRadioStatus() {
     return (await axios.get<RadioStatus>(`/radio/status`)).data;
   },
+
+  async getSubsNewCursors(oldCursors: Record<string, string>) {
+    return (
+      await axios.get<Record<string, { title: string; currentCursor: string; tag: string }>>(
+        `/api/cursors`,
+        {
+          baseURL: '/',
+          params: { cursors: oldCursors },
+        },
+      )
+    ).data;
+  },
 };

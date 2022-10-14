@@ -29,7 +29,7 @@ const Container = styled(Box)`
 
 const Form = Box.withComponent('form');
 let isSendState = false;
-
+// Вытищить в react-query
 const createPost = async (data: {
   tag?: string;
   parent_id?: string;
