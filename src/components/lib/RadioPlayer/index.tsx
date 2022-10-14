@@ -75,7 +75,7 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
         </Text>
       </Box>
 
-      <audio src={url} id={`radio_${mount}`} />
+      <audio src={`${url}?ts=${Date.now()}`} id={`radio_${mount}`} />
 
       <Box gap='8px'>
         <button
