@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 import { useRadioData } from 'src/services';
@@ -45,6 +45,7 @@ const Img = styled('img')`
 `;
 
 export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
+  const id = useId();
   const radioData = useRadioData();
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -75,7 +76,7 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
         </Text>
       </Box>
 
-      <audio src={`${url}?ts=${Date.now()}`} id={`radio_${mount}`} />
+      <audio src={`${url}?ts=${id}`} id={`radio_${mount}`} />
 
       <Box gap='8px'>
         <button
