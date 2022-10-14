@@ -25,11 +25,20 @@ export const ReplyTreeItem = ({
   color?: keyof typeof theme.colors;
 }) => {
   const [visible, setVisible] = useState(false);
+  const [pointer, setPointer] = useState<NodeJS.Timer>();
 
   return (
     <Box
-      onMouseEnter={() => setVisible(true)}
-      onMouseLeave={() => setVisible(false)}
+      onMouseEnter={() => {
+        clearTimeout(pointer);
+        setVisible(true);
+      }}
+      onMouseLeave={() => {
+        const ptr = setTimeout(() => {
+          setVisible(false);
+        }, 750);
+        setPointer(ptr);
+      }}
       style={{ cursor: 'pointer', position: 'relative' }}
     >
       <Popover
