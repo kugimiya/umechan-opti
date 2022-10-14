@@ -21,8 +21,8 @@ export const ReplyTreeItem = ({
   color = 'colorTextLink',
 }: {
   replyPost: Post;
-  variant: TextVariant;
-  color: keyof typeof theme.colors;
+  variant?: TextVariant;
+  color?: keyof typeof theme.colors;
 }) => {
   const [visible, setVisible] = useState(false);
 
