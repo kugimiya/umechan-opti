@@ -44,6 +44,8 @@ const Img = styled('img')`
   }
 `;
 
+const ts = Date.now();
+
 export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
   const id = useId();
   const radioData = useRadioData();
@@ -76,7 +78,13 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
         </Text>
       </Box>
 
-      <audio src={`${url}?ts=${id}`} id={`radio_${mount}`} />
+      {isPlaying && (
+        <audio
+          src={`${url}?ts=${encodeURI(`${id}-${ts}`)}`}
+          id={`radio_${mount}`}
+          autoPlay={false}
+        />
+      )}
 
       <Box gap='8px'>
         <button
@@ -85,11 +93,13 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
             setIsPlaying((flag) => {
               const next = !flag;
 
-              if (next) {
-                (document.getElementById(`radio_${mount}`) as HTMLAudioElement)?.play();
-              } else {
-                (document.getElementById(`radio_${mount}`) as HTMLAudioElement)?.pause();
-              }
+              setTimeout(() => {
+                if (next) {
+                  (document.getElementById(`radio_${mount}`) as HTMLAudioElement)?.play();
+                } else {
+                  (document.getElementById(`radio_${mount}`) as HTMLAudioElement)?.pause();
+                }
+              }, 250);
 
               return next;
             });
@@ -104,9 +114,11 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
           min='0'
           max='100'
           onChange={(ev) => {
-            const value = ev.target.valueAsNumber;
-            const tag = document.getElementById(`radio_${mount}`) as HTMLAudioElement;
-            tag.volume = value / 100;
+            try {
+              const value = ev.target.valueAsNumber;
+              const tag = document.getElementById(`radio_${mount}`) as HTMLAudioElement;
+              tag.volume = value / 100;
+            } catch {}
           }}
         />
       </Box>
