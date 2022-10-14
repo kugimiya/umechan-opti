@@ -70,7 +70,7 @@ export const BoardPage = memo(function BoardPageMemoized(): JSX.Element {
 
             {board.posts?.map((thread, index) => (
               <Fragment key={thread.id}>
-                <BoardThread post={thread} />
+                <BoardThread post={thread} onRefetch={() => boardData.refetch()} />
 
                 {Number(board.posts?.length) - 1 !== index && (
                   <hr
