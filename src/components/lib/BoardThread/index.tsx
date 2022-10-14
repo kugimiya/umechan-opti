@@ -1,9 +1,9 @@
 import { format, fromUnixTime, getYear } from 'date-fns';
 import Link from 'next/link';
-import { useState } from 'react';
 import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
+import { usePostReplyActions } from 'src/hooks/usePostReplyActions';
 import { useSubscriptions } from 'src/hooks/useSubscriptions';
 import { Post } from 'src/services';
 
@@ -21,7 +21,7 @@ export function BoardThread({
   post: Post;
   onRefetch: () => void;
 }): JSX.Element {
-  const [createFormVisible, setCreateFormVisible] = useState(false);
+  const { handleReply, isFormVisible, setIsFormVisible } = usePostReplyActions();
   const date = fromUnixTime(Number(post.timestamp));
   const time = format(date, currentYear === getYear(date) ? 'HH:mm LLLL dd' : 'HH:mm dd.LL.yyyy');
   const subs = useSubscriptions();
@@ -50,19 +50,6 @@ export function BoardThread({
       Подписаться
     </Text>
   );
-
-  // TODO: вытащить в хук
-  const handleReply = (id: number | string) => {
-    setCreateFormVisible(true);
-
-    setTimeout(() => {
-      const event = new Event('reply_at_post');
-      // @ts-ignore потому что лень ебаться с тем чтобы положить в глобальный интерфейс Event поле postId
-      event.postId = id;
-
-      window.dispatchEvent(event);
-    }, 250);
-  };
 
   return (
     <Box flexDirection='column' gap='10px'>
@@ -96,13 +83,13 @@ export function BoardThread({
           <PostComponent key={reply.id} post={reply} onReply={(id) => handleReply(id)} />
         ))}
 
-      {createFormVisible && (
+      {isFormVisible && (
         <CreatePostForm
           mode='post'
           parentBoardId={post?.board?.tag?.toString() || ''}
           parentPostId={post?.id?.toString() || ''}
           onCreate={() => onRefetch()}
-          changeVisibility={setCreateFormVisible}
+          changeVisibility={setIsFormVisible}
         />
       )}
     </Box>

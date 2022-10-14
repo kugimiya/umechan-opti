@@ -1,19 +1,20 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect } from 'react';
 import { Text } from 'src/components/common/Text';
 import { PostsContext } from 'src/hooks/usePostsContext';
 import { useSubscriptions } from 'src/hooks/useSubscriptions';
 import { useThreadData } from 'src/services';
 import { isServer } from 'src/utils/isServer';
 
+import { usePostReplyActions } from '../../hooks/usePostReplyActions';
 import { Box } from '../common/Box';
 import { CreatePostForm } from '../lib/CreatePostForm';
 import { PostComponent } from '../lib/PostComponent';
 import { Tab } from '../lib/Tab';
 
 export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
-  const [createFormVisible, setCreateFormVisible] = useState(false);
+  const { handleReply, isFormVisible, setIsFormVisible } = usePostReplyActions();
   const rolter = useRouter();
   const threadData = useThreadData(rolter.query.id?.toString() || 'null');
   const thread = threadData.data?.payload.thread_data;
@@ -35,19 +36,6 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
     return <Text>Грузим</Text>;
   }
 
-  // TODO: вытащить в хук
-  const handleReply = (id: number | string) => {
-    setCreateFormVisible(true);
-
-    setTimeout(() => {
-      const event = new Event('reply_at_post');
-      // @ts-ignore потому что лень ебаться с тем чтобы положить в глобальный интерфейс Event поле postId
-      event.postId = id;
-
-      window.dispatchEvent(event);
-    }, 250);
-  };
-
   return (
     <>
       <Head>
@@ -58,10 +46,10 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
         <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>
           <Tab
             title={`Тред: ${thread.subject}`}
-            action={{ title: 'Ответить', on: () => setCreateFormVisible((_) => !_) }}
+            action={{ title: 'Ответить', on: () => setIsFormVisible((_) => !_) }}
           >
             <Box gap='10px' flexDirection='column' alignItems='flex-start'>
-              {createFormVisible && (
+              {isFormVisible && (
                 <CreatePostForm
                   mode='post'
                   parentBoardId={rolter.query.tag?.toString() || ''}
@@ -70,7 +58,7 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
                     subs.subscribe(thread.id?.toString() || '', String(thread.replies.at(-1)?.id));
                     threadData.refetch();
                   }}
-                  changeVisibility={setCreateFormVisible}
+                  changeVisibility={setIsFormVisible}
                 />
               )}
 
