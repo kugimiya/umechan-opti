@@ -59,7 +59,12 @@ export function BoardThread({
 
           <Text variant={TextVariant.textBodyBold1}>{post.poster || 'Anon'}</Text>
           <Text>{time}</Text>
-          <Text onClick={() => handleReply(post?.id?.toString() || '')}>#{post.id}</Text>
+          <Text
+            onClick={() => handleReply(post?.id?.toString() || '')}
+            style={{ cursor: 'pointer' }}
+          >
+            #{post.id}
+          </Text>
         </Box>
 
         <Box>{isThreadPostAction}</Box>
@@ -88,7 +93,13 @@ export function BoardThread({
           mode='post'
           parentBoardId={post?.board?.tag?.toString() || ''}
           parentPostId={post?.id?.toString() || ''}
-          onCreate={() => onRefetch()}
+          onCreate={(data, withSubscribe) => {
+            if (withSubscribe) {
+              subs.subscribe(post.id?.toString() || '', String(data.payload.post_id));
+            }
+
+            onRefetch();
+          }}
           changeVisibility={setIsFormVisible}
         />
       )}

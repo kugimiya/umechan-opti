@@ -18,7 +18,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   for (let thread of threads) {
     response[thread.id?.toString() || ''] = {
-      title: thread.subject || `${thread.id} thread without subject`,
+      title:
+        thread.subject ||
+        `${thread.truncated_message?.slice(0, 20).replaceAll('\n', '') || `тред #${thread.id}`}`,
       currentCursor: thread.replies?.at(-1)?.id?.toString() || '',
       tag: thread.board_id?.toString() || '',
     };

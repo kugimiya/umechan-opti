@@ -66,8 +66,11 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
                   mode='post'
                   parentBoardId={rolter.query.tag?.toString() || ''}
                   parentPostId={rolter.query.id?.toString() || ''}
-                  onCreate={() => {
-                    subs.subscribe(thread.id?.toString() || '', String(thread.replies.at(-1)?.id));
+                  onCreate={(data, withSubscribe) => {
+                    if (withSubscribe) {
+                      subs.subscribe(thread.id?.toString() || '', String(data.payload.post_id));
+                    }
+
                     threadData.refetch();
                   }}
                   changeVisibility={setIsFormVisible}

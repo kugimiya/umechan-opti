@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { Box } from 'src/components/common/Box';
 import { Text } from 'src/components/common/Text';
 import { theme } from 'src/theme';
+import { ApiResponse } from 'src/types/utils/ApiResponse';
 import styled from 'styled-components';
 
 interface FormStruct {
@@ -10,6 +11,7 @@ interface FormStruct {
   subject: string;
   text: string;
   file: FileList;
+  withSubscribe: boolean;
 }
 
 const Container = styled(Box)`
@@ -56,11 +58,16 @@ const createPost = async (data: {
     body: formData,
   });
 
+  const responseData = (await response.json()) as unknown as ApiResponse<{
+    post_id: number;
+    password: string;
+  }>;
+
   if (response.status === 500) {
     throw new Error();
   }
 
-  return response;
+  return responseData;
 };
 
 export function CreatePostForm({
@@ -73,11 +80,17 @@ export function CreatePostForm({
   mode: 'post' | 'thread';
   parentPostId?: string;
   parentBoardId?: string;
-  onCreate: () => void;
+  onCreate: (
+    data: ApiResponse<{
+      post_id: number;
+      password: string;
+    }>,
+    withSubscribe: boolean,
+  ) => void;
   changeVisibility: (flag: boolean) => void;
 }) {
   const [sending, setSending] = useState(false);
-  const form = useForm<FormStruct>();
+  const form = useForm<FormStruct>({ defaultValues: { withSubscribe: true } });
   const handler = async (data: FormStruct) => {
     if (sending) {
       return;
@@ -91,7 +104,7 @@ export function CreatePostForm({
     setSending(true);
 
     try {
-      await (mode === 'post'
+      const resData = await (mode === 'post'
         ? createPost({
             poster: data.nickname,
             subject: data.subject,
@@ -109,7 +122,7 @@ export function CreatePostForm({
           }));
 
       form.reset();
-      onCreate();
+      onCreate(resData, data.withSubscribe);
       setSending(false);
     } catch {
       alert('Ошибка при отправке поста; Мб файлик не с тем расширением заливаешь, мб ещё чото');
@@ -146,6 +159,13 @@ export function CreatePostForm({
         borderRadius='4px'
         width='460px'
       >
+        <Box gap='16px'>
+          <Box minWidth='50px'>
+            <Text>Подписаться на тред</Text>
+          </Box>
+          <input type='checkbox' {...form.register('withSubscribe', { required: false })} />
+        </Box>
+
         <Box gap='16px'>
           <Box minWidth='50px' width='50px'>
             <Text>Ник</Text>

@@ -1,13 +1,36 @@
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 import { useSubscriptions } from 'src/hooks/useSubscriptions';
 import { Board, useSubsData } from 'src/services';
+import { isServer } from 'src/utils/isServer';
 
 export const SubsContainer = ({ boards }: { boards: Board[] }) => {
+  const [collapsed, setCollapsed] = useState<string>('');
   const subs = useSubscriptions();
   const cursors = useSubsData(subs.subsIds);
   const router = useRouter();
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (isServer()) {
+        return;
+      }
+
+      setCollapsed(localStorage.getItem('subsBoxCollapsed') || 'false');
+    }, 500);
+  }, []);
+
+  useEffect(() => {
+    if (isServer()) {
+      return;
+    }
+
+    if (collapsed !== localStorage.getItem('subsBoxCollapsed') && collapsed !== '') {
+      localStorage.setItem('subsBoxCollapsed', collapsed);
+    }
+  }, [collapsed]);
 
   if (!cursors.data) {
     return <></>;
@@ -26,9 +49,33 @@ export const SubsContainer = ({ boards }: { boards: Board[] }) => {
           borderRadius: '4px',
         }}
       >
-        <Text>Подписки</Text>
+        {collapsed === 'false' ? (
+          <Text>
+            Подписки{' '}
+            <Text
+              color='colorTextLink'
+              variant={TextVariant.textButton}
+              style={{ cursor: 'pointer' }}
+              onClick={() => setCollapsed('true')}
+            >
+              (свернуть)
+            </Text>
+          </Text>
+        ) : (
+          <Text>
+            Подписки{' '}
+            <Text
+              color='colorTextLink'
+              variant={TextVariant.textButton}
+              style={{ cursor: 'pointer' }}
+              onClick={() => setCollapsed('false')}
+            >
+              (развернуть)
+            </Text>
+          </Text>
+        )}
 
-        {Object.keys(subs.subsIds).map((id) => {
+        {(collapsed === 'false' ? Object.keys(subs.subsIds) : []).map((id) => {
           return (
             <Box key={id} gap='4px' alignItems='center'>
               <Text
@@ -45,7 +92,10 @@ export const SubsContainer = ({ boards }: { boards: Board[] }) => {
                 variant={TextVariant.textBodyBold1}
                 style={{ whiteSpace: 'pre', maxWidth: '100%', overflow: 'hidden' }}
               >
-                {cursors.data[id].currentCursor !== subs.subsIds[id] ? 'Есть новые посты' : ''}
+                {cursors.data[id].currentCursor !== subs.subsIds[id] &&
+                cursors.data[id].currentCursor !== ''
+                  ? 'Есть новые посты'
+                  : ''}
               </Text>
 
               <Text

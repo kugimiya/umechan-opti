@@ -35,7 +35,16 @@ export const BoardService = {
   },
 
   async createPost(data: Record<string, unknown>) {
-    await axios.post('/post', data, { baseURL: 'http://pissykaka.scheoble.xyz/' });
+    const res = await axios.post<ApiResponse<{ post_id: number; password: string }>>(
+      '/post',
+      data,
+      {
+        baseURL: 'http://pissykaka.scheoble.xyz/',
+        validateStatus: (status) => status >= 200 && status < 300,
+      },
+    );
+
+    return res.data;
   },
 
   async getRadioStatus() {
