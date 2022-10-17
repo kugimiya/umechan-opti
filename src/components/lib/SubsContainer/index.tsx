@@ -59,7 +59,7 @@ export const SubsContainer = ({ boards }: { boards: Board[] }) => {
                   router.push(
                     `/board/${
                       boards.find((_) => String(_.id) === cursors.data[id].tag)?.tag || '__'
-                    }/thread/${id}`,
+                    }/thread/${id}?scroll_to=post_${cursors.data[id].currentCursor}`,
                   )
                 }
               >

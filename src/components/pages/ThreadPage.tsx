@@ -19,6 +19,7 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
   const threadData = useThreadData(rolter.query.id?.toString() || 'null');
   const thread = threadData.data?.payload.thread_data;
   const subs = useSubscriptions();
+  const scrollTo = rolter.query.scroll_to as string | undefined;
 
   useEffect(() => {
     if (!thread) {
@@ -31,6 +32,17 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
       }
     }
   }, [thread?.id, thread, subs.subsIds, subs]);
+
+  useEffect(() => {
+    if (!isServer() && thread?.replies) {
+      setTimeout(() => {
+        const elm = document.getElementById(scrollTo || '');
+        if (elm) {
+          elm.scrollIntoView();
+        }
+      }, 250);
+    }
+  }, [scrollTo, thread, thread?.replies, threadData.isFetched]);
 
   if (!thread) {
     return <Text>Грузим</Text>;
