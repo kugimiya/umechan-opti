@@ -28,8 +28,7 @@ const Container = styled(Box)`
 `;
 
 const Form = Box.withComponent('form');
-let isSendState = false;
-// Вытищить в react-query
+// TODO: Вытащить в react-query
 const createPost = async (data: {
   tag?: string;
   parent_id?: string;
@@ -52,10 +51,16 @@ const createPost = async (data: {
     formData.append(key, value as string);
   });
 
-  return await fetch('/api/message', {
+  const response = await fetch('/api/message', {
     method: 'POST',
     body: formData,
   });
+
+  if (response.status === 500) {
+    throw new Error();
+  }
+
+  return response;
 };
 
 export function CreatePostForm({
@@ -74,7 +79,7 @@ export function CreatePostForm({
   const [sending, setSending] = useState(false);
   const form = useForm<FormStruct>();
   const handler = async (data: FormStruct) => {
-    if (isSendState) {
+    if (sending) {
       return;
     }
 
@@ -84,29 +89,32 @@ export function CreatePostForm({
     }
 
     setSending(true);
-    isSendState = true;
 
-    await (mode === 'post'
-      ? createPost({
-          poster: data.nickname,
-          subject: data.subject,
-          message: data.text,
-          tag: parentBoardId,
-          parent_id: parentPostId,
-          file: data.file,
-        })
-      : createPost({
-          poster: data.nickname,
-          subject: data.subject,
-          message: data.text,
-          tag: parentBoardId,
-          file: data.file,
-        }));
+    try {
+      await (mode === 'post'
+        ? createPost({
+            poster: data.nickname,
+            subject: data.subject,
+            message: data.text,
+            tag: parentBoardId,
+            parent_id: parentPostId,
+            file: data.file,
+          })
+        : createPost({
+            poster: data.nickname,
+            subject: data.subject,
+            message: data.text,
+            tag: parentBoardId,
+            file: data.file,
+          }));
 
-    form.reset();
-    onCreate();
-    isSendState = false;
-    setSending(false);
+      form.reset();
+      onCreate();
+      setSending(false);
+    } catch {
+      alert('Ошибка при отправке поста; Мб файлик не с тем расширением заливаешь, мб ещё чото');
+      setSending(false);
+    }
   };
 
   useEffect(() => {
