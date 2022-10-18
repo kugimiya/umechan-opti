@@ -22,6 +22,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.37.0",
+    "react-modal-image": "^2.6.0",
     "react-tiny-popover": "^7.1.0",
     "sharp": "^0.31.1",
     "styled-components": "^5.3.5"
