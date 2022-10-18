@@ -12,6 +12,7 @@ interface FormStruct {
   text: string;
   file: FileList;
   withSubscribe: boolean;
+  multiplyPost: boolean;
 }
 
 const Container = styled(Box)`
@@ -38,6 +39,7 @@ const createPost = async (data: {
   poster?: string;
   message?: string;
   file?: FileList;
+  multiplyPost?: boolean;
 }) => {
   const formData = new FormData();
 
@@ -90,7 +92,7 @@ export function CreatePostForm({
   changeVisibility: (flag: boolean) => void;
 }) {
   const [sending, setSending] = useState(false);
-  const form = useForm<FormStruct>({ defaultValues: { withSubscribe: true } });
+  const form = useForm<FormStruct>({ defaultValues: { withSubscribe: true, multiplyPost: false } });
   const handler = async (data: FormStruct) => {
     if (sending) {
       return;
@@ -112,6 +114,7 @@ export function CreatePostForm({
             tag: parentBoardId,
             parent_id: parentPostId,
             file: data.file,
+            multiplyPost: data.multiplyPost,
           })
         : createPost({
             poster: data.nickname,
@@ -119,6 +122,7 @@ export function CreatePostForm({
             message: data.text,
             tag: parentBoardId,
             file: data.file,
+            multiplyPost: data.multiplyPost,
           }));
 
       form.reset();
@@ -160,10 +164,17 @@ export function CreatePostForm({
         width='460px'
       >
         <Box gap='16px'>
+          <input type='checkbox' {...form.register('multiplyPost', { required: false })} />
+          <Box minWidth='50px'>
+            <Text>Отправить файлы отдельными ответами</Text>
+          </Box>
+        </Box>
+
+        <Box gap='16px'>
+          <input type='checkbox' {...form.register('withSubscribe', { required: false })} />
           <Box minWidth='50px'>
             <Text>Подписаться на тред</Text>
           </Box>
-          <input type='checkbox' {...form.register('withSubscribe', { required: false })} />
         </Box>
 
         <Box gap='16px'>

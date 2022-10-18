@@ -34,6 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { fields, files } = await formidablePromise(req, formidableConfig);
 
   let imagesString = '';
+  let postResponse: unknown;
   const filesAsArray = Object.values(files || {});
   if (filesAsArray.length) {
     for (let savedFile of filesAsArray) {
@@ -44,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         (savedFile as formidable.File).newFilename,
       );
 
-      await axios
+      postResponse = await axios
         .post('/', form, {
           baseURL: 'http://filestore.scheoble.xyz/',
           headers: form.getHeaders(),
@@ -55,18 +56,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const thmb = result.data.thumbnail_file;
           const markedImage = `[![](${thmb})](${orig})`;
 
+          if (fields.multiplyPost) {
+            return BoardService.createPost({
+              ...fields,
+              message: `${fields.message}\n\n${markedImage}`,
+            });
+          }
+
           imagesString = `${imagesString} \n ${markedImage}`;
         });
     }
   }
 
-  await BoardService.createPost({ ...fields, message: `${fields.message}\n\n${imagesString}` })
-    .then((p) => {
-      res.status(200).send(p);
-    })
-    .catch((error: unknown) => {
-      res.status(500).send([(error as AxiosError).response?.data, error]);
-    });
+  if (fields.multiplyPost && !filesAsArray.length) {
+    res.status(500).send('Нельзя мультплаить пост без файликов');
+    return;
+  } else if (fields.multiplyPost) {
+    res.status(200).send(postResponse);
+  }
+
+  if (!fields.multiplyPost) {
+    await BoardService.createPost({ ...fields, message: `${fields.message}\n\n${imagesString}` })
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((error: unknown) => {
+        res.status(500).send([(error as AxiosError).response?.data, error]);
+      });
+  }
 }
 
 export const config = {

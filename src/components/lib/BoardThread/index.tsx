@@ -57,7 +57,10 @@ export function BoardThread({
         <Box gap='10px'>
           {Boolean(post.subject) && <Text variant={TextVariant.textBodyBold1}>{post.subject}</Text>}
 
-          <Text variant={TextVariant.textBodyBold1}>{post.poster || 'Anon'}</Text>
+          <Text variant={TextVariant.textBodyBold1}>
+            {post.is_verify && <Text title='Имеет паспорт вакцинации'>🔰 </Text>}
+            {post.poster || 'Anon'}
+          </Text>
           <Text>{time}</Text>
           <Text
             onClick={() => handleReply(post?.id?.toString() || '')}
