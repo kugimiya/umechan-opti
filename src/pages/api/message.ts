@@ -56,7 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const thmb = result.data.thumbnail_file;
           const markedImage = `[![](${thmb})](${orig})`;
 
-          if (fields.multiplyPost) {
+          if (fields.multiplyPost === 'true') {
             return BoardService.createPost({
               ...fields,
               message: `${fields.message}\n\n${markedImage}`,
@@ -68,14 +68,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
-  if (fields.multiplyPost && !filesAsArray.length) {
+  if (fields.multiplyPost === 'true' && !filesAsArray.length) {
     res.status(500).send('Нельзя мультплаить пост без файликов');
     return;
-  } else if (fields.multiplyPost) {
+  } else if (fields.multiplyPost === 'true') {
     res.status(200).send(postResponse);
   }
 
-  if (!fields.multiplyPost) {
+  if (fields.multiplyPost === 'false') {
     await BoardService.createPost({ ...fields, message: `${fields.message}\n\n${imagesString}` })
       .then((p) => {
         res.status(200).send(p);
