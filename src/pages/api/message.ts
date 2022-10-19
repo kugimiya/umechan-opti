@@ -7,8 +7,8 @@ import { BoardService } from 'src/services';
 
 const formidableConfig = {
   keepExtensions: true,
-  maxFileSize: 500_000_000,
-  maxFieldsSize: 500_000_000,
+  maxFileSize: 500_000_000_0,
+  maxFieldsSize: 500_000_000_0,
   maxFields: 15,
   allowEmptyFiles: true,
   multiples: true,
