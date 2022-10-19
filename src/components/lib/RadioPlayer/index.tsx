@@ -57,7 +57,7 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
     <>
       <Box flexDirection='column' alignItems='center'>
         <Text variant={TextVariant.textBody1}>
-          <Text variant={TextVariant.textBodyBold1}>{mount}</Text>
+          <Text variant={TextVariant.textBodyBold1}>{`${mount} `}</Text>
 
           <Text variant={TextVariant.textBody1}>[{radioData.data?.playlistData?.name}]</Text>
         </Text>
@@ -74,11 +74,7 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
       </Box>
 
       <Box alignItems='center'>
-        <Text variant={TextVariant.textBodyBold1}>{radioData.data?.fileData?.id3Artist}</Text>
-
-        <Text>-</Text>
-
-        <Text variant={TextVariant.textBodyBold1}>{radioData.data?.fileData?.id3Title}</Text>
+        <Text variant={TextVariant.textBodyBold1}>{`${radioData.data?.fileData?.id3Artist} - ${radioData.data?.fileData?.id3Title}`}</Text>
       </Box>
 
       {isPlaying && (

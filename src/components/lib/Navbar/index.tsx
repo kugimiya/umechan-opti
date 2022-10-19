@@ -33,6 +33,7 @@ const bannersHrefs = [
   '/images/18.jpg',
   '/images/19.jpg',
   '/images/20.jpg',
+  '/images/21.png',
 ];
 
 type NavbarProps = {
