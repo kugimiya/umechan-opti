@@ -31,7 +31,7 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
         subs.subscribe(thread.id?.toString() || '', String(thread.replies.at(-1)?.id));
       }
     }
-  }, [thread?.id, thread, subs.subsIds, subs]);
+  }, [thread?.id, thread, subs.subsIds, subs, rolter.query.id]);
 
   useEffect(() => {
     if (!isServer() && thread?.replies) {
@@ -71,7 +71,7 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
                       subs.subscribe(thread.id?.toString() || '', String(data.payload.post_id));
                     }
 
-                    threadData.refetch();
+                    threadData.refetch().catch(console.error);
                   }}
                   changeVisibility={setIsFormVisible}
                 />

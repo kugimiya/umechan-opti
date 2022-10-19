@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   await Promise.all(
     Object.entries(cursors).map(async (cursor) => {
-      const [threadId, _lastPostId] = cursor;
+      const [threadId] = cursor;
 
       const thread = (await BoardService.getThread(threadId)).payload.thread_data;
       threads.push(thread);
@@ -20,11 +20,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   threads = threads.sort((a, b) => Number(a.id) - Number(b.id));
 
-  for (let thread of threads) {
+  for (const thread of threads) {
     response[thread.id?.toString() || ''] = {
       title:
         thread.subject ||
-        `${thread.truncated_message?.slice(0, 20).replaceAll('\n', '') || `тред #${thread.id}`}`,
+        `${
+          thread.truncated_message?.slice(0, 20).replaceAll('\n', '') ||
+          `тред #${Number(thread.id)}`
+        }`,
       currentCursor: thread.replies?.at(-1)?.id?.toString() || '',
       tag: thread.board_id?.toString() || '',
     };

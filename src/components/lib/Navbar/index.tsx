@@ -74,9 +74,7 @@ export const Navbar = memo(function NavbarMemoized({ boards }: NavbarProps): JSX
           <>
             {boards.map((item) => (
               <Link key={item.tag} href={`/board/${item.tag}`}>
-                <A href={`/board/${item.tag}`}>
-                  {item.name} [{item.tag}]
-                </A>
+                <A href={`/board/${item.tag}`}>{`${item.name} [${item.tag}]`}</A>
               </Link>
             ))}
           </>

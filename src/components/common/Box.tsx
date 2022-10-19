@@ -53,6 +53,6 @@ export const Box = styled.div<Props>`
 
   background-color: ${(props) =>
     props.backgroundColor ? theme.colors[props.backgroundColor] : undefined};
-  border: ${(props) => `1px solid ${props.border ? theme.colors[props.border] : undefined}`};
+  border: ${(props) => (props.border ? `1px solid ${theme.colors[props.border]}` : undefined)};
   border-radius: ${(props) => props.borderRadius};
 `;

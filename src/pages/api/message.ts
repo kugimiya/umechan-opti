@@ -1,9 +1,9 @@
 import axios, { AxiosError } from 'axios';
+import FormData from 'form-data';
 import formidable from 'formidable';
+import fs from 'fs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BoardService } from 'src/services';
-const fs = require('fs');
-const FormData = require('form-data');
 
 const formidableConfig = {
   keepExtensions: true,
@@ -37,7 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   let postResponse: unknown;
   const filesAsArray = Object.values(files || {});
   if (filesAsArray.length) {
-    for (let savedFile of filesAsArray) {
+    for (const savedFile of filesAsArray) {
       const form = new FormData();
       form.append(
         'image',
@@ -46,12 +46,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
 
       postResponse = await axios
-        .post('/', form, {
+        .post<{ original_file: string; thumbnail_file: string }>('/', form, {
           baseURL: 'http://filestore.scheoble.xyz/',
           headers: form.getHeaders(),
         })
         .then((result) => {
-          fs.rm((savedFile as formidable.File).filepath, () => {});
+          fs.rm((savedFile as formidable.File).filepath, () => null);
+
           const orig = result.data.original_file;
           const thmb = result.data.thumbnail_file;
           const markedImage = `[![](${thmb})](${orig})`;
@@ -59,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           if (fields.multiplyPost === 'true') {
             return BoardService.createPost({
               ...fields,
-              message: `${fields.message}\n\n${markedImage}`,
+              message: `${fields.message as unknown as string}\n\n${markedImage}`,
             });
           }
 
@@ -76,7 +77,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (fields.multiplyPost === 'false') {
-    await BoardService.createPost({ ...fields, message: `${fields.message}\n\n${imagesString}` })
+    await BoardService.createPost({
+      ...fields,
+      message: `${fields.message as unknown as string}\n\n${imagesString}`,
+    })
       .then((p) => {
         res.status(200).send(p);
       })

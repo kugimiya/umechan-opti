@@ -4,7 +4,10 @@ import { isServer } from 'src/utils/isServer';
 export const useSubscriptions = () => {
   const [subsIds, setSubsIds] = useState<Record<string, string>>({});
   const subscribe = (id: string, cursor: string) => {
-    const fromGlobalState = JSON.parse(localStorage.getItem('subs') || '{}');
+    const fromGlobalState = JSON.parse(localStorage.getItem('subs') || '{}') as Record<
+      string,
+      string
+    >;
     fromGlobalState[id] = cursor;
     localStorage.setItem('subs', JSON.stringify(fromGlobalState));
 
@@ -12,7 +15,10 @@ export const useSubscriptions = () => {
   };
 
   const deleteEntry = (id: string) => {
-    const fromGlobalState = JSON.parse(localStorage.getItem('subs') || '{}');
+    const fromGlobalState = JSON.parse(localStorage.getItem('subs') || '{}') as Record<
+      string,
+      string
+    >;
     delete fromGlobalState[id];
     localStorage.setItem('subs', JSON.stringify(fromGlobalState));
 
@@ -21,10 +27,10 @@ export const useSubscriptions = () => {
 
   useEffect(() => {
     if (!isServer()) {
-      setSubsIds(JSON.parse(localStorage.getItem('subs') || '{}'));
+      setSubsIds(JSON.parse(localStorage.getItem('subs') || '{}') as Record<string, string>);
 
       const int = setInterval(() => {
-        setSubsIds(JSON.parse(localStorage.getItem('subs') || '{}'));
+        setSubsIds(JSON.parse(localStorage.getItem('subs') || '{}') as Record<string, string>);
       }, 2000);
 
       return () => clearInterval(int);

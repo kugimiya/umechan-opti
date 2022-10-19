@@ -1,6 +1,5 @@
 import { parse, Syntax } from '@textlint/markdown-to-ast';
 import Link from 'next/link';
-import { useMemo } from 'react';
 import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
@@ -68,6 +67,7 @@ function MD({
         return (
           <Text color='colorGreen' variant={TextVariant.textBody1}>
             {'>'}
+
             {children.map((subRoot) => (
               <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
             ))}
@@ -87,6 +87,7 @@ function MD({
         <Link href={`#post_${num}`}>
           <A variant={TextVariant.textBody1} color='colorGreen'>
             {'>>'}
+
             {num}
           </A>
         </Link>
@@ -180,8 +181,9 @@ function MD({
             fontSize: '12px',
           }}
         >
-          [{root.lang || 'lang не указан'}]{'\n'}
-          <code>{root.value.replaceAll('\n\n', '\n')}</code>
+          <code>[{`${root.lang}\n` || 'lang не указан\n'}]</code>
+
+          <code>{String(root.value).replaceAll('\n\n', '\n')}</code>
         </pre>
       );
 
@@ -189,7 +191,7 @@ function MD({
       return (
         <A
           variant={TextVariant.textBodyBold1}
-          href={root.url.replaceAll('.../', '')}
+          href={String(root.url).replaceAll('.../', '')}
           target='_blank'
           rel='noreferrer'
           color='colorTextLink'

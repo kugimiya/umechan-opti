@@ -59,9 +59,12 @@ export function BoardThread({
 
           <Text variant={TextVariant.textBodyBold1}>
             {post.is_verify && <Text title='Имеет паспорт вакцинации'>🔰 </Text>}
+
             {post.poster || 'Anon'}
           </Text>
+
           <Text>{time}</Text>
+
           <Text
             onClick={() => handleReply(post?.id?.toString() || '')}
             style={{ cursor: 'pointer' }}
@@ -71,18 +74,21 @@ export function BoardThread({
         </Box>
 
         <Box>{isThreadPostAction}</Box>
+
         <Box>{subscribeAction}</Box>
       </Box>
 
       <PostMedia post={post} />
+
       <PostText post={post} />
 
       {Boolean(Number(post.replies_count) - Number(post.replies?.length)) && (
         <Box margin='10px 0'>
           <Text variant={TextVariant.textBodyBold1}>
-            Пропущено {Number(post.replies_count) - Number(post.replies?.length)} постов.{' '}
-            {isThreadPostAction}
+            Пропущено {Number(post.replies_count) - Number(post.replies?.length)} постов.
           </Text>
+
+          {isThreadPostAction}
         </Box>
       )}
 

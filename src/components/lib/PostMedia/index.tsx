@@ -1,4 +1,5 @@
-import { KeyboardEvent, KeyboardEventHandler, useEffect, useMemo, useState } from 'react';
+/* eslint-disable @next/next/no-img-element */
+import { KeyboardEventHandler, useEffect, useMemo, useState } from 'react';
 // @ts-ignore потому что нет тайпингов
 import ModalImage from 'react-modal-image';
 import { Box } from 'src/components/common/Box';

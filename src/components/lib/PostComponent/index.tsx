@@ -27,7 +27,7 @@ export function PostComponent({
         const searchString = `>>${post.id}`;
         return replyPost.truncated_message?.includes(searchString);
       }),
-    [postsInThread.posts],
+    [postsInThread.posts, post.id],
   );
 
   return (
@@ -45,6 +45,7 @@ export function PostComponent({
 
           <Text variant={TextVariant.textBodyBold1}>
             {post.is_verify && <Text title='Имеет паспорт вакцинации'>🔰 </Text>}
+
             {post.poster || 'Anon'}
           </Text>
 
@@ -66,6 +67,7 @@ export function PostComponent({
       </Box>
 
       <PostMedia post={post} />
+
       <PostText post={post} />
 
       {Boolean(replies.length) && (

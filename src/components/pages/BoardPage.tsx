@@ -54,10 +54,13 @@ export const BoardPage = memo(function BoardPageMemoized(): JSX.Element {
               <CreatePostForm
                 mode='thread'
                 parentBoardId={rolter.query.tag?.toString() || ''}
-                onCreate={() => boardData.refetch()}
+                onCreate={() => {
+                  boardData.refetch().catch(console.error);
+                }}
                 changeVisibility={setCreateFormVisible}
               />
             )}
+
             <Pager pages={pages} />
 
             <hr
@@ -70,7 +73,12 @@ export const BoardPage = memo(function BoardPageMemoized(): JSX.Element {
 
             {board.posts?.map((thread, index) => (
               <Fragment key={thread.id}>
-                <BoardThread post={thread} onRefetch={() => boardData.refetch()} />
+                <BoardThread
+                  post={thread}
+                  onRefetch={() => {
+                    boardData.refetch().catch(console.error);
+                  }}
+                />
 
                 {Number(board.posts?.length) - 1 !== index && (
                   <hr

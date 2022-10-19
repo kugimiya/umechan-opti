@@ -13,6 +13,7 @@ export const NewsPostComponent = memo(function NewsPostComponentMemoized({
   return (
     <Box backgroundColor='colorBgSecondary' gap='10px' padding='10px' id={`post_${post.id}`}>
       <PostMedia post={post} />
+
       <PostText post={post} />
     </Box>
   );

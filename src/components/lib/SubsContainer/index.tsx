@@ -51,7 +51,8 @@ export const SubsContainer = ({ boards }: { boards: Board[] }) => {
       >
         {collapsed === 'false' ? (
           <Text>
-            Подписки{' '}
+            <Text>Подписки </Text>
+
             <Text
               color='colorTextLink'
               variant={TextVariant.textButton}
@@ -63,7 +64,8 @@ export const SubsContainer = ({ boards }: { boards: Board[] }) => {
           </Text>
         ) : (
           <Text>
-            Подписки{' '}
+            <Text>Подписки </Text>
+
             <Text
               color='colorTextLink'
               variant={TextVariant.textButton}
@@ -105,13 +107,15 @@ export const SubsContainer = ({ boards }: { boards: Board[] }) => {
                   overflow: 'hidden',
                   cursor: 'pointer',
                 }}
-                onClick={() =>
-                  router.push(
-                    `/board/${
-                      boards.find((_) => String(_.id) === cursors.data[id].tag)?.tag || '__'
-                    }/thread/${id}?scroll_to=post_${cursors.data[id].currentCursor}`,
-                  )
-                }
+                onClick={() => {
+                  router
+                    .push(
+                      `/board/${
+                        boards.find((_) => String(_.id) === cursors.data[id].tag)?.tag || '__'
+                      }/thread/${id}?scroll_to=post_${cursors.data[id].currentCursor}`,
+                    )
+                    .catch(console.error);
+                }}
               >
                 {cursors.data[id].title}
               </Text>

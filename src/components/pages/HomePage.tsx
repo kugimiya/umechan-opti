@@ -20,6 +20,7 @@ export const HomePage = memo(function HomePageMemoized(): JSX.Element {
         <Tab title='Глагне'>
           <Box gap='10px' flexDirection='column' alignItems='flex-start'>
             <Text variant={TextVariant.textHeading1}>Добро пожаловать на Юмечан</Text>
+
             <Text variant={TextVariant.textBodyBold1}>Новости этого клиента чана:</Text>
 
             {Boolean(clientNews.data?.payload.thread_data.replies) &&

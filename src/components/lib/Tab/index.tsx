@@ -20,6 +20,7 @@ export const Tab = memo(function TabMemoized({
         maxHeight='40px'
       >
         <Text variant={TextVariant.textBodyBold1}>{title}</Text>
+
         {Boolean(action) && (
           <button onClick={() => action?.on()} style={{ padding: '0 10px', lineHeight: '0' }}>
             {action?.title}

@@ -147,7 +147,7 @@ export function CreatePostForm({
     window.addEventListener('reply_at_post', evHandler);
     // @ts-ignore
     return () => window.removeEventListener('reply_at_post', evHandler);
-  }, []);
+  }, [form]);
 
   return (
     <Container>
@@ -165,6 +165,7 @@ export function CreatePostForm({
       >
         <Box gap='16px'>
           <input type='checkbox' {...form.register('multiplyPost', { required: false })} />
+
           <Box minWidth='50px'>
             <Text>Отправить файлы отдельными ответами</Text>
           </Box>
@@ -172,6 +173,7 @@ export function CreatePostForm({
 
         <Box gap='16px'>
           <input type='checkbox' {...form.register('withSubscribe', { required: false })} />
+
           <Box minWidth='50px'>
             <Text>Подписаться на тред</Text>
           </Box>
@@ -181,6 +183,7 @@ export function CreatePostForm({
           <Box minWidth='50px' width='50px'>
             <Text>Ник</Text>
           </Box>
+
           <input {...form.register('nickname', { required: false })} />
         </Box>
 
@@ -188,6 +191,7 @@ export function CreatePostForm({
           <Box minWidth='50px' width='50px'>
             <Text>Тема</Text>
           </Box>
+
           <input {...form.register('subject', { required: false })} />
         </Box>
 
@@ -195,6 +199,7 @@ export function CreatePostForm({
           <Box minWidth='50px' width='50px'>
             <Text>Текст</Text>
           </Box>
+
           <textarea
             style={{
               minWidth: 'calc(100% - 66px)',

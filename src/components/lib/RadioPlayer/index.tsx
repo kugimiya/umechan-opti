@@ -57,8 +57,9 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
     <>
       <Box flexDirection='column' alignItems='center'>
         <Text variant={TextVariant.textBody1}>
-          <Text variant={TextVariant.textBodyBold1}>{mount}</Text> [
-          {radioData.data?.playlistData?.name}]
+          <Text variant={TextVariant.textBodyBold1}>{mount}</Text>
+
+          <Text variant={TextVariant.textBody1}>[{radioData.data?.playlistData?.name}]</Text>
         </Text>
       </Box>
 
@@ -72,10 +73,12 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
         </Comp>
       </Box>
 
-      <Box flexDirection='column' alignItems='center'>
-        <Text variant={TextVariant.textBodyBold1}>
-          {radioData.data?.fileData?.id3Artist} - {radioData.data?.fileData?.id3Title}
-        </Text>
+      <Box alignItems='center'>
+        <Text variant={TextVariant.textBodyBold1}>{radioData.data?.fileData?.id3Artist}</Text>
+
+        <Text>-</Text>
+
+        <Text variant={TextVariant.textBodyBold1}>{radioData.data?.fileData?.id3Title}</Text>
       </Box>
 
       {isPlaying && (
@@ -95,7 +98,9 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
 
               setTimeout(() => {
                 if (next) {
-                  (document.getElementById(`radio_${mount}`) as HTMLAudioElement)?.play();
+                  (document.getElementById(`radio_${mount}`) as HTMLAudioElement)
+                    ?.play()
+                    ?.catch(console.error);
                 } else {
                   (document.getElementById(`radio_${mount}`) as HTMLAudioElement)?.pause();
                 }
