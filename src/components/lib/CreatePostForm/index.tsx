@@ -7,6 +7,7 @@ import { ApiResponse } from 'src/types/utils/ApiResponse';
 import styled from 'styled-components';
 
 import { usePassportContext } from '../../../hooks/usePassportContext';
+import { writePostPasswordToLocalStorage } from '../../../hooks/usePostsPasswordsContext';
 
 interface FormStruct {
   nickname: string;
@@ -134,6 +135,7 @@ export function CreatePostForm({
             multiplyPost: data.multiplyPost,
           }));
 
+      writePostPasswordToLocalStorage(resData.payload);
       form.reset();
       onCreate(resData, data.withSubscribe);
       setSending(false);

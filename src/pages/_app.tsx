@@ -7,6 +7,10 @@ import { theme } from 'src/theme';
 import { ThemeProvider } from 'styled-components';
 
 import { PassportContext, usePassportLocalStorageAdapter } from '../hooks/usePassportContext';
+import {
+  PostsPasswordsContext,
+  usePostsPasswordsLocalStorageAdapter,
+} from '../hooks/usePostsPasswordsContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,18 +22,21 @@ const queryClient = new QueryClient({
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { passwords } = usePostsPasswordsLocalStorageAdapter();
   const { passport } = usePassportLocalStorageAdapter();
 
   return (
-    <PassportContext.Provider value={passport}>
-      <ThemeProvider theme={theme}>
-        <QueryClientProvider client={queryClient}>
-          <CommonLayout>
-            <Component {...pageProps} />
-          </CommonLayout>
-        </QueryClientProvider>
-      </ThemeProvider>
-    </PassportContext.Provider>
+    <PostsPasswordsContext.Provider value={{ passwords }}>
+      <PassportContext.Provider value={passport}>
+        <ThemeProvider theme={theme}>
+          <QueryClientProvider client={queryClient}>
+            <CommonLayout>
+              <Component {...pageProps} />
+            </CommonLayout>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </PassportContext.Provider>
+    </PostsPasswordsContext.Provider>
   );
 }
 

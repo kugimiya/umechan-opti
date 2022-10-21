@@ -3,8 +3,9 @@ import { useMemo } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 import { usePostsContext } from 'src/hooks/usePostsContext';
-import { Post } from 'src/services';
+import { BoardService, Post } from 'src/services';
 
+import { usePostsPasswordsContext } from '../../../hooks/usePostsPasswordsContext';
 import { PostMedia } from '../PostMedia';
 import { PostText } from '../PostText';
 import { ReplyTreeItem } from '../ReplyTreeItem';
@@ -18,6 +19,7 @@ export function PostComponent({
   post: Post;
   onReply?: (postId: string | number) => void;
 }): JSX.Element {
+  const { passwords } = usePostsPasswordsContext();
   const date = fromUnixTime(Number(post.timestamp));
   const time = format(date, currentYear === getYear(date) ? 'HH:mm LLLL dd' : 'HH:mm dd.LL.yyyy');
   const postsInThread = usePostsContext();
@@ -30,6 +32,12 @@ export function PostComponent({
     [postsInThread.posts, post.id],
   );
 
+  const password = passwords?.find((_) => _.post_id === post.id);
+  const handleDelete = () =>
+    password
+      ? BoardService.deletePost(password).then(() => alert('Удолено, страницу сам обновишь'))
+      : null;
+
   return (
     <Box
       backgroundColor='colorBgSecondary'
@@ -41,6 +49,17 @@ export function PostComponent({
     >
       <Box justifyContent='space-between' width='100%'>
         <Box alignItems='baseline' gap='10px'>
+          {Boolean(password) && (
+            <Text
+              variant={TextVariant.textInput}
+              color='colorTextLink'
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleDelete()}
+            >
+              (удолить)
+            </Text>
+          )}
+
           {Boolean(post.subject) && <Text variant={TextVariant.textBodyBold1}>{post.subject}</Text>}
 
           <Text variant={TextVariant.textBodyBold1}>

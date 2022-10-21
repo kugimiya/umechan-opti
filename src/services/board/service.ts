@@ -3,6 +3,7 @@ import { NEWS_THREAD, PAGE_SIZE } from 'src/constants';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 import { Passport } from '../../hooks/usePassportContext';
+import { PostPassword } from '../../hooks/usePostsPasswordsContext';
 import { Board, BoardData, Post, RadioStatus, ThreadData } from './types';
 
 export const BoardService = {
@@ -70,6 +71,20 @@ export const BoardService = {
       passport,
       {
         validateStatus: (status) => status >= 200 && status < 300,
+      },
+    );
+
+    return res.data;
+  },
+
+  async deletePost(postPass: PostPassword) {
+    const res = await axios.delete<ApiResponse<{ post_id: number; password: string }>>(
+      `/post/${postPass.post_id}`,
+      {
+        validateStatus: (status) => status >= 200 && status < 300,
+        params: {
+          password: postPass.password,
+        },
       },
     );
 
