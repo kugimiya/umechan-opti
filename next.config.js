@@ -15,11 +15,6 @@ const nextConfig = {
   output: 'standalone',
   rewrites: async () => ({
     beforeFiles: [
-      { source: '/back-api/radio/status', destination: 'http://buk:3001/api/status' },
-      {
-        source: '/back-api/radio/thumb/:path*',
-        destination: 'http://buk:3001/api/scanner/image/:path*',
-      },
       { source: '/back-api/:path*', destination: 'http://pissykaka.scheoble.xyz/:path*' },
     ],
   }),

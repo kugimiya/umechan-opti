@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { memo, useEffect, useState } from 'react';
 import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
-import { LINKS } from 'src/constants';
+import { LINKS, RADIOS_LINKS } from 'src/constants';
 import { Board } from 'src/services';
 import { isServer } from 'src/utils/isServer';
 import { randomInteger } from 'src/utils/randomInteger';
@@ -99,15 +99,18 @@ export const Navbar = memo(function NavbarMemoized({ boards }: NavbarProps): JSX
         <Image alt='Banner' height={100} src={bannerSrc} width={300} />
       </Box>
 
-      <Box
-        justifyContent='center'
-        width='100%'
-        border='colorBgSecondary'
-        borderRadius='4px'
-        overflow='hidden'
-      >
-        <RadioPlayer mount='neformat' url='http://kugi.club:8000/neformat.mp3' />
-      </Box>
+      {RADIOS_LINKS.map(({ name, link }) => (
+        <Box
+          key={`${name}-${link}`}
+          justifyContent='center'
+          width='100%'
+          border='colorBgSecondary'
+          borderRadius='4px'
+          overflow='hidden'
+        >
+          <RadioPlayer mount={name} url={link} />
+        </Box>
+      ))}
     </Box>
   );
 });

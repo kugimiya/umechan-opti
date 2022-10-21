@@ -5,8 +5,13 @@ export const NEWS_THREAD = {
   threadId: '28549',
   whitelist: ['28550', '28551', '28555', '28603', '28883', '29109', '29355', '29438'],
 };
-export const ALL_NEWS_THREAD = { board: 'mod' };
-export const RADIOS_LINKS = [{ name: 'neformat', link: 'http://kugi.club:8000/neformat.mp3' }];
+export const RADIOS_LINKS = [
+  {
+    name: 'neformat',
+    link: 'http://kugi.club:8000/neformat.mp3',
+    apiBasePath: 'http://kugi.club:3001/',
+  },
+];
 export const LINKS = [
   { text: 'Pissychan', href: 'http://pissychan.oxore.net/' },
   { text: 'Discord', href: 'https://discord.gg/DhhjsVgXBG' },

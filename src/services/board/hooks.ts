@@ -20,6 +20,7 @@ export const useBoardData = (boardTag: string, page: number) => {
     () => BoardService.getBoard(boardTag, page),
     {
       enabled: true,
+      refetchInterval: 30000,
     },
   );
 };
@@ -27,14 +28,19 @@ export const useBoardData = (boardTag: string, page: number) => {
 export const useThreadData = (threadId: string) => {
   return useQuery(['thread data', threadId], () => BoardService.getThread(threadId), {
     enabled: true,
+    refetchInterval: 30000,
   });
 };
 
-export const useRadioData = () => {
-  return useQuery(['radio status'], () => BoardService.getRadioStatus(), {
-    enabled: true,
-    refetchInterval: 10000,
-  });
+export const useRadioData = (url: string, mount: string, apiBasePath: string) => {
+  return useQuery(
+    ['radio status', url, mount, apiBasePath],
+    () => BoardService.getRadioStatus(apiBasePath),
+    {
+      enabled: true,
+      refetchInterval: 10000,
+    },
+  );
 };
 
 export const useSubsData = (cursors: Record<string, string>) => {

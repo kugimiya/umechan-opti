@@ -46,9 +46,17 @@ const Img = styled('img')`
 
 const ts = Date.now();
 
-export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
+export const RadioPlayer = ({
+  url,
+  mount,
+  apiBasePath,
+}: {
+  url: string;
+  mount: string;
+  apiBasePath: string;
+}) => {
   const id = useId();
-  const radioData = useRadioData();
+  const radioData = useRadioData(url, mount, apiBasePath);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const Comp = isPlaying ? RotatingBox : HoveredBox;
@@ -66,7 +74,7 @@ export const RadioPlayer = ({ url, mount }: { url: string; mount: string }) => {
       <Box gap='8px' width='100%' justifyContent='center'>
         <Comp borderRadius='100%' overflow='hidden'>
           <Img
-            src={`/back-api/radio/thumb/${radioData.data.currentFile}`}
+            src={`${apiBasePath}/api/scanner/image/${radioData.data.currentFile}`}
             alt={radioData.data?.fileData?.id3Artist}
             style={{ width: '100%', height: 'auto' }}
           />

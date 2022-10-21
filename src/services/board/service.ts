@@ -47,8 +47,8 @@ export const BoardService = {
     return res.data;
   },
 
-  async getRadioStatus() {
-    return (await axios.get<RadioStatus>(`/radio/status`)).data;
+  async getRadioStatus(radioApiBasePath: string) {
+    return (await axios.get<RadioStatus>(`/api/status`, { baseURL: radioApiBasePath })).data;
   },
 
   async getSubsNewCursors(oldCursors: Record<string, string>) {
