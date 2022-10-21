@@ -100,7 +100,7 @@ export const Navbar = memo(function NavbarMemoized({ boards }: NavbarProps): JSX
         <Image alt='Banner' height={100} src={bannerSrc} width={300} />
       </Box>
 
-      {RADIOS_LINKS.map(({ name, link }) => (
+      {RADIOS_LINKS.map(({ name, link, apiBasePath }) => (
         <Box
           key={`${name}-${link}`}
           justifyContent='center'
@@ -109,7 +109,7 @@ export const Navbar = memo(function NavbarMemoized({ boards }: NavbarProps): JSX
           borderRadius='4px'
           overflow='hidden'
         >
-          <RadioPlayer mount={name} url={link} />
+          <RadioPlayer mount={name} url={link} apiBasePath={apiBasePath} />
         </Box>
       ))}
     </Box>

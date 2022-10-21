@@ -9,7 +9,7 @@ export const RADIOS_LINKS = [
   {
     name: 'neformat',
     link: 'http://kugi.club:8000/neformat.mp3',
-    apiBasePath: 'http://kugi.club:3001/',
+    apiBasePath: 'http://chan.kugi.club:3005/',
   },
 ];
 export const LINKS = [
