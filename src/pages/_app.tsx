@@ -6,6 +6,8 @@ import { CommonLayout } from 'src/components/layouts/CommonLayout';
 import { theme } from 'src/theme';
 import { ThemeProvider } from 'styled-components';
 
+import { PassportContext, usePassportLocalStorageAdapter } from '../hooks/usePassportContext';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -16,14 +18,18 @@ const queryClient = new QueryClient({
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const { passport } = usePassportLocalStorageAdapter();
+
   return (
-    <ThemeProvider theme={theme}>
-      <QueryClientProvider client={queryClient}>
-        <CommonLayout>
-          <Component {...pageProps} />
-        </CommonLayout>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <PassportContext.Provider value={passport}>
+      <ThemeProvider theme={theme}>
+        <QueryClientProvider client={queryClient}>
+          <CommonLayout>
+            <Component {...pageProps} />
+          </CommonLayout>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </PassportContext.Provider>
   );
 }
 

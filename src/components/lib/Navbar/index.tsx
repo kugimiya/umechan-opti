@@ -8,6 +8,7 @@ import { Board } from 'src/services';
 import { isServer } from 'src/utils/isServer';
 import { randomInteger } from 'src/utils/randomInteger';
 
+import { PassportView } from '../PassportView';
 import { RadioPlayer } from '../RadioPlayer';
 import { Tab } from '../Tab';
 
@@ -88,6 +89,16 @@ export const Navbar = memo(function NavbarMemoized({ boards }: NavbarProps): JSX
             </A>
           ))}
         </Tab>
+      </Box>
+
+      <Box
+        justifyContent='center'
+        width='100%'
+        border='colorBgSecondary'
+        borderRadius='4px'
+        overflow='hidden'
+      >
+        <PassportView />
       </Box>
 
       <Box

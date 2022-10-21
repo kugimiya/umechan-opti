@@ -2,6 +2,7 @@ import axios from 'axios';
 import { NEWS_THREAD, PAGE_SIZE } from 'src/constants';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
+import { Passport } from '../../hooks/usePassportContext';
 import { Board, BoardData, Post, RadioStatus, ThreadData } from './types';
 
 export const BoardService = {
@@ -61,5 +62,17 @@ export const BoardService = {
         },
       )
     ).data;
+  },
+
+  async registerPassport(passport: Passport) {
+    const res = await axios.post<ApiResponse<{ post_id: number; password: string }>>(
+      '/v2/passport',
+      passport,
+      {
+        validateStatus: (status) => status >= 200 && status < 300,
+      },
+    );
+
+    return res.data;
   },
 };

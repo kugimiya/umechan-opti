@@ -6,6 +6,8 @@ import { theme } from 'src/theme';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 import styled from 'styled-components';
 
+import { usePassportContext } from '../../../hooks/usePassportContext';
+
 interface FormStruct {
   nickname: string;
   subject: string;
@@ -91,8 +93,15 @@ export function CreatePostForm({
   ) => void;
   changeVisibility: (flag: boolean) => void;
 }) {
+  const { passport, isAuthorized } = usePassportContext();
   const [sending, setSending] = useState(false);
-  const form = useForm<FormStruct>({ defaultValues: { withSubscribe: true, multiplyPost: false } });
+  const form = useForm<FormStruct>({
+    defaultValues: {
+      withSubscribe: true,
+      multiplyPost: false,
+      nickname: isAuthorized ? passport?.key : '',
+    },
+  });
   const handler = async (data: FormStruct) => {
     if (sending) {
       return;
