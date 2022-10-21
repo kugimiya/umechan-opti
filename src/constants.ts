@@ -11,6 +11,11 @@ export const RADIOS_LINKS = [
     link: 'http://kugi.club:8000/neformat.mp3',
     apiBasePath: 'http://chan.kugi.club:3005/',
   },
+  {
+    name: 'special',
+    link: 'http://kugi.club:9002/neformat.mp3',
+    apiBasePath: 'http://chan.kugi.club:9005/',
+  },
 ];
 export const LINKS = [
   { text: 'Pissychan', href: 'http://pissychan.oxore.net/' },
