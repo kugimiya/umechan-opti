@@ -37,10 +37,13 @@ const HoveredBox = styled(Box)`
 
 const Img = styled('img')`
   max-width: 128px;
+  height: 128px;
   transition: 0.1s all;
+  object-fit: cover;
 
   &:hover {
     max-width: 256px;
+    height: 256px;
   }
 `;
 
@@ -63,11 +66,19 @@ export const RadioPlayer = ({
 
   const content = radioData.data?.streaming ? (
     <>
-      <Box flexDirection='column' alignItems='center'>
-        <Text variant={TextVariant.textBody1}>
-          <Text variant={TextVariant.textBodyBold1}>{`${mount} `}</Text>
+      <Box flexDirection='column' alignItems='center' width='100%' gap='4px'>
+        <Text variant={TextVariant.textBodyBold1}>{`${mount} `}</Text>
 
-          <Text variant={TextVariant.textBody1}>[{radioData.data?.playlistData?.name}]</Text>
+        <Text
+          variant={TextVariant.textBody1}
+          style={{
+            whiteSpace: 'pre',
+            maxWidth: '100%',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {radioData.data?.playlistData?.name}
         </Text>
       </Box>
 
@@ -76,7 +87,7 @@ export const RadioPlayer = ({
           <Img
             src={`${apiBasePath}api/scanner/image/${radioData.data.currentFile}`}
             alt={radioData.data?.fileData?.id3Artist}
-            style={{ width: '100%', height: 'auto' }}
+            style={{ width: '100%' }}
           />
         </Comp>
       </Box>
@@ -84,6 +95,7 @@ export const RadioPlayer = ({
       <Box alignItems='center'>
         <Text
           variant={TextVariant.textBodyBold1}
+          style={{ textAlign: 'center' }}
         >{`${radioData.data?.fileData?.id3Artist} - ${radioData.data?.fileData?.id3Title}`}</Text>
       </Box>
 
