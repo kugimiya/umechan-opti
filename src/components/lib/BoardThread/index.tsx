@@ -53,7 +53,7 @@ export function BoardThread({
 
   return (
     <Box flexDirection='column' gap='10px'>
-      <Box alignItems='baseline' gap='10px' justifyContent='space-between'>
+      <Box alignItems='baseline' gap='10px'>
         <Box gap='10px'>
           {Boolean(post.subject) && <Text variant={TextVariant.textBodyBold1}>{post.subject}</Text>}
 
