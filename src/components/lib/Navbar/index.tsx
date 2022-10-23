@@ -3,13 +3,12 @@ import Link from 'next/link';
 import { memo, useEffect, useState } from 'react';
 import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
-import { LINKS, RADIOS_LINKS } from 'src/constants';
+import { LINKS } from 'src/constants';
 import { Board } from 'src/services';
 import { isServer } from 'src/utils/isServer';
 import { randomInteger } from 'src/utils/randomInteger';
 
 import { PassportView } from '../PassportView';
-import { RadioPlayer } from '../RadioPlayer';
 import { Tab } from '../Tab';
 
 const bannersHrefs = [
