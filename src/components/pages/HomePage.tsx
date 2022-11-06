@@ -17,7 +17,17 @@ export const HomePage = function HomePageMemoized(
       <Head>
         <title>Юмечан</title>
 
+        <meta name='description' content='Страница сайта' />
+
         <meta property='og:image' content={`/api/og?title=${'Главная'}`} />
+
+        <meta property='og:type' content='website' />
+
+        <meta property='og:description' content='Страница сайта' />
+
+        <meta property='og:title' content={`Юмечан`} />
+
+        <meta name='twitter:image' content={`/api/og?title=${'Главная'}`} />
       </Head>
 
       <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>

@@ -56,8 +56,24 @@ export const ThreadPage = function ThreadPageMemoized(
       <Head>
         <title>{`Юмечан :: ${thread.subject || thread.truncated_message?.slice(0, 20)}`}</title>
 
+        <meta name='description' content='Страница сайта' />
+
         <meta
           property='og:image'
+          content={`/api/og?title=${thread.subject || thread.truncated_message?.slice(0, 20)}`}
+        />
+
+        <meta property='og:type' content='website' />
+
+        <meta property='og:description' content='Страница сайта' />
+
+        <meta
+          property='og:title'
+          content={`Юмечан :: ${thread.subject || thread.truncated_message?.slice(0, 20)}`}
+        />
+
+        <meta
+          name='twitter:image'
           content={`/api/og?title=${thread.subject || thread.truncated_message?.slice(0, 20)}`}
         />
       </Head>
