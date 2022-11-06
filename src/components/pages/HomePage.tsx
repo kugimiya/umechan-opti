@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 import { ThreadData, useClientNews } from 'src/services';
@@ -11,23 +12,24 @@ export const HomePage = function HomePageMemoized(
   props: ApiResponse<{ thread_data: ThreadData }>,
 ): JSX.Element {
   const clientNews = useClientNews(props);
+  const router = useRouter();
 
   return (
     <>
       <Head>
         <title>Юмечан</title>
 
-        <meta name='description' content='Страница сайта' />
+        <meta name='description' content={`Главная чана`} />
 
-        <meta property='og:image' content={`/api/og?title=${'Главная'}`} />
+        <meta property='og:url' content={`http://chan.kugi.club${router.asPath}`} />
+
+        <meta property='og:image' content={`/api/og?title=${'Юмечан'}`} />
 
         <meta property='og:type' content='website' />
 
-        <meta property='og:description' content='Страница сайта' />
+        <meta property='og:description' content={`Главная чана"`} />
 
         <meta property='og:title' content={`Юмечан`} />
-
-        <meta name='twitter:image' content={`/api/og?title=${'Главная'}`} />
       </Head>
 
       <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>

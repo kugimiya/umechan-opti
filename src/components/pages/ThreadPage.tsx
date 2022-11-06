@@ -18,11 +18,11 @@ export const ThreadPage = function ThreadPageMemoized(
   props: ApiResponse<{ thread_data: ThreadData }>,
 ): JSX.Element {
   const { handleReply, isFormVisible, setIsFormVisible } = usePostReplyActions();
-  const rolter = useRouter();
-  const threadData = useThreadData(rolter.query.id?.toString() || 'null', props);
+  const router = useRouter();
+  const threadData = useThreadData(router.query.id?.toString() || 'null', props);
   const thread = threadData.data?.payload.thread_data;
   const subs = useSubscriptions();
-  const scrollTo = rolter.query.scroll_to as string | undefined;
+  const scrollTo = router.query.scroll_to as string | undefined;
 
   useEffect(() => {
     if (!thread) {
@@ -30,11 +30,11 @@ export const ThreadPage = function ThreadPageMemoized(
     }
 
     if (!isServer() && Object.keys(subs.subsIds).includes(thread.id?.toString() || '__')) {
-      if (String(thread.replies.at(-1)?.id) !== subs.subsIds[rolter.query.id?.toString() || '']) {
+      if (String(thread.replies.at(-1)?.id) !== subs.subsIds[router.query.id?.toString() || '']) {
         subs.subscribe(thread.id?.toString() || '', String(thread.replies.at(-1)?.id));
       }
     }
-  }, [thread?.id, thread, subs.subsIds, subs, rolter.query.id]);
+  }, [thread?.id, thread, subs.subsIds, subs, router.query.id]);
 
   useEffect(() => {
     if (!isServer() && thread?.replies) {
@@ -56,7 +56,12 @@ export const ThreadPage = function ThreadPageMemoized(
       <Head>
         <title>{`Юмечан :: ${thread.subject || thread.truncated_message?.slice(0, 20)}`}</title>
 
-        <meta name='description' content='Страница сайта' />
+        <meta
+          name='description'
+          content={`Страница треда "${thread.subject || thread.truncated_message?.slice(0, 20)}"`}
+        />
+
+        <meta property='og:url' content={`http://chan.kugi.club${router.asPath}`} />
 
         <meta
           property='og:image'
@@ -65,16 +70,14 @@ export const ThreadPage = function ThreadPageMemoized(
 
         <meta property='og:type' content='website' />
 
-        <meta property='og:description' content='Страница сайта' />
-
         <meta
-          property='og:title'
+          property='og:description'
           content={`Юмечан :: ${thread.subject || thread.truncated_message?.slice(0, 20)}`}
         />
 
         <meta
-          name='twitter:image'
-          content={`/api/og?title=${thread.subject || thread.truncated_message?.slice(0, 20)}`}
+          property='og:title'
+          content={`Юмечан :: ${thread.subject || thread.truncated_message?.slice(0, 20)}`}
         />
       </Head>
 
@@ -88,8 +91,8 @@ export const ThreadPage = function ThreadPageMemoized(
               {isFormVisible && (
                 <CreatePostForm
                   mode='post'
-                  parentBoardId={rolter.query.tag?.toString() || ''}
-                  parentPostId={rolter.query.id?.toString() || ''}
+                  parentBoardId={router.query.tag?.toString() || ''}
+                  parentPostId={router.query.id?.toString() || ''}
                   onCreate={(data, withSubscribe) => {
                     if (withSubscribe) {
                       subs.subscribe(thread.id?.toString() || '', String(data.payload.post_id));
