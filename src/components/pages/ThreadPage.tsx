@@ -54,7 +54,12 @@ export const ThreadPage = function ThreadPageMemoized(
   return (
     <>
       <Head>
-        <title>{`Юмечан :: ${thread.subject}`}</title>
+        <title>{`Юмечан :: ${thread.subject || thread.truncated_message?.slice(0, 20)}`}</title>
+
+        <meta
+          property='og:image'
+          content={`/api/og?title=${thread.subject || thread.truncated_message?.slice(0, 20)}`}
+        />
       </Head>
 
       <PostsContext.Provider value={{ posts: thread.replies || [] }}>

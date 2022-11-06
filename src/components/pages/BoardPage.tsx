@@ -44,6 +44,8 @@ export const BoardPage = function BoardPageMemoized(props: ApiResponse<BoardData
     <>
       <Head>
         <title>{`Юмечан :: ${boardName}`}</title>
+
+        <meta property='og:image' content={`/api/og?title=${boardName}`} />
       </Head>
 
       <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>

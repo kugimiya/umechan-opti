@@ -16,6 +16,8 @@ export const HomePage = function HomePageMemoized(
     <>
       <Head>
         <title>Юмечан</title>
+
+        <meta property='og:image' content={`/api/og?title=${'Главная'}`} />
       </Head>
 
       <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>
