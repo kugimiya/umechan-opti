@@ -94,8 +94,8 @@ export const SubsContainer = ({ boards }: { boards: Board[] }) => {
                 variant={TextVariant.textBodyBold1}
                 style={{ whiteSpace: 'pre', maxWidth: '100%', overflow: 'hidden' }}
               >
-                {cursors.data[id].currentCursor !== subs.subsIds[id] &&
-                cursors.data[id].currentCursor !== ''
+                {cursors.data[id]?.currentCursor !== subs.subsIds[id] &&
+                cursors.data[id]?.currentCursor !== ''
                   ? 'Есть новые посты'
                   : ''}
               </Text>
@@ -111,13 +111,13 @@ export const SubsContainer = ({ boards }: { boards: Board[] }) => {
                   router
                     .push(
                       `/board/${
-                        boards.find((_) => String(_.id) === cursors.data[id].tag)?.tag || '__'
-                      }/thread/${id}?scroll_to=post_${cursors.data[id].currentCursor}`,
+                        boards.find((_) => String(_.id) === cursors.data[id]?.tag)?.tag || '__'
+                      }/thread/${id}?scroll_to=post_${cursors.data[id]?.currentCursor}`,
                     )
                     .catch(console.error);
                 }}
               >
-                {cursors.data[id].title}
+                {cursors.data[id]?.title}
               </Text>
             </Box>
           );

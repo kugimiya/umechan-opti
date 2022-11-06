@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
+import { Text } from 'src/components/common/Text';
 import { LINKS } from 'src/constants';
 import { Board } from 'src/services';
 import { isServer } from 'src/utils/isServer';
@@ -42,9 +43,7 @@ type NavbarProps = {
 };
 
 export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Element {
-  const [bannerSrc, setBannerSrc] = useState(
-    bannersHrefs[randomInteger(0, bannersHrefs.length)] || bannersHrefs[0],
-  );
+  const [bannerSrc, setBannerSrc] = useState(bannersHrefs[0]);
 
   useEffect(() => {
     if (isServer()) {
@@ -70,13 +69,13 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
       >
         <Tab title='Досочки'>
           <Link key={'Глагне'} href='/'>
-            <A href='/'>Глагне</A>
+            <Text>Глагне</Text>
           </Link>
 
           <>
             {boards.map((item) => (
               <Link key={item.tag} href={`/board/${item.tag}`}>
-                <A href={`/board/${item.tag}`}>{`${item.name} [${item.tag}]`}</A>
+                <Text>{`${item.name} [${item.tag}]`}</Text>
               </Link>
             ))}
           </>

@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Post } from 'src/services';
 

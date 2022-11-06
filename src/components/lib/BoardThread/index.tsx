@@ -1,6 +1,5 @@
 import { format, fromUnixTime, getYear } from 'date-fns';
 import Link from 'next/link';
-import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 import { usePostReplyActions } from 'src/hooks/usePostReplyActions';
@@ -28,13 +27,9 @@ export function BoardThread({
 
   const isThreadPostAction = (
     <Link href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}`}>
-      <A
-        href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}`}
-        color='colorTextLink'
-        variant={TextVariant.textBodyBold1}
-      >
+      <Text color='colorTextLink' variant={TextVariant.textBodyBold1}>
         В тред
-      </A>
+      </Text>
     </Link>
   );
 

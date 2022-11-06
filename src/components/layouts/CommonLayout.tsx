@@ -1,9 +1,9 @@
-import { memo } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Navbar } from 'src/components/lib/Navbar';
 import { RADIOS_LINKS } from 'src/constants';
-import { useAllBoards } from 'src/services';
+import { Board, Post, RadioStatus, useAllBoards } from 'src/services';
 import { theme } from 'src/theme';
+import { ApiResponse } from 'src/types/utils/ApiResponse';
 import styled from 'styled-components';
 
 import { RadioPlayer } from '../lib/RadioPlayer';
@@ -28,12 +28,19 @@ const NavbarContainer = styled(Box)`
 
 type CommonLayoutProps = {
   children: JSX.Element;
+  boardsData: ApiResponse<{
+    boards: Board[];
+    posts: Post[];
+  }>;
+  initialRadioData: Record<string, RadioStatus>;
 };
 
 export const CommonLayout = function CommonLayoutMemoized({
   children,
+  boardsData,
+  initialRadioData,
 }: CommonLayoutProps): JSX.Element {
-  const allBoardsData = useAllBoards();
+  const allBoardsData = useAllBoards(boardsData);
 
   return (
     <MainContainer
@@ -62,7 +69,12 @@ export const CommonLayout = function CommonLayoutMemoized({
             borderRadius='4px'
             overflow='hidden'
           >
-            <RadioPlayer mount={name} url={link} apiBasePath={apiBasePath} />
+            <RadioPlayer
+              mount={name}
+              url={link}
+              apiBasePath={apiBasePath}
+              initialRadioData={initialRadioData[name]}
+            />
           </Box>
         ))}
       </NavbarContainer>

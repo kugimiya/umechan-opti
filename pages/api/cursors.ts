@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { BoardService, ThreadData } from 'src/services';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const cursors = JSON.parse(req.query.cursors as string) as Record<string, string>;
+  const cursors = req.query || {};
   let threads = [] as ThreadData[];
   const response = {} as Record<string, { title: string; currentCursor: string; tag: string }>;
 
@@ -12,8 +12,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   await Promise.all(
     Object.entries(cursors).map(async (cursor) => {
       const [threadId] = cursor;
-
-      const thread = (await BoardService.getThread(threadId)).payload.thread_data;
+      const thread = (
+        await BoardService.getThread(threadId.replaceAll('cursors[', '').replaceAll(']', ''))
+      ).payload.thread_data;
       threads.push(thread);
     }),
   );
@@ -33,5 +34,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
   }
 
-  res.json(response);
+  res.status(200).json(response);
 }

@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import { memo } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 import { ThreadData, useClientNews } from 'src/services';

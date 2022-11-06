@@ -1,16 +1,14 @@
-import '../styles/globals.css';
+import 'src/styles/globals.css';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { AppProps } from 'next/app';
-import { CommonLayout } from 'src/components/layouts/CommonLayout';
-import { theme } from 'src/theme';
-import { ThemeProvider } from 'styled-components';
-
-import { PassportContext, usePassportLocalStorageAdapter } from '../hooks/usePassportContext';
+import { PassportContext, usePassportLocalStorageAdapter } from 'src/hooks/usePassportContext';
 import {
   PostsPasswordsContext,
   usePostsPasswordsLocalStorageAdapter,
-} from '../hooks/usePostsPasswordsContext';
+} from 'src/hooks/usePostsPasswordsContext';
+import { theme } from 'src/theme';
+import { ThemeProvider } from 'styled-components';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,9 +28,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <PassportContext.Provider value={passport}>
         <ThemeProvider theme={theme}>
           <QueryClientProvider client={queryClient}>
-            <CommonLayout>
-              <Component {...pageProps} />
-            </CommonLayout>
+            <Component {...pageProps} />
           </QueryClientProvider>
         </ThemeProvider>
       </PassportContext.Provider>

@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 

@@ -85,11 +85,11 @@ function MD({
 
       return (
         <Link href={`#post_${num}`}>
-          <A variant={TextVariant.textBody1} color='colorGreen'>
+          <Text variant={TextVariant.textBody1} color='colorGreen'>
             {'>>'}
 
             {num}
-          </A>
+          </Text>
         </Link>
       );
 

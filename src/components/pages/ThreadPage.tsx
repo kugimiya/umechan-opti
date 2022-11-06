@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { memo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Text } from 'src/components/common/Text';
 import { PostsContext } from 'src/hooks/usePostsContext';
 import { useSubscriptions } from 'src/hooks/useSubscriptions';

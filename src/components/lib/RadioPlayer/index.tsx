@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
-import { useRadioData } from 'src/services';
+import { RadioStatus, useRadioData } from 'src/services';
 import styled from 'styled-components';
 
 const RotatingBox = styled(Box)`
@@ -53,13 +53,15 @@ export const RadioPlayer = ({
   url,
   mount,
   apiBasePath,
+  initialRadioData,
 }: {
   url: string;
   mount: string;
   apiBasePath: string;
+  initialRadioData: RadioStatus;
 }) => {
   const id = useId();
-  const radioData = useRadioData(url, mount, apiBasePath);
+  const radioData = useRadioData(url, mount, apiBasePath, initialRadioData);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const Comp = isPlaying ? RotatingBox : HoveredBox;
