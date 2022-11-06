@@ -3,7 +3,18 @@ export const PAGE_SIZE = 20;
 export const NEWS_THREAD = {
   board: 'mod',
   threadId: '28549',
-  whitelist: ['28550', '28551', '28555', '28603', '28883', '29109', '29355', '29438', '30281'],
+  whitelist: [
+    '28550',
+    '28551',
+    '28555',
+    '28603',
+    '28883',
+    '29109',
+    '29355',
+    '29438',
+    '30281',
+    '30621',
+  ],
 };
 export const RADIOS_LINKS = [
   {
