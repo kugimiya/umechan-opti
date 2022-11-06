@@ -58,7 +58,18 @@ export const usePassportLocalStorageAdapter = () => {
     }
 
     const intervalPointer = setInterval(() => {
-      setPassport(readFromLocalStorage());
+      const nextPass = readFromLocalStorage();
+      setPassport((prevPass) => {
+        if (
+          prevPass.isAuthorized !== nextPass.isAuthorized ||
+          prevPass.passport?.key !== nextPass.passport?.key ||
+          prevPass.passport?.name !== nextPass.passport?.name
+        ) {
+          return nextPass;
+        }
+
+        return prevPass;
+      });
     }, 1000);
 
     return () => clearInterval(intervalPointer);

@@ -15,7 +15,7 @@ import {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
       refetchInterval: 20000,
     },
   },

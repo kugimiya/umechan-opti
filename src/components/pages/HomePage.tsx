@@ -2,13 +2,16 @@ import Head from 'next/head';
 import { memo } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
-import { useClientNews } from 'src/services';
+import { ThreadData, useClientNews } from 'src/services';
+import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 import { NewsPostComponent } from '../lib/NewsPostComponent';
 import { Tab } from '../lib/Tab';
 
-export const HomePage = memo(function HomePageMemoized(): JSX.Element {
-  const clientNews = useClientNews();
+export const HomePage = function HomePageMemoized(
+  props: ApiResponse<{ thread_data: ThreadData }>,
+): JSX.Element {
+  const clientNews = useClientNews(props);
 
   return (
     <>
@@ -32,4 +35,4 @@ export const HomePage = memo(function HomePageMemoized(): JSX.Element {
       </Box>
     </>
   );
-});
+};

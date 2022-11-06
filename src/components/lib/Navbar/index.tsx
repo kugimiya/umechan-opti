@@ -41,7 +41,7 @@ type NavbarProps = {
   boards: Board[];
 };
 
-export const Navbar = memo(function NavbarMemoized({ boards }: NavbarProps): JSX.Element {
+export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Element {
   const [bannerSrc, setBannerSrc] = useState(
     bannersHrefs[randomInteger(0, bannersHrefs.length)] || bannersHrefs[0],
   );
@@ -112,4 +112,4 @@ export const Navbar = memo(function NavbarMemoized({ boards }: NavbarProps): JSX
       </Box>
     </Box>
   );
-});
+};

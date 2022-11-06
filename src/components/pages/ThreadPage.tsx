@@ -4,7 +4,8 @@ import { memo, useEffect } from 'react';
 import { Text } from 'src/components/common/Text';
 import { PostsContext } from 'src/hooks/usePostsContext';
 import { useSubscriptions } from 'src/hooks/useSubscriptions';
-import { useThreadData } from 'src/services';
+import { ThreadData, useThreadData } from 'src/services';
+import { ApiResponse } from 'src/types/utils/ApiResponse';
 import { isServer } from 'src/utils/isServer';
 
 import { usePostReplyActions } from '../../hooks/usePostReplyActions';
@@ -13,10 +14,12 @@ import { CreatePostForm } from '../lib/CreatePostForm';
 import { PostComponent } from '../lib/PostComponent';
 import { Tab } from '../lib/Tab';
 
-export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
+export const ThreadPage = function ThreadPageMemoized(
+  props: ApiResponse<{ thread_data: ThreadData }>,
+): JSX.Element {
   const { handleReply, isFormVisible, setIsFormVisible } = usePostReplyActions();
   const rolter = useRouter();
-  const threadData = useThreadData(rolter.query.id?.toString() || 'null');
+  const threadData = useThreadData(rolter.query.id?.toString() || 'null', props);
   const thread = threadData.data?.payload.thread_data;
   const subs = useSubscriptions();
   const scrollTo = rolter.query.scroll_to as string | undefined;
@@ -51,7 +54,7 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Юмечан :: {thread.subject}</title>
+        <title>{`Юмечан :: ${thread.subject}`}</title>
       </Head>
 
       <PostsContext.Provider value={{ posts: thread.replies || [] }}>
@@ -88,4 +91,4 @@ export const ThreadPage = memo(function ThreadPageMemoized(): JSX.Element {
       </PostsContext.Provider>
     </>
   );
-});
+};

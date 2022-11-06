@@ -26,15 +26,29 @@ export const useSubscriptions = () => {
   };
 
   useEffect(() => {
-    if (!isServer()) {
-      setSubsIds(JSON.parse(localStorage.getItem('subs') || '{}') as Record<string, string>);
-
-      const int = setInterval(() => {
-        setSubsIds(JSON.parse(localStorage.getItem('subs') || '{}') as Record<string, string>);
-      }, 2000);
-
-      return () => clearInterval(int);
+    if (isServer()) {
+      return;
     }
+
+    setSubsIds(JSON.parse(localStorage.getItem('subs') || '{}') as Record<string, string>);
+
+    const int = setInterval(() => {
+      const nextSubs = JSON.parse(localStorage.getItem('subs') || '{}') as Record<string, string>;
+
+      setSubsIds((prevSubs) => {
+        const update = Object.entries(nextSubs).some(([key, value]) => {
+          return prevSubs[key] === undefined || prevSubs[key] !== value;
+        });
+
+        if (update) {
+          return nextSubs;
+        }
+
+        return prevSubs;
+      });
+    }, 2000);
+
+    return () => clearInterval(int);
   }, []);
 
   return { subsIds, subscribe, deleteEntry };

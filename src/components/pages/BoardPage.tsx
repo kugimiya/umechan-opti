@@ -1,10 +1,11 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { Fragment, memo, useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Text } from 'src/components/common/Text';
 import { PAGE_SIZE } from 'src/constants';
-import { useBoardData } from 'src/services';
+import { BoardData, useBoardData } from 'src/services';
 import { theme } from 'src/theme';
+import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 import { Box } from '../common/Box';
 import { BoardThread } from '../lib/BoardThread';
@@ -12,12 +13,13 @@ import { CreatePostForm } from '../lib/CreatePostForm';
 import { Pager } from '../lib/Pager';
 import { Tab } from '../lib/Tab';
 
-export const BoardPage = memo(function BoardPageMemoized(): JSX.Element {
+export const BoardPage = function BoardPageMemoized(props: ApiResponse<BoardData>): JSX.Element {
   const [createFormVisible, setCreateFormVisible] = useState(false);
-  const rolter = useRouter();
+  const router = useRouter();
   const boardData = useBoardData(
-    rolter.query.tag?.toString() || 'b',
-    Number(rolter.query.page || '0') || 0,
+    router.query.tag?.toString() || 'b',
+    Number(router.query.page || '0') || 0,
+    props,
   );
   const board = boardData.data?.payload;
 
@@ -30,8 +32,8 @@ export const BoardPage = memo(function BoardPageMemoized(): JSX.Element {
   for (let index = 0; index < allPages; index += 1) {
     pages.push({
       title: `${index.toString()}`,
-      href: `/board/${rolter.query.tag}?page=${index}`,
-      active: index === (Number(rolter.query.page || '0') || 0),
+      href: `/board/${router.query.tag}?page=${index}`,
+      active: index === (Number(router.query.page || '0') || 0),
     });
   }
 
@@ -41,7 +43,7 @@ export const BoardPage = memo(function BoardPageMemoized(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Юмечан :: {boardName}</title>
+        <title>{`Юмечан :: ${boardName}`}</title>
       </Head>
 
       <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>
@@ -53,7 +55,7 @@ export const BoardPage = memo(function BoardPageMemoized(): JSX.Element {
             {createFormVisible && (
               <CreatePostForm
                 mode='thread'
-                parentBoardId={rolter.query.tag?.toString() || ''}
+                parentBoardId={router.query.tag?.toString() || ''}
                 onCreate={() => {
                   boardData.refetch().catch(console.error);
                 }}
@@ -106,4 +108,4 @@ export const BoardPage = memo(function BoardPageMemoized(): JSX.Element {
       </Box>
     </>
   );
-});
+};

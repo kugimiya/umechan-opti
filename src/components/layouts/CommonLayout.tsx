@@ -30,7 +30,7 @@ type CommonLayoutProps = {
   children: JSX.Element;
 };
 
-export const CommonLayout = memo(function CommonLayoutMemoized({
+export const CommonLayout = function CommonLayoutMemoized({
   children,
 }: CommonLayoutProps): JSX.Element {
   const allBoardsData = useAllBoards();
@@ -70,4 +70,4 @@ export const CommonLayout = memo(function CommonLayoutMemoized({
       <SubsContainer boards={allBoardsData.data?.payload.boards || []} />
     </MainContainer>
   );
-});
+};

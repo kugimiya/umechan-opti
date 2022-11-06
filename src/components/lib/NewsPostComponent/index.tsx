@@ -5,7 +5,7 @@ import { Post } from 'src/services';
 import { PostMedia } from '../PostMedia';
 import { PostText } from '../PostText';
 
-export const NewsPostComponent = memo(function NewsPostComponentMemoized({
+export const NewsPostComponent = function NewsPostComponentMemoized({
   post,
 }: {
   post: Post;
@@ -17,4 +17,4 @@ export const NewsPostComponent = memo(function NewsPostComponentMemoized({
       <PostText post={post} />
     </Box>
   );
-});
+};

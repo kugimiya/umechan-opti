@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 
-export const Tab = memo(function TabMemoized({
+export const Tab = function TabMemoized({
   title,
   children,
   action,
@@ -33,4 +33,4 @@ export const Tab = memo(function TabMemoized({
       </Box>
     </Box>
   );
-});
+};

@@ -50,7 +50,14 @@ export const usePostsPasswordsLocalStorageAdapter = () => {
     }
 
     const intervalPointer = setInterval(() => {
-      setPasswords(readPostPasswordFromLocalStorage());
+      const nextPasswords = readPostPasswordFromLocalStorage();
+      setPasswords((oldPasswords) => {
+        if (oldPasswords.passwords.length !== nextPasswords.passwords.length) {
+          return nextPasswords;
+        }
+
+        return oldPasswords;
+      });
     }, 1000);
 
     return () => clearInterval(intervalPointer);

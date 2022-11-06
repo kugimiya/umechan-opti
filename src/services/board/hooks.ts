@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 import { BoardService } from './service';
+import { BoardData, ThreadData } from './types';
 
 export const useAllBoards = () => {
   return useQuery(['boards list'], () => BoardService.getAllBoards(), {
@@ -8,27 +10,37 @@ export const useAllBoards = () => {
   });
 };
 
-export const useClientNews = () => {
+export const useClientNews = (initialData?: ApiResponse<{ thread_data: ThreadData }>) => {
   return useQuery(['client data'], () => BoardService.getLatestNews(), {
     enabled: true,
+    initialData,
   });
 };
 
-export const useBoardData = (boardTag: string, page: number) => {
+export const useBoardData = (
+  boardTag: string,
+  page: number,
+  initialData?: ApiResponse<BoardData>,
+) => {
   return useQuery(
     ['board data', boardTag, page.toString()],
     () => BoardService.getBoard(boardTag, page),
     {
       enabled: true,
       refetchInterval: 30000,
+      initialData,
     },
   );
 };
 
-export const useThreadData = (threadId: string) => {
+export const useThreadData = (
+  threadId: string,
+  initialData?: ApiResponse<{ thread_data: ThreadData }>,
+) => {
   return useQuery(['thread data', threadId], () => BoardService.getThread(threadId), {
     enabled: true,
     refetchInterval: 30000,
+    initialData,
   });
 };
 
