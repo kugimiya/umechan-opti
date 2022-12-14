@@ -15,7 +15,7 @@ const nextConfig = {
   output: 'standalone',
   rewrites: async () => ({
     beforeFiles: [
-      { source: '/back-api/:path*', destination: 'http://pissykaka.scheoble.xyz/:path*' },
+      { source: '/back-api/:path*', destination: 'http://scheoble.xyz/api/:path*' },
     ],
   }),
 };
