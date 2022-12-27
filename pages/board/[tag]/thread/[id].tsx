@@ -11,7 +11,13 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
 
   const initialRadioData: Record<string, RadioStatus> = {};
   for (const item of RADIOS_LINKS) {
-    initialRadioData[item.name] = await BoardService.getRadioStatus(item.apiBasePath);
+    try {
+      const data = await BoardService.getRadioStatus(item.apiBasePath);
+      initialRadioData[item.name] = data;
+    } catch (e) {
+      initialRadioData[item.name] = {};
+      console.error(e);
+    }
   }
 
   return { props: { threadData, boardsData, initialRadioData } };

@@ -41,7 +41,7 @@ export const BoardService = {
       '/post',
       data,
       {
-        baseURL: 'http://pissykaka.scheoble.xyz/',
+        baseURL: 'http://scheoble.xyz/api/',
         validateStatus: (status) => status >= 200 && status < 300,
       },
     );

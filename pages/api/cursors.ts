@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   let threads = [] as ThreadData[];
   const response = {} as Record<string, { title: string; currentCursor: string; tag: string }>;
 
-  axios.defaults.baseURL = 'http://pissykaka.scheoble.xyz';
+  axios.defaults.baseURL = 'http://scheoble.xyz/api';
 
   await Promise.all(
     Object.entries(cursors).map(async (cursor) => {
