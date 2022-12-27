@@ -46,8 +46,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
 
       postResponse = await axios
-        .post<{ original_file: string; thumbnail_file: string }>('/', form, {
-          baseURL: 'http://scheoble.xyz/filestore/',
+        .post<{ original_file: string; thumbnail_file: string }>('/filestore', form, {
+          baseURL: 'http://scheoble.xyz/',
           headers: form.getHeaders(),
         })
         .then((result) => {
