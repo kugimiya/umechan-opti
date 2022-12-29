@@ -36,6 +36,7 @@ export const RADIOS_LINKS = [
 ];
 export const LINKS = [
   { text: 'Pissychan', href: 'http://pissychan.oxore.net/' },
+  { text: 'Оно живое', href: 'http://u05917ya.bget.ru/index.php' },
   { text: 'Discord', href: 'https://discord.gg/DhhjsVgXBG' },
   { text: 'Исходники', href: 'https://github.com/U-Me-Chan' },
 ];
