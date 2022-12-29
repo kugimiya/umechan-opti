@@ -53,15 +53,13 @@ export const RadioPlayer = ({
   url,
   mount,
   apiBasePath,
-  initialRadioData,
 }: {
   url: string;
   mount: string;
   apiBasePath: string;
-  initialRadioData: RadioStatus;
 }) => {
   const id = useId();
-  const radioData = useRadioData(url, mount, apiBasePath, initialRadioData);
+  const radioData = useRadioData(url, mount, apiBasePath);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const Comp = isPlaying ? RotatingBox : HoveredBox;

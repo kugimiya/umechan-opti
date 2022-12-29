@@ -1,41 +1,17 @@
 import type { NextPage } from 'next';
-import { CommonLayout } from 'src/components/layouts/CommonLayout';
 import { HomePage } from 'src/components/pages/HomePage';
-import { RADIOS_LINKS } from 'src/constants';
-import { Board, BoardService, Post, RadioStatus, ThreadData } from 'src/services';
+import { BoardService, ThreadData } from 'src/services';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 export async function getServerSideProps() {
   const boardData = await BoardService.getLatestNews();
-  const boardsData = await BoardService.getAllBoards();
-
-  const initialRadioData: Record<string, RadioStatus> = {};
-  for (const item of RADIOS_LINKS) {
-    try {
-      const data = await BoardService.getRadioStatus(item.apiBasePath);
-      initialRadioData[item.name] = data;
-    } catch (e) {
-      initialRadioData[item.name] = {};
-      console.error(e);
-    }
-  }
-
-  return { props: { boardData, boardsData, initialRadioData } };
+  return { props: { boardData } };
 }
 
 const Home: NextPage<{
   boardData: ApiResponse<{ thread_data: ThreadData }>;
-  boardsData: ApiResponse<{
-    boards: Board[];
-    posts: Post[];
-  }>;
-  initialRadioData: Record<string, RadioStatus>;
 }> = (props) => {
-  return (
-    <CommonLayout boardsData={props.boardsData} initialRadioData={props.initialRadioData}>
-      <HomePage {...props.boardData} />
-    </CommonLayout>
-  );
+  return <HomePage {...props.boardData} />;
 };
 
 export default Home;

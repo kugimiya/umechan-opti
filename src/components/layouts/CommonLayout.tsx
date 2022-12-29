@@ -28,19 +28,16 @@ const NavbarContainer = styled(Box)`
 
 type CommonLayoutProps = {
   children: JSX.Element;
-  boardsData: ApiResponse<{
+  boardsData?: ApiResponse<{
     boards: Board[];
     posts: Post[];
   }>;
-  initialRadioData: Record<string, RadioStatus>;
 };
 
 export const CommonLayout = function CommonLayoutMemoized({
   children,
-  boardsData,
-  initialRadioData,
 }: CommonLayoutProps): JSX.Element {
-  const allBoardsData = useAllBoards(boardsData);
+  const allBoardsData = useAllBoards();
 
   return (
     <MainContainer
@@ -51,7 +48,7 @@ export const CommonLayout = function CommonLayoutMemoized({
       backgroundColor='colorBgPrimary'
       alignItems='flex-start'
     >
-      <NavbarContainer width='100%' maxWidth='256px'>
+      <NavbarContainer width='100%' maxWidth='300px'>
         <Navbar boards={allBoardsData.data?.payload?.boards || []} />
       </NavbarContainer>
 
@@ -69,17 +66,12 @@ export const CommonLayout = function CommonLayoutMemoized({
             borderRadius='4px'
             overflow='hidden'
           >
-            <RadioPlayer
-              mount={name}
-              url={link}
-              apiBasePath={apiBasePath}
-              initialRadioData={initialRadioData[name]}
-            />
+            <RadioPlayer mount={name} url={link} apiBasePath={apiBasePath} />
           </Box>
         ))}
       </NavbarContainer>
 
-      <SubsContainer boards={allBoardsData.data?.payload.boards || []} />
+      {/*<SubsContainer boards={allBoardsData.data?.payload.boards || []} />*/}
     </MainContainer>
   );
 };

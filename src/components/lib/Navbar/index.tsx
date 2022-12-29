@@ -58,7 +58,7 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
   }, []);
 
   return (
-    <Box width='100%' flexDirection='column' gap='10px'>
+    <Box width='100%' flexDirection='column' gap='10px' minWidth='300px'>
       <Box
         width='100%'
         flexDirection='column'

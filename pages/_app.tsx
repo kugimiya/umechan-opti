@@ -10,6 +10,8 @@ import {
 import { theme } from 'src/theme';
 import { ThemeProvider } from 'styled-components';
 
+import { CommonLayout } from '../src/components/layouts/CommonLayout';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -28,7 +30,9 @@ function MyApp({ Component, pageProps }: AppProps) {
       <PassportContext.Provider value={passport}>
         <ThemeProvider theme={theme}>
           <QueryClientProvider client={queryClient}>
-            <Component {...pageProps} />
+            <CommonLayout>
+              <Component {...pageProps} />
+            </CommonLayout>
           </QueryClientProvider>
         </ThemeProvider>
       </PassportContext.Provider>

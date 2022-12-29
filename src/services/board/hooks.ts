@@ -4,15 +4,9 @@ import { ApiResponse } from 'src/types/utils/ApiResponse';
 import { BoardService } from './service';
 import { Board, BoardData, Post, RadioStatus, ThreadData } from './types';
 
-export const useAllBoards = (
-  initialData?: ApiResponse<{
-    boards: Board[];
-    posts: Post[];
-  }>,
-) => {
+export const useAllBoards = () => {
   return useQuery(['boards list'], () => BoardService.getAllBoards(), {
     enabled: true,
-    initialData,
   });
 };
 
@@ -50,19 +44,13 @@ export const useThreadData = (
   });
 };
 
-export const useRadioData = (
-  url: string,
-  mount: string,
-  apiBasePath: string,
-  initialData?: RadioStatus,
-) => {
+export const useRadioData = (url: string, mount: string, apiBasePath: string) => {
   return useQuery(
     ['radio status', url, mount, apiBasePath],
     () => BoardService.getRadioStatus(apiBasePath),
     {
       enabled: true,
       refetchInterval: 10000,
-      initialData,
       staleTime: 10000,
     },
   );

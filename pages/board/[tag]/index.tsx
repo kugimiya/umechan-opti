@@ -1,8 +1,6 @@
 import type { GetServerSidePropsContext, NextPage } from 'next';
-import { CommonLayout } from 'src/components/layouts/CommonLayout';
 import { BoardPage } from 'src/components/pages/BoardPage';
-import { RADIOS_LINKS } from 'src/constants';
-import { Board, BoardData, BoardService, Post, RadioStatus } from 'src/services';
+import { BoardData, BoardService } from 'src/services';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -10,35 +8,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     context.query.tag?.toString() || 'b',
     Number(context.query.page || '0') || 0,
   );
-  const boardsData = await BoardService.getAllBoards();
 
-  const initialRadioData: Record<string, RadioStatus> = {};
-  for (const item of RADIOS_LINKS) {
-    try {
-      const data = await BoardService.getRadioStatus(item.apiBasePath);
-      initialRadioData[item.name] = data;
-    } catch (e) {
-      initialRadioData[item.name] = {};
-      console.error(e);
-    }
-  }
-
-  return { props: { boardData, boardsData, initialRadioData } };
+  return { props: { boardData } };
 }
 
 const Board: NextPage<{
-  boardsData: ApiResponse<{
-    boards: Board[];
-    posts: Post[];
-  }>;
   boardData: ApiResponse<BoardData>;
-  initialRadioData: Record<string, RadioStatus>;
 }> = (props) => {
-  return (
-    <CommonLayout boardsData={props.boardsData} initialRadioData={props.initialRadioData}>
-      <BoardPage {...props.boardData} />
-    </CommonLayout>
-  );
+  return <BoardPage {...props.boardData} />;
 };
 
 export default Board;
