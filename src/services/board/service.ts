@@ -7,6 +7,20 @@ import { PostPassword } from '../../hooks/usePostsPasswordsContext';
 import { Board, BoardData, Post, RadioStatus, ThreadData } from './types';
 
 export const BoardService = {
+  async getAll(page: number) {
+    return (
+      await axios.get<ApiResponse<{ posts: Post[]; count: number }>>(
+        '/v2/board/b+cu+l+m+mod+t+test+v+vg',
+        {
+          params: {
+            limit: 20,
+            offset: page * 20,
+          },
+        },
+      )
+    ).data;
+  },
+
   async getAllBoards() {
     return (await axios.get<ApiResponse<{ boards: Board[]; posts: Post[] }>>('/v2/board')).data;
   },

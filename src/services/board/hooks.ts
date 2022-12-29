@@ -4,6 +4,12 @@ import { ApiResponse } from 'src/types/utils/ApiResponse';
 import { BoardService } from './service';
 import { Board, BoardData, Post, RadioStatus, ThreadData } from './types';
 
+export const useAllPosts = (page: number) => {
+  return useQuery(['boards list', page.toString()], () => BoardService.getAll(page), {
+    enabled: true,
+  });
+};
+
 export const useAllBoards = () => {
   return useQuery(['boards list'], () => BoardService.getAllBoards(), {
     enabled: true,
