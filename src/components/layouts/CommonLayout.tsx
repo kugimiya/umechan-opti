@@ -1,17 +1,27 @@
 import { Box } from 'src/components/common/Box';
 import { Navbar } from 'src/components/lib/Navbar';
 import { RADIOS_LINKS } from 'src/constants';
-import { Board, Post, RadioStatus, useAllBoards } from 'src/services';
+import { Board, Post, useAllBoards } from 'src/services';
 import { theme } from 'src/theme';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 import styled from 'styled-components';
 
 import { RadioPlayer } from '../lib/RadioPlayer';
-import { SubsContainer } from '../lib/SubsContainer';
 
 const MainContainer = styled(Box)`
   @media ${theme.mobileBreakpoint} {
     flex-direction: column;
+    padding: 0;
+
+    .navbar {
+      order: 1;
+    }
+    .content {
+      order: 2;
+    }
+    .radios {
+      order: 0;
+    }
   }
 `;
 
@@ -48,15 +58,21 @@ export const CommonLayout = function CommonLayoutMemoized({
       backgroundColor='colorBgPrimary'
       alignItems='flex-start'
     >
-      <NavbarContainer width='100%' maxWidth='300px'>
+      <NavbarContainer className='navbar' width='100%' maxWidth='300px'>
         <Navbar boards={allBoardsData.data?.payload?.boards || []} />
       </NavbarContainer>
 
-      <Box width='100%' maxWidth='1024px' flexDirection='column' flexGrow='1'>
+      <Box className='content' width='100%' maxWidth='1024px' flexDirection='column' flexGrow='1'>
         {children}
       </Box>
 
-      <NavbarContainer width='100%' maxWidth='256px' flexDirection='column' gap='10px'>
+      <NavbarContainer
+        className='radios'
+        width='100%'
+        maxWidth='256px'
+        flexDirection='column'
+        gap='10px'
+      >
         {RADIOS_LINKS.map(({ name, link, apiBasePath }) => (
           <Box
             key={`${name}-${link}`}

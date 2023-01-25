@@ -10,15 +10,18 @@ import { CreatePostForm } from '../CreatePostForm';
 import { PostComponent } from '../PostComponent';
 import { PostMedia } from '../PostMedia';
 import { PostText } from '../PostText';
+import { StyledPostInfo } from './styles';
 
 const currentYear = getYear(new Date());
 
 export function BoardThread({
   post,
   onRefetch,
+  showTag,
 }: {
   post: Post;
   onRefetch: () => void;
+  showTag?: boolean;
 }): JSX.Element {
   const { handleReply, isFormVisible, setIsFormVisible } = usePostReplyActions();
   const date = fromUnixTime(Number(post.timestamp));
@@ -48,8 +51,10 @@ export function BoardThread({
 
   return (
     <Box flexDirection='column' gap='10px'>
-      <Box alignItems='baseline' gap='10px'>
-        <Box gap='10px'>
+      <StyledPostInfo alignItems='baseline' gap='10px'>
+        <Box flexWrap='wrap' gap='10px'>
+          {Boolean(showTag) && <Text>/{post.board?.tag}/ </Text>}
+
           {Boolean(post.subject) && <Text variant={TextVariant.textBodyBold1}>{post.subject}</Text>}
 
           <Text variant={TextVariant.textBodyBold1}>
@@ -71,7 +76,7 @@ export function BoardThread({
         <Box>{isThreadPostAction}</Box>
 
         <Box>{subscribeAction}</Box>
-      </Box>
+      </StyledPostInfo>
 
       <PostMedia post={post} />
 

@@ -1,5 +1,28 @@
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
+import styled from 'styled-components';
+
+import { theme } from '../../../theme';
+
+const StyledInner = styled(Box)`
+  padding: 12px 8px;
+  justify-content: space-between;
+  max-height: 40px;
+
+  @media ${theme.mobileBreakpoint} {
+    padding: 6px;
+  }
+`;
+
+const StyledContent = styled(Box)`
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+
+  @media ${theme.mobileBreakpoint} {
+    padding: 6px;
+  }
+`;
 
 export const Tab = function TabMemoized({
   title,
@@ -12,12 +35,7 @@ export const Tab = function TabMemoized({
 }): JSX.Element {
   return (
     <Box width='100%' flexDirection='column'>
-      <Box
-        padding='12px 8px'
-        backgroundColor='colorBgSecondary'
-        justifyContent='space-between'
-        maxHeight='40px'
-      >
+      <StyledInner backgroundColor='colorBgSecondary'>
         <Text variant={TextVariant.textBodyBold1}>{title}</Text>
 
         {Boolean(action) && (
@@ -25,11 +43,9 @@ export const Tab = function TabMemoized({
             {action?.title}
           </button>
         )}
-      </Box>
+      </StyledInner>
 
-      <Box flexDirection='column' padding='12px' gap='6px'>
-        {children}
-      </Box>
+      <StyledContent>{children}</StyledContent>
     </Box>
   );
 };

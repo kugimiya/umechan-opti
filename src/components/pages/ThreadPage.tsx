@@ -57,6 +57,11 @@ export const ThreadPage = function ThreadPageMemoized(
         <title>{`Юмечан :: ${thread.subject || thread.truncated_message?.slice(0, 20)}`}</title>
 
         <meta
+          content='width=device-width,initial-scale=1.0,minimum-scale=1.0,shrink-to-fit=no'
+          name='viewport'
+        />
+
+        <meta
           name='description'
           content={`Страница треда "${thread.subject || thread.truncated_message?.slice(0, 20)}"`}
         />

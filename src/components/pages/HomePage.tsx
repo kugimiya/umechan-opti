@@ -19,6 +19,11 @@ export const HomePage = function HomePageMemoized(
       <Head>
         <title>Юмечан</title>
 
+        <meta
+          content='width=device-width,initial-scale=1.0,minimum-scale=1.0,shrink-to-fit=no'
+          name='viewport'
+        />
+
         <meta name='description' content={`Главная чана`} />
 
         <meta property='og:url' content={`http://chan.kugi.club${router.asPath}`} />

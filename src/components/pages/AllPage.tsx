@@ -40,6 +40,11 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
       <Head>
         <title>Юмечан : Последнее</title>
 
+        <meta
+          content='width=device-width,initial-scale=1.0,minimum-scale=1.0,shrink-to-fit=no'
+          name='viewport'
+        />
+
         <meta name='description' content={`Главная чана`} />
 
         <meta property='og:url' content={`http://chan.kugi.club${router.asPath}`} />
@@ -69,6 +74,7 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
             {board.posts?.map((thread, index) => (
               <Fragment key={thread.id}>
                 <BoardThread
+                  showTag
                   post={thread}
                   onRefetch={() => {
                     boardData.refetch().catch(console.error);
