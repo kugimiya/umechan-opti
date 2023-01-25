@@ -15,6 +15,7 @@ export const NEWS_THREAD = {
     '30281',
     '30621',
     '32335',
+    '32917',
   ],
 };
 export const RADIOS_LINKS = [
