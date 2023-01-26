@@ -45,7 +45,7 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
           name='viewport'
         />
 
-        <meta name='description' content={`Главная чана`} />
+        <meta name='description' content={`Последнее`} />
 
         <meta property='og:url' content={`http://chan.kugi.club${router.asPath}`} />
 

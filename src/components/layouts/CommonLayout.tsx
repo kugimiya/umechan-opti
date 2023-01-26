@@ -58,21 +58,15 @@ export const CommonLayout = function CommonLayoutMemoized({
       backgroundColor='colorBgPrimary'
       alignItems='flex-start'
     >
-      <NavbarContainer className='navbar' width='100%' maxWidth='300px'>
-        <Navbar boards={allBoardsData.data?.payload?.boards || []} />
-      </NavbarContainer>
-
-      <Box className='content' width='100%' maxWidth='1024px' flexDirection='column' flexGrow='1'>
-        {children}
-      </Box>
-
       <NavbarContainer
-        className='radios'
+        className='navbar'
         width='100%'
-        maxWidth='256px'
-        flexDirection='column'
+        maxWidth='300px'
         gap='10px'
+        flexDirection='column'
       >
+        <Navbar boards={allBoardsData.data?.payload?.boards || []} />
+
         {RADIOS_LINKS.map(({ name, link, apiBasePath }) => (
           <Box
             key={`${name}-${link}`}
@@ -87,7 +81,9 @@ export const CommonLayout = function CommonLayoutMemoized({
         ))}
       </NavbarContainer>
 
-      {/*<SubsContainer boards={allBoardsData.data?.payload.boards || []} />*/}
+      <Box className='content' width='100%' maxWidth='1024px' flexDirection='column' flexGrow='1'>
+        {children}
+      </Box>
     </MainContainer>
   );
 };
