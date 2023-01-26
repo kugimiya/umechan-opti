@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
-import { RadioStatus, useRadioData } from 'src/services';
+import { useRadioData } from 'src/services';
 import styled from 'styled-components';
 
 const RotatingBox = styled(Box)`

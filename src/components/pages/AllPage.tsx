@@ -16,6 +16,7 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
   const router = useRouter();
   const page = useMemo(
     () => Number(isServer() ? 0 : new URL(location.toString()).searchParams.get('page') || '0'),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [router.asPath],
   );
   const boardData = useAllPosts(Number(page) || 0);

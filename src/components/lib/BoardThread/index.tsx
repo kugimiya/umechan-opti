@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
 import { usePostReplyActions } from 'src/hooks/usePostReplyActions';
-import { useSubscriptions } from 'src/hooks/useSubscriptions';
 import { Post } from 'src/services';
 
 import { CreatePostForm } from '../CreatePostForm';
@@ -26,7 +25,6 @@ export function BoardThread({
   const { handleReply, isFormVisible, setIsFormVisible } = usePostReplyActions();
   const date = fromUnixTime(Number(post.timestamp));
   const time = format(date, currentYear === getYear(date) ? 'HH:mm LLLL dd' : 'HH:mm dd.LL.yyyy');
-  const subs = useSubscriptions();
 
   const isThreadPostAction = (
     <Link href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}`}>
@@ -34,19 +32,6 @@ export function BoardThread({
         В тред
       </Text>
     </Link>
-  );
-
-  const subscribeAction = (
-    <Text
-      onClick={() =>
-        subs.subscribe(post.id?.toString() || '', post.replies?.at(-1)?.id?.toString() || '')
-      }
-      color='colorTextLink'
-      variant={TextVariant.textBodyBold1}
-      style={{ cursor: 'pointer' }}
-    >
-      Подписаться
-    </Text>
   );
 
   return (
@@ -74,8 +59,6 @@ export function BoardThread({
         </Box>
 
         <Box>{isThreadPostAction}</Box>
-
-        <Box>{subscribeAction}</Box>
       </StyledPostInfo>
 
       <PostMedia post={post} />
@@ -102,11 +85,7 @@ export function BoardThread({
           mode='post'
           parentBoardId={post?.board?.tag?.toString() || ''}
           parentPostId={post?.id?.toString() || ''}
-          onCreate={(data, withSubscribe) => {
-            if (withSubscribe) {
-              subs.subscribe(post.id?.toString() || '', String(data.payload.post_id));
-            }
-
+          onCreate={() => {
             onRefetch();
           }}
           changeVisibility={setIsFormVisible}

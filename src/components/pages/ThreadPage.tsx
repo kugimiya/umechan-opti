@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { Text } from 'src/components/common/Text';
 import { PostsContext } from 'src/hooks/usePostsContext';
-import { useSubscriptions } from 'src/hooks/useSubscriptions';
 import { ThreadData, useThreadData } from 'src/services';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 import { isServer } from 'src/utils/isServer';
@@ -21,20 +20,7 @@ export const ThreadPage = function ThreadPageMemoized(
   const router = useRouter();
   const threadData = useThreadData(router.query.id?.toString() || 'null', props);
   const thread = threadData.data?.payload.thread_data;
-  const subs = useSubscriptions();
   const scrollTo = router.query.scroll_to as string | undefined;
-
-  useEffect(() => {
-    if (!thread) {
-      return;
-    }
-
-    if (!isServer() && Object.keys(subs.subsIds).includes(thread.id?.toString() || '__')) {
-      if (String(thread.replies.at(-1)?.id) !== subs.subsIds[router.query.id?.toString() || '']) {
-        subs.subscribe(thread.id?.toString() || '', String(thread.replies.at(-1)?.id));
-      }
-    }
-  }, [thread?.id, thread, subs.subsIds, subs, router.query.id]);
 
   useEffect(() => {
     if (!isServer() && thread?.replies) {
@@ -98,11 +84,7 @@ export const ThreadPage = function ThreadPageMemoized(
                   mode='post'
                   parentBoardId={router.query.tag?.toString() || ''}
                   parentPostId={router.query.id?.toString() || ''}
-                  onCreate={(data, withSubscribe) => {
-                    if (withSubscribe) {
-                      subs.subscribe(thread.id?.toString() || '', String(data.payload.post_id));
-                    }
-
+                  onCreate={() => {
                     threadData.refetch().catch(console.error);
                   }}
                   changeVisibility={setIsFormVisible}

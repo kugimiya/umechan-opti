@@ -67,18 +67,6 @@ export const BoardService = {
     return (await axios.get<RadioStatus>(`/api/status`, { baseURL: radioApiBasePath })).data;
   },
 
-  async getSubsNewCursors(oldCursors: Record<string, string>) {
-    return (
-      await axios.get<Record<string, { title: string; currentCursor: string; tag: string }>>(
-        `/api/cursors`,
-        {
-          baseURL: '/',
-          params: { cursors: oldCursors },
-        },
-      )
-    ).data;
-  },
-
   async registerPassport(passport: Passport) {
     const res = await axios.post<ApiResponse<{ post_id: number; password: string }>>(
       '/v2/passport',
