@@ -50,10 +50,15 @@ export const useThreadData = (
   });
 };
 
-export const useRadioData = (url: string, mount: string, apiBasePath: string) => {
+export const useRadioData = (
+  url: string,
+  mount: string,
+  apiBasePath: string,
+  statusUrl: string,
+) => {
   return useQuery(
-    ['radio status', url, mount, apiBasePath],
-    () => BoardService.getRadioStatus(apiBasePath),
+    ['radio status', url, mount, apiBasePath, statusUrl],
+    () => BoardService.getRadioStatus(statusUrl),
     {
       enabled: true,
       refetchInterval: 10000,

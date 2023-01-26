@@ -23,17 +23,8 @@ export const RADIOS_LINKS = [
     name: 'neformat',
     link: 'http://kugi.club:8000/neformat.mp3',
     apiBasePath: 'http://chan.kugi.club:3005/',
+    statusUrl: 'https://chan.kugi.club/radio-status',
   },
-  // {
-  //   name: 'special',
-  //   link: 'http://kugi.club:9002/neformat.mp3',
-  //   apiBasePath: 'http://chan.kugi.club:9005/',
-  // },
-  // {
-  //   name: 'tapes',
-  //   link: 'http://kugi.club:10002/neformat.mp3',
-  //   apiBasePath: 'http://chan.kugi.club:10000/',
-  // },
 ];
 export const LINKS = [
   { text: 'Pissychan', href: 'http://pissychan.oxore.net/' },

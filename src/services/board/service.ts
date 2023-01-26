@@ -63,8 +63,8 @@ export const BoardService = {
     return res.data;
   },
 
-  async getRadioStatus(radioApiBasePath: string) {
-    return (await axios.get<RadioStatus>(`/api/status`, { baseURL: radioApiBasePath })).data;
+  async getRadioStatus(statusUrl: string) {
+    return (await axios.get<RadioStatus>(statusUrl)).data;
   },
 
   async registerPassport(passport: Passport) {
