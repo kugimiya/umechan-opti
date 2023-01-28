@@ -11,6 +11,7 @@ import { theme } from 'src/theme';
 import { ThemeProvider } from 'styled-components';
 
 import { CommonLayout } from '../src/components/layouts/CommonLayout';
+import { SettingsContext, useSettingsLocalStorageAdapter } from '../src/hooks/useSettingsContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,19 +25,22 @@ const queryClient = new QueryClient({
 function MyApp({ Component, pageProps }: AppProps) {
   const { passwords } = usePostsPasswordsLocalStorageAdapter();
   const { passport } = usePassportLocalStorageAdapter();
+  const settings = useSettingsLocalStorageAdapter();
 
   return (
-    <PostsPasswordsContext.Provider value={{ passwords }}>
-      <PassportContext.Provider value={passport}>
-        <ThemeProvider theme={theme}>
-          <QueryClientProvider client={queryClient}>
-            <CommonLayout>
-              <Component {...pageProps} />
-            </CommonLayout>
-          </QueryClientProvider>
-        </ThemeProvider>
-      </PassportContext.Provider>
-    </PostsPasswordsContext.Provider>
+    <SettingsContext.Provider value={settings}>
+      <PostsPasswordsContext.Provider value={{ passwords }}>
+        <PassportContext.Provider value={passport}>
+          <ThemeProvider theme={theme}>
+            <QueryClientProvider client={queryClient}>
+              <CommonLayout>
+                <Component {...pageProps} />
+              </CommonLayout>
+            </QueryClientProvider>
+          </ThemeProvider>
+        </PassportContext.Provider>
+      </PostsPasswordsContext.Provider>
+    </SettingsContext.Provider>
   );
 }
 

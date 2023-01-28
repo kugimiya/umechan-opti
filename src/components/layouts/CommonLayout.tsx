@@ -7,6 +7,7 @@ import { ApiResponse } from 'src/types/utils/ApiResponse';
 import styled from 'styled-components';
 
 import { RadioPlayer } from '../lib/RadioPlayer';
+import { Settings } from '../lib/Settings';
 
 const MainContainer = styled(Box)`
   @media ${theme.mobileBreakpoint} {
@@ -65,6 +66,8 @@ export const CommonLayout = function CommonLayoutMemoized({
         gap='10px'
         flexDirection='column'
       >
+        <Settings />
+
         <Navbar boards={allBoardsData.data?.payload?.boards || []} />
 
         {RADIOS_LINKS.map(({ name, link, apiBasePath, statusUrl }) => (

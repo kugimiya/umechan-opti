@@ -9,6 +9,7 @@ import { Board } from 'src/services';
 import { isServer } from 'src/utils/isServer';
 import { randomInteger } from 'src/utils/randomInteger';
 
+import { useSettingsContext } from '../../../hooks/useSettingsContext';
 import { PassportView } from '../PassportView';
 import { Tab } from '../Tab';
 
@@ -43,6 +44,7 @@ type NavbarProps = {
 };
 
 export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Element {
+  const { settings } = useSettingsContext();
   const [bannerSrc, setBannerSrc] = useState(bannersHrefs[0]);
 
   useEffect(() => {
@@ -85,34 +87,40 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
           </>
         </Tab>
 
-        <Tab title='Ссылочки'>
-          {LINKS.map((item) => (
-            <A key={item.text} href={item.href} target='_blank'>
-              {item.text}
-            </A>
-          ))}
-        </Tab>
+        {settings.show_links && (
+          <Tab title='Ссылочки'>
+            {LINKS.map((item) => (
+              <A key={item.text} href={item.href} target='_blank'>
+                {item.text}
+              </A>
+            ))}
+          </Tab>
+        )}
       </Box>
 
-      <Box
-        justifyContent='center'
-        width='100%'
-        border='colorBgSecondary'
-        borderRadius='4px'
-        overflow='hidden'
-      >
-        <PassportView />
-      </Box>
+      {settings.show_login && (
+        <Box
+          justifyContent='center'
+          width='100%'
+          border='colorBgSecondary'
+          borderRadius='4px'
+          overflow='hidden'
+        >
+          <PassportView />
+        </Box>
+      )}
 
-      <Box
-        justifyContent='center'
-        width='100%'
-        border='colorBgSecondary'
-        borderRadius='4px'
-        overflow='hidden'
-      >
-        <Image alt='Banner' height={100} src={bannerSrc} width={300} />
-      </Box>
+      {settings.show_banners && (
+        <Box
+          justifyContent='center'
+          width='100%'
+          border='colorBgSecondary'
+          borderRadius='4px'
+          overflow='hidden'
+        >
+          <Image alt='Banner' height={100} src={bannerSrc} width={300} />
+        </Box>
+      )}
     </Box>
   );
 };
