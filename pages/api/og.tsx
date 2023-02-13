@@ -1,3 +1,4 @@
+import { wrapApiHandlerWithSentry } from '@sentry/nextjs';
 import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
 
@@ -5,7 +6,7 @@ export const config = {
   runtime: 'experimental-edge',
 };
 
-export default function OG(req: NextRequest) {
+function handler(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const hasTitle = searchParams.has('title');
   const title = hasTitle ? searchParams.get('title')?.slice(0, 100) : '';
@@ -32,3 +33,5 @@ export default function OG(req: NextRequest) {
     ),
   );
 }
+
+export default wrapApiHandlerWithSentry(handler, '/api/og');

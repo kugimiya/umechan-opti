@@ -1,3 +1,4 @@
+import { wrapApiHandlerWithSentry } from '@sentry/nextjs';
 import axios, { AxiosError } from 'axios';
 import FormData from 'form-data';
 import formidable from 'formidable';
@@ -30,7 +31,7 @@ function formidablePromise(
   });
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { fields, files } = await formidablePromise(req, formidableConfig);
 
   let imagesString = '';
@@ -89,6 +90,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
   }
 }
+
+export default wrapApiHandlerWithSentry(handler, '/api/message');
 
 export const config = {
   api: {
