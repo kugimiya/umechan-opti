@@ -67,17 +67,19 @@ export const RadioPlayer = ({ mount }: Props) => {
       <Box flexDirection='column' alignItems='center' width='100%' gap='4px'>
         <Text variant={TextVariant.textBodyBold1}>{`${name} `}</Text>
 
-        <Text
-          variant={TextVariant.textBody1}
-          style={{
-            whiteSpace: 'pre',
-            maxWidth: '100%',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {radioData.data?.playlistData?.name}
-        </Text>
+        {Boolean(radioData.data?.playlistData?.name) && (
+          <Text
+            variant={TextVariant.textBody1}
+            style={{
+              whiteSpace: 'pre',
+              maxWidth: '100%',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            {radioData.data?.playlistData?.name}
+          </Text>
+        )}
       </Box>
 
       <Box gap='8px' width='100%' justifyContent='center'>
@@ -93,10 +95,17 @@ export const RadioPlayer = ({ mount }: Props) => {
       </Box>
 
       <Box alignItems='center'>
-        <Text
-          variant={TextVariant.textBodyBold1}
-          style={{ textAlign: 'center' }}
-        >{`${radioData.data?.fileData?.id3Artist} - ${radioData.data?.fileData?.id3Title}`}</Text>
+        {radioData.data?.fileData?.metadata ? (
+          <Text
+            variant={TextVariant.textBodyBold1}
+            style={{ textAlign: 'center' }}
+          >{`${radioData.data?.fileData?.metadata?.artist} - ${radioData.data?.fileData?.metadata?.title}`}</Text>
+        ) : (
+          <Text
+            variant={TextVariant.textBodyBold1}
+            style={{ textAlign: 'center' }}
+          >{`${radioData.data?.fileData?.id3Artist} ${radioData.data?.fileData?.id3Title}`}</Text>
+        )}
       </Box>
 
       {isPlaying && (

@@ -92,7 +92,7 @@ export const BoardService = {
       playing: true,
       playlistData: {
         id: 0,
-        name: 'main',
+        name: '',
         type: '',
       },
       currentPlaylistId: '0',

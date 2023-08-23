@@ -70,6 +70,10 @@ export interface FileData {
   duration?: number;
   trimStart?: number;
   trimEnd?: number;
+  metadata?: {
+    artist?: string;
+    title?: string;
+  };
 }
 
 export interface PlaylistData {
