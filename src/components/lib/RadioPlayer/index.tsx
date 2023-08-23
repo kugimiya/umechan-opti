@@ -1,6 +1,7 @@
 import { useId, useState } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
+import { Mount } from 'src/constants';
 import { useRadioData } from 'src/services';
 import styled from 'styled-components';
 
@@ -49,19 +50,14 @@ const Img = styled('img')`
 
 const ts = Date.now();
 
-export const RadioPlayer = ({
-  url,
-  mount,
-  apiBasePath,
-  statusUrl,
-}: {
-  url: string;
-  mount: string;
-  apiBasePath: string;
-  statusUrl: string;
-}) => {
+type Props = {
+  mount: Mount;
+};
+
+export const RadioPlayer = ({ mount }: Props) => {
+  const { apiBasePath, link, name, type } = mount;
   const id = useId();
-  const radioData = useRadioData(url, mount, apiBasePath, statusUrl);
+  const radioData = useRadioData(mount);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const Comp = isPlaying ? RotatingBox : HoveredBox;
@@ -69,7 +65,7 @@ export const RadioPlayer = ({
   const content = radioData.data?.streaming ? (
     <>
       <Box flexDirection='column' alignItems='center' width='100%' gap='4px'>
-        <Text variant={TextVariant.textBodyBold1}>{`${mount} `}</Text>
+        <Text variant={TextVariant.textBodyBold1}>{`${name} `}</Text>
 
         <Text
           variant={TextVariant.textBody1}
@@ -86,11 +82,13 @@ export const RadioPlayer = ({
 
       <Box gap='8px' width='100%' justifyContent='center'>
         <Comp borderRadius='100%' overflow='hidden'>
-          <Img
-            src={`${apiBasePath}api/scanner/image/${radioData.data.currentFile}`}
-            alt={radioData.data?.fileData?.id3Artist}
-            style={{ width: '100%' }}
-          />
+          {type === 'nesorter' && (
+            <Img
+              src={`${apiBasePath}api/scanner/image/${radioData.data.currentFile}`}
+              alt={radioData.data?.fileData?.id3Artist}
+              style={{ width: '100%' }}
+            />
+          )}
         </Comp>
       </Box>
 
@@ -103,8 +101,8 @@ export const RadioPlayer = ({
 
       {isPlaying && (
         <audio
-          src={`${url}?ts=${encodeURI(`${id}-${ts}`)}`}
-          id={`radio_${mount}`}
+          src={`${link}?ts=${encodeURI(`${id}-${ts}`)}`}
+          id={`radio_${name}`}
           autoPlay={false}
         />
       )}
@@ -118,11 +116,11 @@ export const RadioPlayer = ({
 
               setTimeout(() => {
                 if (next) {
-                  (document.getElementById(`radio_${mount}`) as HTMLAudioElement)
+                  (document.getElementById(`radio_${name}`) as HTMLAudioElement)
                     ?.play()
                     ?.catch(console.error);
                 } else {
-                  (document.getElementById(`radio_${mount}`) as HTMLAudioElement)?.pause();
+                  (document.getElementById(`radio_${name}`) as HTMLAudioElement)?.pause();
                 }
               }, 250);
 
@@ -141,9 +139,9 @@ export const RadioPlayer = ({
           onChange={(ev) => {
             try {
               const value = ev.target.valueAsNumber;
-              const tag = document.getElementById(`radio_${mount}`) as HTMLAudioElement;
+              const tag = document.getElementById(`radio_${name}`) as HTMLAudioElement;
               tag.volume = value / 100;
-            } catch {}
+            } catch { }
           }}
         />
       </Box>

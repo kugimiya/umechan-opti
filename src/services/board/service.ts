@@ -1,28 +1,33 @@
 import axios from 'axios';
-import { NEWS_THREAD, PAGE_SIZE } from 'src/constants';
+import { CUSTOM_NEWS, HIDDEN_BOARDS_TAGS, NEWS_THREAD, PAGE_SIZE } from 'src/constants';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 import { Passport } from '../../hooks/usePassportContext';
 import { PostPassword } from '../../hooks/usePostsPasswordsContext';
-import { Board, BoardData, Post, RadioStatus, ThreadData } from './types';
+import { Board, BoardData, IcestatsResponse, Post, RadioStatus, ThreadData } from './types';
 
 export const BoardService = {
   async getAll(page: number) {
+    const boards = await BoardService.getAllBoards();
+    const concatenated = boards.payload.boards.map((_) => _.tag).join('+');
+
     return (
-      await axios.get<ApiResponse<{ posts: Post[]; count: number }>>(
-        '/v2/board/b+cu+l+m+mod+t+test+v+vg',
-        {
-          params: {
-            limit: 20,
-            offset: page * 20,
-          },
+      await axios.get<ApiResponse<{ posts: Post[]; count: number }>>(`/v2/board/${concatenated}`, {
+        params: {
+          limit: 20,
+          offset: page * 20,
         },
-      )
+      })
     ).data;
   },
 
   async getAllBoards() {
-    return (await axios.get<ApiResponse<{ boards: Board[]; posts: Post[] }>>('/v2/board')).data;
+    const boards = await axios.get<ApiResponse<{ boards: Board[]; posts: Post[] }>>('/v2/board');
+    boards.data.payload.boards = boards.data.payload.boards.filter(
+      (_) => !HIDDEN_BOARDS_TAGS.includes(_.tag),
+    );
+
+    return boards.data;
   },
 
   async getBoard(tag: string, page = 0) {
@@ -47,6 +52,16 @@ export const BoardService = {
       .reverse()
       .filter((post) => NEWS_THREAD.whitelist.includes(Number(post.id).toString()));
 
+    CUSTOM_NEWS.forEach((news) => {
+      threadData.payload.thread_data.replies = [
+        {
+          truncated_message: news.text,
+          message: news.text,
+        },
+        ...threadData.payload.thread_data.replies,
+      ];
+    });
+
     return threadData;
   },
 
@@ -65,6 +80,37 @@ export const BoardService = {
 
   async getRadioStatus(statusUrl: string) {
     return (await axios.get<RadioStatus>(statusUrl)).data;
+  },
+
+  async getRadioStatusIceStats(statusUrl: string) {
+    const rawStatus = (await axios.get<IcestatsResponse>(statusUrl)).data;
+    const status: RadioStatus = {
+      thumbnailPath: '',
+      syncing: false,
+      streaming: true,
+      scheduling: true,
+      playing: true,
+      playlistData: {
+        id: 0,
+        name: 'main',
+        type: '',
+      },
+      currentPlaylistId: '0',
+      currentFile: '',
+      fileData: {
+        duration: 0,
+        filehash: '',
+        id3Title: rawStatus.icestats?.source?.at(0)?.title,
+        id3Artist: '',
+        name: '',
+        path: '',
+        trimEnd: 0,
+        trimStart: 0,
+        type: '',
+      },
+    };
+
+    return status;
   },
 
   async registerPassport(passport: Passport) {

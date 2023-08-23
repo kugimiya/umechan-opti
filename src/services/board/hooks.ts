@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { Mount } from 'src/constants';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 import { BoardService } from './service';
@@ -50,15 +51,13 @@ export const useThreadData = (
   });
 };
 
-export const useRadioData = (
-  url: string,
-  mount: string,
-  apiBasePath: string,
-  statusUrl: string,
-) => {
+export const useRadioData = (mount: Mount) => {
   return useQuery(
-    ['radio status', url, mount, apiBasePath, statusUrl],
-    () => BoardService.getRadioStatus(statusUrl),
+    ['radio status', mount.link, mount.name, mount.apiBasePath, mount.statusUrl],
+    () =>
+      mount.type === 'nesorter'
+        ? BoardService.getRadioStatus(mount.statusUrl)
+        : BoardService.getRadioStatusIceStats(mount.statusUrl),
     {
       enabled: true,
       refetchInterval: 10000,

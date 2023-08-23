@@ -70,16 +70,16 @@ export const CommonLayout = function CommonLayoutMemoized({
 
         <Navbar boards={allBoardsData.data?.payload?.boards || []} />
 
-        {RADIOS_LINKS.map(({ name, link, apiBasePath, statusUrl }) => (
+        {RADIOS_LINKS.map((mount) => (
           <Box
-            key={`${name}-${link}`}
+            key={`${mount.name}-${mount.link}`}
             justifyContent='center'
             width='100%'
             border='colorBgSecondary'
             borderRadius='4px'
             overflow='hidden'
           >
-            <RadioPlayer mount={name} url={link} apiBasePath={apiBasePath} statusUrl={statusUrl} />
+            <RadioPlayer mount={mount} />
           </Box>
         ))}
       </NavbarContainer>
