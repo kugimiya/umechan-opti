@@ -37,7 +37,7 @@ export const RADIOS_LINKS: Mount[] = [
   {
     type: 'nesorter',
     name: 'neformat',
-    link: 'http://kugi.club:8000/neformat.mp3',
+    link: 'http://kugi.club:8000/stream.mp3',
     apiBasePath: 'http://chan.kugi.club:3005/',
     statusUrl: 'https://chan.kugi.club/radio-status',
   },
