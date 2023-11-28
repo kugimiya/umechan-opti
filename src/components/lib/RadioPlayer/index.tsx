@@ -150,7 +150,7 @@ export const RadioPlayer = ({ mount }: Props) => {
               const value = ev.target.valueAsNumber;
               const tag = document.getElementById(`radio_${name}`) as HTMLAudioElement;
               tag.volume = value / 100;
-            } catch { }
+            } catch {}
           }}
         />
       </Box>

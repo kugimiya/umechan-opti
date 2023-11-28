@@ -1,4 +1,3 @@
-import { wrapApiHandlerWithSentry } from '@sentry/nextjs';
 import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
 
@@ -34,4 +33,4 @@ function handler(req: NextRequest) {
   );
 }
 
-export default wrapApiHandlerWithSentry(handler, '/api/og');
+export default handler;

@@ -1,4 +1,3 @@
-import { wrapApiHandlerWithSentry } from '@sentry/nextjs';
 import axios, { AxiosError } from 'axios';
 import FormData from 'form-data';
 import formidable from 'formidable';
@@ -91,7 +90,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export default wrapApiHandlerWithSentry(handler, '/api/message');
+export default handler;
 
 export const config = {
   api: {
