@@ -12,7 +12,6 @@ const nextConfig = {
   devIndicators: {
     buildActivityPosition: 'bottom-right',
   },
-  output: 'standalone',
   rewrites: async () => ({
     beforeFiles: [
       { source: '/back-api/:path*', destination: 'https://scheoble.xyz/api/:path*' },
