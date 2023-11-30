@@ -27,7 +27,7 @@
     "react-hook-form": "^7.42.1",
     "react-modal-image": "^2.6.0",
     "react-tiny-popover": "^7.2.0",
-    "sharp": "^0.31.3",
+    "sharp": "^0.33.0",
     "styled-components": "^5.3.6"
   },
   "devDependencies": {
