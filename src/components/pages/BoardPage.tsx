@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Fragment, useState } from 'react';
 import { Text } from 'src/components/common/Text';
-import { PAGE_SIZE } from 'src/constants';
+import { ADMIN_EMAIL, PAGE_SIZE } from 'src/constants';
 import { BoardData, useBoardData } from 'src/services';
 import { theme } from 'src/theme';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
@@ -63,7 +63,7 @@ export const BoardPage = function BoardPageMemoized(props: ApiResponse<BoardData
         <meta property='og:title' content={`Юмечан :: ${boardName}`} />
       </Head>
 
-      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>
+      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
         <Tab
           title={`${boardTag} - ${boardName}`}
           action={{ title: 'Создать тред', on: () => setCreateFormVisible((_) => !_) }}
@@ -121,6 +121,12 @@ export const BoardPage = function BoardPageMemoized(props: ApiResponse<BoardData
 
             <Pager pages={pages} />
           </Box>
+        </Tab>
+
+        <Tab title='Контакты'>
+          <Text>
+            Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
+          </Text>
         </Tab>
       </Box>
     </>

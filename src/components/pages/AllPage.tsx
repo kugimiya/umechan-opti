@@ -5,7 +5,7 @@ import { Box } from 'src/components/common/Box';
 import { Text } from 'src/components/common/Text';
 import { useAllPosts } from 'src/services';
 
-import { PAGE_SIZE } from '../../constants';
+import { ADMIN_EMAIL, PAGE_SIZE } from '../../constants';
 import { theme } from '../../theme';
 import { isServer } from '../../utils/isServer';
 import { BoardThread } from '../lib/BoardThread';
@@ -59,7 +59,7 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
         <meta property='og:title' content={`Юмечан : Последнее`} />
       </Head>
 
-      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>
+      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
         <Tab title={`Последнее`}>
           <Box gap='20px' flexDirection='column' alignItems='flex-start'>
             <Pager pages={pages} />
@@ -104,6 +104,12 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
 
             <Pager pages={pages} />
           </Box>
+        </Tab>
+
+        <Tab title='Контакты'>
+          <Text>
+            Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
+          </Text>
         </Tab>
       </Box>
     </>

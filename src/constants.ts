@@ -17,6 +17,7 @@ export const NEWS_THREAD = {
     '32335',
     '32917',
     '33025',
+    '53720',
   ],
 };
 export const CUSTOM_NEWS = [
@@ -58,3 +59,5 @@ export const LINKS = [
 ];
 
 export const HIDDEN_BOARDS_TAGS = ['fap', 'und'];
+
+export const ADMIN_EMAIL = 'admin@kugi.club';

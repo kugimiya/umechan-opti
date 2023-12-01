@@ -2,6 +2,7 @@ import { format, fromUnixTime, getYear } from 'date-fns';
 import { useMemo } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
+import { ADMIN_EMAIL } from 'src/constants';
 import { usePostsContext } from 'src/hooks/usePostsContext';
 import { BoardService, Post } from 'src/services';
 
@@ -49,6 +50,14 @@ export function PostComponent({
     >
       <Box justifyContent='space-between' width='100%'>
         <Box alignItems='baseline' gap='10px'>
+          <Text variant={TextVariant.textInput} color='colorTextLink' style={{ cursor: 'pointer' }}>
+            <a
+              href={`mailto:${ADMIN_EMAIL}?subject=Жалоба на пост №${post.id}&body=Добрый день. Хочу пожаловаться на пост №${post.id} по причине: _напишите причину здесь_`}
+            >
+              (пожаловаться)
+            </a>
+          </Text>
+
           {Boolean(password) && (
             <Text
               variant={TextVariant.textInput}

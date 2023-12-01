@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { Text } from 'src/components/common/Text';
+import { ADMIN_EMAIL } from 'src/constants';
 import { PostsContext } from 'src/hooks/usePostsContext';
 import { ThreadData, useThreadData } from 'src/services';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
@@ -73,7 +74,7 @@ export const ThreadPage = function ThreadPageMemoized(
       </Head>
 
       <PostsContext.Provider value={{ posts: thread.replies || [] }}>
-        <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>
+        <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
           <Tab
             title={`Тред: ${thread.subject}`}
             action={{ title: 'Ответить', on: () => setIsFormVisible((_) => !_) }}
@@ -97,6 +98,12 @@ export const ThreadPage = function ThreadPageMemoized(
                 <PostComponent key={post.id} post={post} onReply={(id) => handleReply(id)} />
               ))}
             </Box>
+          </Tab>
+
+          <Tab title='Контакты'>
+            <Text>
+              Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
+            </Text>
           </Tab>
         </Box>
       </PostsContext.Provider>

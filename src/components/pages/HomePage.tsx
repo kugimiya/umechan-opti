@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
+import { ADMIN_EMAIL } from 'src/constants';
 import { ThreadData, useClientNews } from 'src/services';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
@@ -37,7 +38,7 @@ export const HomePage = function HomePageMemoized(
         <meta property='og:title' content={`Юмечан`} />
       </Head>
 
-      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden'>
+      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
         <Tab title='Глагне'>
           <Box gap='10px' flexDirection='column' alignItems='flex-start'>
             <Text variant={TextVariant.textHeading1}>Добро пожаловать на Юмечан</Text>
@@ -49,6 +50,12 @@ export const HomePage = function HomePageMemoized(
                 <NewsPostComponent key={item.id} post={item} />
               ))}
           </Box>
+        </Tab>
+
+        <Tab title='Контакты'>
+          <Text>
+            Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
+          </Text>
         </Tab>
       </Box>
     </>
