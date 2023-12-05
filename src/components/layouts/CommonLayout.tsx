@@ -49,7 +49,8 @@ const NavbarContainer = styled(Box)`
 
 const ContentContainer = styled(Box)`
   max-width: 1024px;
-  flexdirection: column;
+  flex-direction: column;
+  width: calc(100% - 330px);
   flexgrow: 1;
 
   @media ${theme.tabletBreakpoint} {

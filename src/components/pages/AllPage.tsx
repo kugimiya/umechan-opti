@@ -23,7 +23,23 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
   const board = boardData.data?.payload;
 
   if (!board) {
-    return <Text>Грузим</Text>;
+    return (
+      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
+        <Tab title={`Последнее`}>
+          <Box gap='20px' flexDirection='column' alignItems='flex-start'>
+            <Box width='100%'>
+              <Text>Грузим</Text>
+            </Box>
+          </Box>
+        </Tab>
+
+        <Tab title='Контакты'>
+          <Text>
+            Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
+          </Text>
+        </Tab>
+      </Box>
+    );
   }
 
   const allPages = Math.ceil(Number(board.count) / PAGE_SIZE);
@@ -72,27 +88,28 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
               }}
             />
 
-            {board.posts?.map((thread, index) => (
-              <Fragment key={thread.id}>
-                <BoardThread
-                  showTag
-                  post={thread}
-                  onRefetch={() => {
-                    boardData.refetch().catch(console.error);
-                  }}
-                />
-
-                {Number(board.posts?.length) - 1 !== index && (
-                  <hr
-                    style={{
-                      width: '100%',
-                      border: 'none',
-                      borderTop: `1px solid ${theme.colors.colorBgSecondary}`,
+            {board &&
+              board.posts?.map((thread, index) => (
+                <Fragment key={thread.id}>
+                  <BoardThread
+                    showTag
+                    post={thread}
+                    onRefetch={() => {
+                      boardData.refetch().catch(console.error);
                     }}
                   />
-                )}
-              </Fragment>
-            ))}
+
+                  {Number(board.posts?.length) - 1 !== index && (
+                    <hr
+                      style={{
+                        width: '100%',
+                        border: 'none',
+                        borderTop: `1px solid ${theme.colors.colorBgSecondary}`,
+                      }}
+                    />
+                  )}
+                </Fragment>
+              ))}
 
             <hr
               style={{
