@@ -19,7 +19,7 @@ export const Settings = () => {
         }}
         style={{ cursor: 'pointer' }}
       >
-        {isExpanded ? 'Скрыть' : 'Показать'} настройки
+        {isExpanded ? 'Скрыть' : 'Открыть'} настройки
       </Text>
 
       {isExpanded && (
@@ -43,6 +43,13 @@ export const Settings = () => {
             id='show_login'
             enabled={settings.show_login}
             onChange={(next) => handleChange('show_login', next)}
+          />
+
+          <SettingItem
+            title='Показывать радио'
+            id='show_radio'
+            enabled={settings.show_radio}
+            onChange={(next) => handleChange('show_radio', next)}
           />
         </Box>
       )}

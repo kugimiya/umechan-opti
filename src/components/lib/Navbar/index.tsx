@@ -11,6 +11,7 @@ import { randomInteger } from 'src/utils/randomInteger';
 
 import { useSettingsContext } from '../../../hooks/useSettingsContext';
 import { PassportView } from '../PassportView';
+import { Settings } from '../Settings';
 import { Tab } from '../Tab';
 
 const bannersHrefs = [
@@ -97,6 +98,8 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
           </Tab>
         )}
       </Box>
+
+      <Settings />
 
       {settings.show_login && (
         <Box

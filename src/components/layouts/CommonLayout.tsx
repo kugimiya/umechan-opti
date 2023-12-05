@@ -1,13 +1,13 @@
 import { Box } from 'src/components/common/Box';
 import { Navbar } from 'src/components/lib/Navbar';
 import { RADIOS_LINKS } from 'src/constants';
+import { useSettingsContext } from 'src/hooks/useSettingsContext';
 import { Board, Post, useAllBoards } from 'src/services';
 import { theme } from 'src/theme';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 import styled from 'styled-components';
 
 import { RadioPlayer } from '../lib/RadioPlayer';
-import { Settings } from '../lib/Settings';
 
 const MainContainer = styled(Box)`
   @media ${theme.mobileBreakpoint} {
@@ -29,11 +29,37 @@ const MainContainer = styled(Box)`
 const NavbarContainer = styled(Box)`
   position: sticky;
   top: 10px;
+  max-width: 300px;
+  gap: 10px;
+  flex-direction: column;
+
+  @media ${theme.tabletBreakpoint} {
+    min-width: 300px;
+    width: 300px;
+    max-width: unset;
+  }
 
   @media ${theme.mobileBreakpoint} {
     position: initial;
     top: unset;
     max-width: unset;
+    width: 100%;
+  }
+`;
+
+const ContentContainer = styled(Box)`
+  max-width: 1024px;
+  flexdirection: column;
+  flexgrow: 1;
+
+  @media ${theme.tabletBreakpoint} {
+    max-width: unset;
+    width: calc(100% - 330px);
+  }
+
+  @media ${theme.mobileBreakpoint} {
+    max-width: unset;
+    width: 100%;
   }
 `;
 
@@ -49,6 +75,7 @@ export const CommonLayout = function CommonLayoutMemoized({
   children,
 }: CommonLayoutProps): JSX.Element {
   const allBoardsData = useAllBoards();
+  const { settings } = useSettingsContext();
 
   return (
     <MainContainer
@@ -59,34 +86,24 @@ export const CommonLayout = function CommonLayoutMemoized({
       backgroundColor='colorBgPrimary'
       alignItems='flex-start'
     >
-      <NavbarContainer
-        className='navbar'
-        width='100%'
-        maxWidth='300px'
-        gap='10px'
-        flexDirection='column'
-      >
-        <Settings />
-
+      <NavbarContainer className='navbar'>
         <Navbar boards={allBoardsData.data?.payload?.boards || []} />
 
-        {RADIOS_LINKS.map((mount) => (
-          <Box
-            key={`${mount.name}-${mount.link}`}
-            justifyContent='center'
-            width='100%'
-            border='colorBgSecondary'
-            borderRadius='4px'
-            overflow='hidden'
-          >
-            <RadioPlayer mount={mount} />
-          </Box>
-        ))}
+        {settings.show_radio &&
+          RADIOS_LINKS.map((mount) => (
+            <Box
+              key={`${mount.name}-${mount.link}`}
+              justifyContent='center'
+              border='colorBgSecondary'
+              borderRadius='4px'
+              overflow='hidden'
+            >
+              <RadioPlayer mount={mount} />
+            </Box>
+          ))}
       </NavbarContainer>
 
-      <Box className='content' width='100%' maxWidth='1024px' flexDirection='column' flexGrow='1'>
-        {children}
-      </Box>
+      <ContentContainer className='content'>{children}</ContentContainer>
     </MainContainer>
   );
 };

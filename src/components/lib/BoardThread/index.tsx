@@ -2,6 +2,7 @@ import { format, fromUnixTime, getYear } from 'date-fns';
 import Link from 'next/link';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
+import { ADMIN_EMAIL } from 'src/constants';
 import { usePostReplyActions } from 'src/hooks/usePostReplyActions';
 import { Post } from 'src/services';
 
@@ -16,7 +17,7 @@ const currentYear = getYear(new Date());
 export function BoardThread({
   post,
   onRefetch,
-  showTag,
+  showTag = true,
 }: {
   post: Post;
   onRefetch: () => void;
@@ -37,7 +38,7 @@ export function BoardThread({
   return (
     <Box flexDirection='column' gap='10px'>
       <StyledPostInfo alignItems='baseline' gap='10px'>
-        <Box flexWrap='wrap' gap='10px'>
+        <Box flexWrap='wrap' gap='10px' alignItems='baseline'>
           {Boolean(showTag) && <Text>/{post.board?.tag}/ </Text>}
 
           {Boolean(post.subject) && <Text variant={TextVariant.textBodyBold1}>{post.subject}</Text>}
@@ -56,9 +57,17 @@ export function BoardThread({
           >
             #{post.id}
           </Text>
+
+          <Text variant={TextVariant.textInput} color='colorTextLink' style={{ cursor: 'pointer' }}>
+            <a
+              href={`mailto:${ADMIN_EMAIL}?subject=Жалоба на пост №${post.id}&body=Добрый день. Хочу пожаловаться на пост №${post.id} по причине: _напишите причину здесь_`}
+            >
+              (пожаловаться)
+            </a>
+          </Text>
         </Box>
 
-        <Box>{isThreadPostAction}</Box>
+        <Box minWidth='54px'>{isThreadPostAction}</Box>
       </StyledPostInfo>
 
       <PostMedia post={post} />
@@ -68,7 +77,7 @@ export function BoardThread({
       {Boolean(Number(post.replies_count) - Number(post.replies?.length)) && (
         <Box margin='10px 0'>
           <Text variant={TextVariant.textBodyBold1}>
-            Пропущено {Number(post.replies_count) - Number(post.replies?.length)} постов.
+            Пропущено {Number(post.replies_count) - Number(post.replies?.length)} постов.&nbsp;
           </Text>
 
           {isThreadPostAction}

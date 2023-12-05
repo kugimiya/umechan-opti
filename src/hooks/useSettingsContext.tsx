@@ -6,12 +6,14 @@ type ReturnType = {
   show_banners: boolean;
   show_links: boolean;
   show_login: boolean;
+  show_radio: boolean;
 };
 
 export const SettingsContext = createContext<ReturnType | null>({
   show_banners: true,
   show_links: true,
   show_login: true,
+  show_radio: true,
 });
 
 const setInLocalStorage = (key: string, value: boolean) => {
@@ -40,6 +42,7 @@ export const useSettingsContext = (): {
       show_banners: true,
       show_links: true,
       show_login: true,
+      show_radio: true,
     },
     change: (key, value) => setInLocalStorage(key, value),
   };
@@ -51,6 +54,7 @@ export const readSettingsFromLocalStorage = (): ReturnType => {
       show_banners: true,
       show_links: true,
       show_login: true,
+      show_radio: true,
     };
   }
 
@@ -59,6 +63,7 @@ export const readSettingsFromLocalStorage = (): ReturnType => {
     show_banners: true,
     show_links: true,
     show_login: true,
+    show_radio: true,
   };
 
   if (settingsStr && !isServer()) {
@@ -75,6 +80,7 @@ export const useSettingsLocalStorageAdapter = () => {
     show_banners: true,
     show_links: true,
     show_login: true,
+    show_radio: true,
   });
 
   useEffect(() => {

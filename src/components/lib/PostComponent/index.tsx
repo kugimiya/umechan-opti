@@ -49,15 +49,7 @@ export function PostComponent({
       className='post'
     >
       <Box justifyContent='space-between' width='100%'>
-        <Box alignItems='baseline' gap='10px'>
-          <Text variant={TextVariant.textInput} color='colorTextLink' style={{ cursor: 'pointer' }}>
-            <a
-              href={`mailto:${ADMIN_EMAIL}?subject=Жалоба на пост №${post.id}&body=Добрый день. Хочу пожаловаться на пост №${post.id} по причине: _напишите причину здесь_`}
-            >
-              (пожаловаться)
-            </a>
-          </Text>
-
+        <Box alignItems='baseline' gap='10px' flexWrap='wrap'>
           {Boolean(password) && (
             <Text
               variant={TextVariant.textInput}
@@ -90,6 +82,14 @@ export function PostComponent({
             variant={TextVariant.textBodyBold1}
           >
             #{post.id}
+          </Text>
+
+          <Text variant={TextVariant.textInput} color='colorTextLink' style={{ cursor: 'pointer' }}>
+            <a
+              href={`mailto:${ADMIN_EMAIL}?subject=Жалоба на пост №${post.id}&body=Добрый день. Хочу пожаловаться на пост №${post.id} по причине: _напишите причину здесь_`}
+            >
+              (пожаловаться)
+            </a>
           </Text>
         </Box>
       </Box>

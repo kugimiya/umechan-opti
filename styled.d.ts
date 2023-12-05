@@ -12,5 +12,6 @@ declare module 'styled-components' {
       colorGreen: string;
     };
     mobileBreakpoint: string;
+    tabletBreakpoint: string;
   }
 }

@@ -10,4 +10,5 @@ export const theme: DefaultTheme = {
     colorGreen: '#60834B',
   },
   mobileBreakpoint: `(max-width: 768px)`,
+  tabletBreakpoint: `(max-width: 1364px)`,
 };
