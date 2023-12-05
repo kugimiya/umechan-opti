@@ -18,6 +18,7 @@ export const NEWS_THREAD = {
     '32917',
     '33025',
     '53720',
+    '53779',
   ],
 };
 export const CUSTOM_NEWS = [
