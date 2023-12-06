@@ -62,8 +62,13 @@ export function PostMedia({ post }: { post: Post }) {
             >
               <ModalImage
                 onClose={() => setVisible(false)}
-                small={media.preview}
-                large={index !== -1 ? allImages[index]?.link || media.link : media.link}
+                small={media.preview?.replaceAll('http://', 'https://')}
+                large={
+                  index !== -1
+                    ? allImages[index]?.link?.replaceAll('http://', 'https://') ||
+                      media.link?.replaceAll('http://', 'https://')
+                    : media.link?.replaceAll('http://', 'https://')
+                }
               />
             </Box>
           ))}
@@ -86,9 +91,9 @@ export function PostMedia({ post }: { post: Post }) {
                 target='_blank'
               >
                 <img
-                  alt={media.preview}
+                  alt={media.preview?.replaceAll('http://', 'https://')}
                   height='248px'
-                  src={media.preview || ''}
+                  src={(media.preview || '').replaceAll('http://', 'https://')}
                   style={{ maxWidth: '100%' }}
                 />
               </a>
