@@ -7,8 +7,8 @@ import { PostPassword } from '../../hooks/usePostsPasswordsContext';
 import { Board, BoardData, IcestatsResponse, Post, RadioStatus, ThreadData } from './types';
 
 export const BoardService = {
-  async getAll(page: number) {
-    const boards = await BoardService.getAllBoards();
+  async getAll(page: number, filter = true) {
+    const boards = await BoardService.getAllBoards(filter);
     const concatenated = boards.payload.boards.map((_) => _.tag).join('+');
 
     return (
@@ -21,11 +21,13 @@ export const BoardService = {
     ).data;
   },
 
-  async getAllBoards() {
+  async getAllBoards(filter = true) {
     const boards = await axios.get<ApiResponse<{ boards: Board[]; posts: Post[] }>>('/v2/board');
-    boards.data.payload.boards = boards.data.payload.boards.filter(
-      (_) => !HIDDEN_BOARDS_TAGS.includes(_.tag),
-    );
+    if (filter) {
+      boards.data.payload.boards = boards.data.payload.boards.filter(
+        (_) => !HIDDEN_BOARDS_TAGS.includes(_.tag),
+      );
+    }
 
     return boards.data;
   },
