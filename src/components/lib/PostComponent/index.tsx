@@ -47,6 +47,7 @@ export function PostComponent({
       gap='10px'
       id={`post_${post.id}`}
       className='post'
+      as='article'
     >
       <Box justifyContent='space-between' width='100%'>
         <Box alignItems='baseline' gap='10px' flexWrap='wrap'>

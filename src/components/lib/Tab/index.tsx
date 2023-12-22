@@ -28,13 +28,15 @@ export const Tab = function TabMemoized({
   title,
   children,
   action,
+  as = 'section',
 }: {
   title: string;
   children: JSX.Element | JSX.Element[];
   action?: { title: string; on: () => void };
+  as?: string;
 }): JSX.Element {
   return (
-    <Box width='100%' flexDirection='column'>
+    <Box width='100%' flexDirection='column' as={as as unknown as undefined}>
       <StyledInner backgroundColor='colorBgSecondary'>
         <Text variant={TextVariant.textBodyBold1}>{title}</Text>
 

@@ -46,4 +46,5 @@ export const Text = styled.span<Props>`
   font-size: ${({ variant = TextVariant.textBody1 }) => FONT_SIZES[variant]};
   font-weight: ${({ variant = TextVariant.textBody1 }) => FONT_WEIGHTS[variant]};
   line-height: ${({ variant = TextVariant.textBody1 }) => LINE_HEIGHTS[variant]};
+  margin: 0;
 `;

@@ -25,25 +25,29 @@ export const HomePage = function HomePageMemoized(
           name='viewport'
         />
 
-        <meta name='description' content={`Главная чана`} />
+        <meta name='description' content={`Главная страница Юмечана`} />
 
         <meta property='og:url' content={`http://chan.kugi.club${router.asPath}`} />
 
-        <meta property='og:image' content={`/api/og?title=${'Юмечан'}`} />
+        <meta property='og:image' content={`/api/og?title=${'Главная страница Юмечана'}`} />
 
         <meta property='og:type' content='website' />
 
-        <meta property='og:description' content={`Главная чана"`} />
+        <meta property='og:description' content={`Главная страница Юмечана"`} />
 
         <meta property='og:title' content={`Юмечан`} />
       </Head>
 
       <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
-        <Tab title='Глагне'>
+        <Tab title='Глагне' as='main'>
           <Box gap='10px' flexDirection='column' alignItems='flex-start'>
-            <Text variant={TextVariant.textHeading1}>Добро пожаловать на Юмечан</Text>
+            <Text variant={TextVariant.textHeading1} as='h1'>
+              Добро пожаловать на Юмечан
+            </Text>
 
-            <Text variant={TextVariant.textBodyBold1}>Новости этого клиента чана:</Text>
+            <Text variant={TextVariant.textBodyBold1} as='h3'>
+              Новости этого клиента чана:
+            </Text>
 
             {Boolean(clientNews.data?.payload.thread_data.replies) &&
               clientNews.data?.payload.thread_data.replies.map((item) => (
@@ -52,7 +56,7 @@ export const HomePage = function HomePageMemoized(
           </Box>
         </Tab>
 
-        <Tab title='Контакты'>
+        <Tab title='Контакты' as='footer'>
           <Text>
             Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
           </Text>

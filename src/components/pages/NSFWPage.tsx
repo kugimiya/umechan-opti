@@ -25,7 +25,7 @@ export const NsfwPage = function HomePageMemoized(): JSX.Element {
   if (!board) {
     return (
       <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
-        <Tab title={`Последнее`}>
+        <Tab title={`Последнее`} as='main'>
           <Box gap='20px' flexDirection='column' alignItems='flex-start'>
             <Box width='100%'>
               <Text>Грузим</Text>
@@ -33,7 +33,7 @@ export const NsfwPage = function HomePageMemoized(): JSX.Element {
           </Box>
         </Tab>
 
-        <Tab title='Контакты'>
+        <Tab title='Контакты' as='footer'>
           <Text>
             Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
           </Text>

@@ -78,6 +78,7 @@ export const ThreadPage = function ThreadPageMemoized(
           <Tab
             title={`Тред: ${thread.subject}`}
             action={{ title: 'Ответить', on: () => setIsFormVisible((_) => !_) }}
+            as='main'
           >
             <Box gap='10px' flexDirection='column' alignItems='flex-start'>
               {isFormVisible && (
@@ -100,7 +101,7 @@ export const ThreadPage = function ThreadPageMemoized(
             </Box>
           </Tab>
 
-          <Tab title='Контакты'>
+          <Tab title='Контакты' as='footer'>
             <Text>
               Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
             </Text>

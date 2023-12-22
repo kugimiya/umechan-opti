@@ -67,6 +67,7 @@ export const BoardPage = function BoardPageMemoized(props: ApiResponse<BoardData
         <Tab
           title={`${boardTag} - ${boardName}`}
           action={{ title: 'Создать тред', on: () => setCreateFormVisible((_) => !_) }}
+          as='main'
         >
           <Box gap='20px' flexDirection='column' alignItems='flex-start'>
             {createFormVisible && (
@@ -123,7 +124,7 @@ export const BoardPage = function BoardPageMemoized(props: ApiResponse<BoardData
           </Box>
         </Tab>
 
-        <Tab title='Контакты'>
+        <Tab title='Контакты' as='footer'>
           <Text>
             Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
           </Text>

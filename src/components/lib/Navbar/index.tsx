@@ -61,7 +61,7 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
   }, []);
 
   return (
-    <Box width='100%' flexDirection='column' gap='10px' minWidth='300px'>
+    <Box width='100%' flexDirection='column' gap='10px' minWidth='300px' as='aside'>
       <Box
         width='100%'
         flexDirection='column'
@@ -70,7 +70,7 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
         borderRadius='4px'
         overflow='hidden'
       >
-        <Tab title='Досочки'>
+        <Tab title='Досочки' as='nav'>
           <Link key={'Глагне'} href='/'>
             <Text>Глагне</Text>
           </Link>
@@ -89,7 +89,7 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
         </Tab>
 
         {settings.show_links && (
-          <Tab title='Ссылочки'>
+          <Tab title='Ссылочки' as='nav'>
             {LINKS.map((item) => (
               <A key={item.text} href={item.href} target='_blank'>
                 {item.text}

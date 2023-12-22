@@ -55,28 +55,28 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
   return (
     <>
       <Head>
-        <title>Юмечан : Последнее</title>
+        <title>Юмечан : Лента последних постов</title>
 
         <meta
           content='width=device-width,initial-scale=1.0,minimum-scale=1.0,shrink-to-fit=no'
           name='viewport'
         />
 
-        <meta name='description' content={`Последнее`} />
+        <meta name='description' content={`Лента последних постов`} />
 
         <meta property='og:url' content={`http://chan.kugi.club${router.asPath}`} />
 
-        <meta property='og:image' content={`/api/og?title=${'Последнее'}`} />
+        <meta property='og:image' content={`/api/og?title=${'Лента последних постов'}`} />
 
         <meta property='og:type' content='website' />
 
-        <meta property='og:description' content={`Последнее"`} />
+        <meta property='og:description' content={`Лента последних постов"`} />
 
-        <meta property='og:title' content={`Юмечан : Последнее`} />
+        <meta property='og:title' content={`Юмечан : Лента последних постов`} />
       </Head>
 
       <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
-        <Tab title={`Последнее`}>
+        <Tab title={`Последнее`} as='main'>
           <Box gap='20px' flexDirection='column' alignItems='flex-start'>
             <Pager pages={pages} />
 
@@ -123,7 +123,7 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
           </Box>
         </Tab>
 
-        <Tab title='Контакты'>
+        <Tab title='Контакты' as='footer'>
           <Text>
             Почта админа: <a href={`mailto:${ADMIN_EMAIL}`}>{ADMIN_EMAIL}</a>
           </Text>
