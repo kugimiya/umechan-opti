@@ -32,10 +32,10 @@ export const BoardService = {
     return boards.data;
   },
 
-  async getBoard(tag: string, page = 0) {
+  async getBoard(tag: string, page = 0, size = PAGE_SIZE) {
     return (
       await axios.get<ApiResponse<BoardData>>(`/v2/board/${tag}`, {
-        params: { offset: page * PAGE_SIZE, limit: PAGE_SIZE },
+        params: { offset: page * size, limit: size },
       })
     ).data;
   },
