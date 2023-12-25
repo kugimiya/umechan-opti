@@ -68,7 +68,7 @@ export async function getServerSideProps({ res }) {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  res.setHeader('Content-Type', 'text/xml');
+  res.setHeader('Content-Type', 'application/xml');
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   res.write(sitemap);
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
