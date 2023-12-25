@@ -64,6 +64,7 @@ export async function getServerSideProps({ res }) {
     sitemap = generateSiteMap(boardResponse.payload.boards, postsUrls);
     global.__cache = sitemap;
   } else {
+    console.log('sitemap cache hit', Date.now() - global.__time, 24 * 60 * 60 * 1000);
     sitemap = global.__cache as string;
   }
 
