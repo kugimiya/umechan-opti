@@ -57,6 +57,8 @@ export const useRadioData = (mount: Mount) => {
     () =>
       mount.type === 'nesorter'
         ? BoardService.getRadioStatus(mount.statusUrl)
+        : mount.type === 'tui'
+        ? BoardService.getRadioStatusTui(mount.statusUrl)
         : BoardService.getRadioStatusIceStats(mount.statusUrl),
     {
       enabled: true,

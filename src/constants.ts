@@ -28,7 +28,7 @@ export const CUSTOM_NEWS = [
 ];
 
 export type Mount = {
-  type: 'nesorter' | 'icestats';
+  type: 'nesorter' | 'icestats' | 'tui';
   name: string;
   link: string;
   apiBasePath: string;
@@ -37,10 +37,10 @@ export type Mount = {
 
 export const RADIOS_LINKS: Mount[] = [
   {
-    type: 'nesorter',
+    type: 'tui',
     name: 'neformat',
-    link: 'https://chan.kugi.club/stream.mp3',
-    apiBasePath: 'https://neformat.kugi.club/',
+    link: 'https://chan.kugi.club/radio-listen',
+    apiBasePath: 'https://neformat.kugi.club',
     statusUrl: 'https://chan.kugi.club/radio-status',
   },
   {

@@ -91,6 +91,14 @@ export const RadioPlayer = ({ mount }: Props) => {
               style={{ width: '100%' }}
             />
           )}
+
+          {type === 'tui' && (
+            <Img
+              src={`${apiBasePath}${radioData.data.thumbnailPath}`}
+              alt={radioData.data?.fileData?.id3Artist}
+              style={{ width: '100%' }}
+            />
+          )}
         </Comp>
       </Box>
 

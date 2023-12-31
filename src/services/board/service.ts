@@ -4,7 +4,7 @@ import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 import { Passport } from '../../hooks/usePassportContext';
 import { PostPassword } from '../../hooks/usePostsPasswordsContext';
-import { Board, BoardData, IcestatsResponse, Post, RadioStatus, ThreadData } from './types';
+import { Board, BoardData, IcestatsResponse, Post, RadioStatus, ThreadData, TuiStatsResponse } from './types';
 
 export const BoardService = {
   async getAll(page: number, filter = true) {
@@ -82,6 +82,37 @@ export const BoardService = {
 
   async getRadioStatus(statusUrl: string) {
     return (await axios.get<RadioStatus>(statusUrl)).data;
+  },
+
+  async getRadioStatusTui(statusUrl: string) {
+    const rawStatus = (await axios.get<TuiStatsResponse>(statusUrl)).data;
+    const status: RadioStatus = {
+      thumbnailPath: rawStatus.cover,
+      syncing: false,
+      streaming: true,
+      scheduling: true,
+      playing: true,
+      playlistData: {
+        id: 0,
+        name: '',
+        type: '',
+      },
+      currentPlaylistId: '0',
+      currentFile: '',
+      fileData: {
+        duration: 0,
+        filehash: '',
+        id3Title: rawStatus.title,
+        id3Artist: rawStatus.artist,
+        name: '',
+        path: '',
+        trimEnd: 0,
+        trimStart: 0,
+        type: '',
+      },
+    };
+
+    return status;
   },
 
   async getRadioStatusIceStats(statusUrl: string) {

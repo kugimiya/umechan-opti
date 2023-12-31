@@ -82,6 +82,12 @@ export interface PlaylistData {
   type?: string;
 }
 
+export type TuiStatsResponse = {
+  artist: string;
+  title: string;
+  cover: string;
+};
+
 export type IcestatsResponse = {
   icestats?: Icestats;
 };
