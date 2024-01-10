@@ -161,9 +161,17 @@ function MD({
         <pre
           style={{
             whiteSpace: 'break-spaces',
+            display: 'inline',
+            fontFamily: 'monaco, menlo, monospace',
+            margin: 0,
             // @ts-ignore
             wordWrap: 'anywhere',
-            fontSize: '12px',
+            padding: '0px 4px',
+            fontSize: '14px',
+            lineHeight: '18px',
+            borderRadius: '4px',
+            background: 'black',
+            color: 'white',
           }}
         >
           {root.value}
@@ -171,20 +179,32 @@ function MD({
       );
 
     case Syntax.CodeBlock:
-      return (
-        <pre
-          style={{
-            border: '1px solid darkgreen',
-            borderRadius: '4px',
-            padding: '4px',
-            whiteSpace: 'pre-line',
-            fontSize: '12px',
-          }}
-        >
-          <code>[{`${root.lang}\n` || 'lang не указан\n'}]</code>
+      const style = {
+        background: 'black',
+        color: 'white',
+        borderRadius: '4px',
+        padding: '4px 8px',
+        whiteSpace: 'pre-line',
+        fontSize: '14px',
+        width: '100%',
+        fontFamily: 'monaco, menlo, monospace',
+        margin: 0,
+      };
 
-          <code>{String(root.value).replaceAll('\n\n', '\n')}</code>
-        </pre>
+      return (
+        <>
+          {/* @ts-ignore */}
+
+          <pre style={style}>
+            <code key='code'>
+              {root.lang ? (
+                <Text as='code' key='lang' style={{ color: 'gray' }}>{`lang=${root.lang}\n`}</Text>
+              ) : null}
+
+              {String(root.value).replaceAll('\n\n', '\n').replace('\n', '')}
+            </code>
+          </pre>
+        </>
       );
 
     case Syntax.Link:
