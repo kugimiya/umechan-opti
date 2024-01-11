@@ -21,6 +21,7 @@ export const NEWS_THREAD = {
     '53779',
     '54189',
     '54440',
+    '54493',
   ],
 };
 export const CUSTOM_NEWS = [

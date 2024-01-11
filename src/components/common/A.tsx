@@ -2,6 +2,8 @@ import styled from 'styled-components';
 
 import { Text } from './Text';
 
-export const A = styled(Text.withComponent('a'))`
+const AProto = styled(Text)`
   cursor: pointer;
 `;
+
+export const A = (props: (typeof Text)['defaultProps']) => <AProto as='a' {...props} />;

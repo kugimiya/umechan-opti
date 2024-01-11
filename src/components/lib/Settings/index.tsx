@@ -11,9 +11,9 @@ export const Settings = () => {
   const handleChange = (name: string, value: boolean) => change(name, value);
 
   return (
-    <Box flexDirection='column' gap='12px'>
+    <Box $flexDirection='column' $gap='12px'>
       <Text
-        variant={TextVariant.textButton}
+        $variant={TextVariant.textButton}
         onClick={() => {
           setIsExpanded((_) => !_);
         }}
@@ -23,7 +23,7 @@ export const Settings = () => {
       </Text>
 
       {isExpanded && (
-        <Box flexDirection='column'>
+        <Box $flexDirection='column'>
           <SettingItem
             title='Показывать баннеры'
             id='show_banners'
@@ -57,8 +57,6 @@ export const Settings = () => {
   );
 };
 
-const Label = Box.withComponent('label');
-
 export const SettingItem = ({
   enabled,
   title,
@@ -71,7 +69,7 @@ export const SettingItem = ({
   onChange: (next: boolean) => void;
 }) => {
   return (
-    <Label htmlFor={id}>
+    <Box as='label' htmlFor={id}>
       <input
         type='checkbox'
         id={id}
@@ -80,6 +78,6 @@ export const SettingItem = ({
       />
 
       <Text>{title}</Text>
-    </Label>
+    </Box>
   );
 };

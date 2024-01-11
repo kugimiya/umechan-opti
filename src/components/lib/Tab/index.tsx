@@ -36,9 +36,9 @@ export const Tab = function TabMemoized({
   as?: string;
 }): JSX.Element {
   return (
-    <Box width='100%' flexDirection='column' as={as as unknown as undefined}>
-      <StyledInner backgroundColor='colorBgSecondary'>
-        <Text variant={TextVariant.textBodyBold1}>{title}</Text>
+    <Box $width='100%' $flexDirection='column' as={as as unknown as undefined}>
+      <StyledInner $backgroundColor='colorBgSecondary'>
+        <Text $variant={TextVariant.textBodyBold1}>{title}</Text>
 
         {Boolean(action) && (
           <button onClick={() => action?.on()} style={{ padding: '0 10px', lineHeight: '0' }}>

@@ -11,9 +11,9 @@ export enum TextVariant {
 }
 
 interface Props {
-  variant?: TextVariant;
-  color?: keyof typeof theme.colors;
-  fontStyle?: CSSProperties['fontStyle'];
+  $variant?: TextVariant;
+  $color?: keyof typeof theme.colors;
+  $fontStyle?: CSSProperties['fontStyle'];
 }
 
 export const FONT_SIZES: Record<TextVariant, string> = {
@@ -41,10 +41,10 @@ export const FONT_WEIGHTS: Record<TextVariant, string> = {
 };
 
 export const Text = styled.span<Props>`
-  color: ${({ color = 'colorTextPrimary' }) => theme.colors[color]};
-  font-style: ${(props) => props.fontStyle};
-  font-size: ${({ variant = TextVariant.textBody1 }) => FONT_SIZES[variant]};
-  font-weight: ${({ variant = TextVariant.textBody1 }) => FONT_WEIGHTS[variant]};
-  line-height: ${({ variant = TextVariant.textBody1 }) => LINE_HEIGHTS[variant]};
+  color: ${({ $color: color = 'colorTextPrimary' }) => theme.colors[color]};
+  font-style: ${(props) => props.$fontStyle};
+  font-size: ${({ $variant: variant = TextVariant.textBody1 }) => FONT_SIZES[variant]};
+  font-weight: ${({ $variant: variant = TextVariant.textBody1 }) => FONT_WEIGHTS[variant]};
+  line-height: ${({ $variant: variant = TextVariant.textBody1 }) => LINE_HEIGHTS[variant]};
   margin: 0;
 `;

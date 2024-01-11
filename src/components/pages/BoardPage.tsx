@@ -63,13 +63,18 @@ export const BoardPage = function BoardPageMemoized(props: ApiResponse<BoardData
         <meta property='og:title' content={`Юмечан :: ${boardName}`} />
       </Head>
 
-      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
+      <Box
+        $border='colorBgSecondary'
+        $borderRadius='4px'
+        $overflow='hidden'
+        $flexDirection='column'
+      >
         <Tab
           title={`${boardTag} - ${boardName}`}
           action={{ title: 'Создать тред', on: () => setCreateFormVisible((_) => !_) }}
           as='main'
         >
-          <Box gap='20px' flexDirection='column' alignItems='flex-start'>
+          <Box $gap='20px' $flexDirection='column' $alignItems='flex-start'>
             {createFormVisible && (
               <CreatePostForm
                 mode='thread'

@@ -50,7 +50,7 @@ export function PostMedia({ post }: { post: Post }) {
   return (
     <>
       {Boolean(post.media.images?.length) && (
-        <Box flexWrap='wrap' gap='10px'>
+        <Box $flexWrap='wrap' $gap='10px'>
           {post.media.images?.map((media) => (
             <Box
               key={`${media.link}_${post.id}`}
@@ -76,7 +76,7 @@ export function PostMedia({ post }: { post: Post }) {
       )}
 
       {Boolean(post.media.youtubes?.length) && (
-        <Box flexWrap='wrap' gap='10px'>
+        <Box $flexWrap='wrap' $gap='10px'>
           {post.media.youtubes?.map((media) => (
             <Box key={`${media.link}_${post.id}`} style={{ maxWidth: '100%' }}>
               <a

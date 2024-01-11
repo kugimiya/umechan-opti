@@ -33,7 +33,6 @@ const Container = styled(Box)`
   }
 `;
 
-const Form = Box.withComponent('form');
 // TODO: Вытащить в react-query
 const createPost = async (data: {
   tag?: string;
@@ -162,52 +161,53 @@ export function CreatePostForm({
 
   return (
     <Container>
-      <Form
-        flexDirection='column'
-        gap='16px'
+      <Box
+        as='form'
+        $flexDirection='column'
+        $gap='16px'
         onSubmit={form.handleSubmit(handler, () => {
           alert('Чот ты не то заполнил в форме, братка; наверн текст забыл');
         })}
-        padding='8px'
-        border='colorBgSecondary'
-        backgroundColor='colorBgPrimary'
-        borderRadius='4px'
-        width='460px'
+        $padding='8px'
+        $border='colorBgSecondary'
+        $backgroundColor='colorBgPrimary'
+        $borderRadius='4px'
+        $width='460px'
       >
-        <Box gap='16px'>
+        <Box $gap='16px'>
           <input type='checkbox' {...form.register('multiplyPost', { required: false })} />
 
-          <Box minWidth='50px'>
+          <Box $minWidth='50px'>
             <Text>Отправить файлы отдельными ответами</Text>
           </Box>
         </Box>
 
-        <Box gap='16px'>
+        <Box $gap='16px'>
           <input type='checkbox' {...form.register('withSubscribe', { required: false })} />
 
-          <Box minWidth='50px'>
+          <Box $minWidth='50px'>
             <Text>Подписаться на тред</Text>
           </Box>
         </Box>
 
-        <Box gap='16px'>
-          <Box minWidth='50px' width='50px'>
+        <Box $gap='16px'>
+          <Box $minWidth='50px' $width='50px'>
             <Text>Ник</Text>
           </Box>
 
           <input {...form.register('nickname', { required: false })} />
         </Box>
 
-        <Box gap='16px'>
-          <Box minWidth='50px' width='50px'>
+        <Box $gap='16px'>
+          <Box $minWidth='50px' $width='50px'>
             <Text>Тема</Text>
           </Box>
 
           <input {...form.register('subject', { required: false })} />
         </Box>
 
-        <Box gap='16px'>
-          <Box minWidth='50px' width='50px'>
+        <Box $gap='16px'>
+          <Box $minWidth='50px' $width='50px'>
             <Text>Текст</Text>
           </Box>
 
@@ -221,15 +221,15 @@ export function CreatePostForm({
           />
         </Box>
 
-        <Box gap='16px'>
-          <Box minWidth='50px' width='50px'>
+        <Box $gap='16px'>
+          <Box $minWidth='50px' $width='50px'>
             <Text>Пикчи</Text>
           </Box>
 
           <input type='file' accept='image/*' multiple {...form.register('file')} />
         </Box>
 
-        <Box justifyContent='flex-end' gap='10px'>
+        <Box $justifyContent='flex-end' $gap='10px'>
           <button type='button' onClick={() => changeVisibility(false)} disabled={sending}>
             Скрыть
           </button>
@@ -238,7 +238,7 @@ export function CreatePostForm({
             {sending ? 'Отправка...' : mode === 'thread' ? 'Создать тред' : 'Ответить'}
           </button>
         </Box>
-      </Form>
+      </Box>
     </Container>
   );
 }

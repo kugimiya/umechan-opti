@@ -29,21 +29,23 @@ export function BoardThread({
 
   const isThreadPostAction = (
     <Link href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}`}>
-      <Text color='colorTextLink' variant={TextVariant.textBodyBold1}>
+      <Text $color='colorTextLink' $variant={TextVariant.textBodyBold1}>
         В тред
       </Text>
     </Link>
   );
 
   return (
-    <Box flexDirection='column' gap='10px' as='section'>
-      <StyledPostInfo alignItems='baseline' gap='10px'>
-        <Box flexWrap='wrap' gap='10px' alignItems='baseline'>
+    <Box $flexDirection='column' $gap='10px' as='section'>
+      <StyledPostInfo $alignItems='baseline' $gap='10px'>
+        <Box $flexWrap='wrap' $gap='10px' $alignItems='baseline'>
           {Boolean(showTag) && <Text>/{post.board?.tag}/ </Text>}
 
-          {Boolean(post.subject) && <Text variant={TextVariant.textBodyBold1}>{post.subject}</Text>}
+          {Boolean(post.subject) && (
+            <Text $variant={TextVariant.textBodyBold1}>{post.subject}</Text>
+          )}
 
-          <Text variant={TextVariant.textBodyBold1}>
+          <Text $variant={TextVariant.textBodyBold1}>
             {post.is_verify && <Text title='Имеет паспорт вакцинации'>🔰 </Text>}
 
             {post.poster || 'Anon'}
@@ -58,7 +60,11 @@ export function BoardThread({
             #{post.id}
           </Text>
 
-          <Text variant={TextVariant.textInput} color='colorTextLink' style={{ cursor: 'pointer' }}>
+          <Text
+            $variant={TextVariant.textInput}
+            $color='colorTextLink'
+            style={{ cursor: 'pointer' }}
+          >
             <a
               href={`mailto:${ADMIN_EMAIL}?subject=Жалоба на пост №${post.id}&body=Добрый день. Хочу пожаловаться на пост №${post.id} по причине: _напишите причину здесь_`}
             >
@@ -67,7 +73,7 @@ export function BoardThread({
           </Text>
         </Box>
 
-        <Box minWidth='54px'>{isThreadPostAction}</Box>
+        <Box $minWidth='54px'>{isThreadPostAction}</Box>
       </StyledPostInfo>
 
       <PostMedia post={post} />
@@ -75,8 +81,8 @@ export function BoardThread({
       <PostText post={post} />
 
       {Boolean(Number(post.replies_count) - Number(post.replies?.length)) && (
-        <Box margin='10px 0'>
-          <Text variant={TextVariant.textBodyBold1}>
+        <Box $margin='10px 0'>
+          <Text $variant={TextVariant.textBodyBold1}>
             Пропущено {Number(post.replies_count) - Number(post.replies?.length)} постов.&nbsp;
           </Text>
 

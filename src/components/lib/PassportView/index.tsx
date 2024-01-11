@@ -11,8 +11,6 @@ import { BoardService } from '../../../services';
 import { Box } from '../../common/Box';
 import { Text, TextVariant } from '../../common/Text';
 
-const Form = Box.withComponent('form');
-
 export const PassportView = () => {
   const credentialsForm = useForm<Passport>();
   const [viewMode, setViewMode] = useState<'none' | 'input' | 'register'>('none');
@@ -41,8 +39,8 @@ export const PassportView = () => {
           <Text>Вакцинирован?</Text>
 
           <Text
-            variant={TextVariant.textButton}
-            color='colorTextLink'
+            $variant={TextVariant.textButton}
+            $color='colorTextLink'
             onClick={() => setViewMode('input')}
             style={{ cursor: 'pointer' }}
           >
@@ -50,8 +48,8 @@ export const PassportView = () => {
           </Text>
 
           <Text
-            variant={TextVariant.textButton}
-            color='colorTextLink'
+            $variant={TextVariant.textButton}
+            $color='colorTextLink'
             onClick={() => setViewMode('register')}
             style={{ cursor: 'pointer' }}
           >
@@ -66,9 +64,10 @@ export const PassportView = () => {
         <>
           <Text>Welcome back</Text>
 
-          <Form
-            flexDirection={'column'}
-            gap={'4px'}
+          <Box
+            as='form'
+            $flexDirection={'column'}
+            $gap={'4px'}
             onSubmit={credentialsForm.handleSubmit(handleLogin, (errors) =>
               alert(JSON.stringify([errors.name?.message, errors.key?.message])),
             )}
@@ -84,11 +83,11 @@ export const PassportView = () => {
             />
 
             <button type='submit'>на, держи</button>
-          </Form>
+          </Box>
 
           <Text
-            variant={TextVariant.textButton}
-            color='colorTextLink'
+            $variant={TextVariant.textButton}
+            $color='colorTextLink'
             onClick={() => setViewMode('none')}
             style={{ cursor: 'pointer' }}
           >
@@ -103,9 +102,10 @@ export const PassportView = () => {
         <>
           <Text>Представьтесь</Text>
 
-          <Form
-            flexDirection={'column'}
-            gap={'4px'}
+          <Box
+            as='form'
+            $flexDirection={'column'}
+            $gap={'4px'}
             onSubmit={credentialsForm.handleSubmit(handleRegister, (errors) =>
               alert(JSON.stringify([errors.name?.message, errors.key?.message])),
             )}
@@ -121,11 +121,11 @@ export const PassportView = () => {
             />
 
             <button type='submit'>хоба-на</button>
-          </Form>
+          </Box>
 
           <Text
-            variant={TextVariant.textButton}
-            color='colorTextLink'
+            $variant={TextVariant.textButton}
+            $color='colorTextLink'
             onClick={() => setViewMode('none')}
             style={{ cursor: 'pointer' }}
           >
@@ -137,11 +137,11 @@ export const PassportView = () => {
   } else {
     content = (
       <>
-        <Text variant={TextVariant.textInput}>Привет, {passport?.name}</Text>
+        <Text $variant={TextVariant.textInput}>Привет, {passport?.name}</Text>
 
         <Text
-          variant={TextVariant.textButton}
-          color='colorTextLink'
+          $variant={TextVariant.textButton}
+          $color='colorTextLink'
           style={{ cursor: 'pointer' }}
           onClick={() => clearFromLocalStorage()}
         >
@@ -152,7 +152,7 @@ export const PassportView = () => {
   }
 
   return (
-    <Box width='100%' padding='4px' gap='4px' flexDirection='column' alignItems='flex-start'>
+    <Box $width='100%' $padding='4px' $gap='4px' $flexDirection='column' $alignItems='flex-start'>
       {content}
     </Box>
   );

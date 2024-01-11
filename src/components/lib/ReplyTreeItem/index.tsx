@@ -48,7 +48,7 @@ export const ReplyTreeItem = ({
         align='start'
         content={<Child>{visible && <PostComponent post={replyPost} />}</Child>}
       >
-        <Text variant={variant} color={color}>{`>>${replyPost.id}`}</Text>
+        <Text $variant={variant} $color={color}>{`>>${replyPost.id}`}</Text>
       </Popover>
     </Box>
   );

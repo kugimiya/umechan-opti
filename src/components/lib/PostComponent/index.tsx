@@ -41,20 +41,20 @@ export function PostComponent({
 
   return (
     <Box
-      backgroundColor='colorBgSecondary'
-      flexDirection='column'
-      padding='10px'
-      gap='10px'
+      $backgroundColor='colorBgSecondary'
+      $flexDirection='column'
+      $padding='10px'
+      $gap='10px'
       id={`post_${post.id}`}
       className='post'
       as='article'
     >
-      <Box justifyContent='space-between' width='100%'>
-        <Box alignItems='baseline' gap='10px' flexWrap='wrap'>
+      <Box $justifyContent='space-between' $width='100%'>
+        <Box $alignItems='baseline' $gap='10px' $flexWrap='wrap'>
           {Boolean(password) && (
             <Text
-              variant={TextVariant.textInput}
-              color='colorTextLink'
+              $variant={TextVariant.textInput}
+              $color='colorTextLink'
               style={{ cursor: 'pointer' }}
               onClick={() => handleDelete()}
             >
@@ -62,9 +62,11 @@ export function PostComponent({
             </Text>
           )}
 
-          {Boolean(post.subject) && <Text variant={TextVariant.textBodyBold1}>{post.subject}</Text>}
+          {Boolean(post.subject) && (
+            <Text $variant={TextVariant.textBodyBold1}>{post.subject}</Text>
+          )}
 
-          <Text variant={TextVariant.textBodyBold1}>
+          <Text $variant={TextVariant.textBodyBold1}>
             {post.is_verify && <Text title='Имеет паспорт вакцинации'>🔰 </Text>}
 
             {post.poster || 'Anon'}
@@ -79,13 +81,17 @@ export function PostComponent({
               }
             }}
             style={{ cursor: 'pointer' }}
-            color='colorTextLink'
-            variant={TextVariant.textBodyBold1}
+            $color='colorTextLink'
+            $variant={TextVariant.textBodyBold1}
           >
             #{post.id}
           </Text>
 
-          <Text variant={TextVariant.textInput} color='colorTextLink' style={{ cursor: 'pointer' }}>
+          <Text
+            $variant={TextVariant.textInput}
+            $color='colorTextLink'
+            style={{ cursor: 'pointer' }}
+          >
             <a
               href={`mailto:${ADMIN_EMAIL}?subject=Жалоба на пост №${post.id}&body=Добрый день. Хочу пожаловаться на пост №${post.id} по причине: _напишите причину здесь_`}
             >
@@ -100,8 +106,8 @@ export function PostComponent({
       <PostText post={post} />
 
       {Boolean(replies.length) && (
-        <Box gap='10px' flexWrap='wrap'>
-          <Text variant={TextVariant.textInput}>Ответы:</Text>
+        <Box $gap='10px' $flexWrap='wrap'>
+          <Text $variant={TextVariant.textInput}>Ответы:</Text>
 
           {replies.map((replyPost) => (
             <ReplyTreeItem key={replyPost.id} replyPost={replyPost} />

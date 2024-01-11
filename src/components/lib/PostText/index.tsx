@@ -37,7 +37,7 @@ export function PostText({ post }: { post: Post }) {
   const postsInThread = usePostsContext();
 
   return (
-    <Box gap='8px' flexDirection='column' justifyContent='flex-start' alignItems='flex-start'>
+    <Box $gap='8px' $flexDirection='column' $justifyContent='flex-start' $alignItems='flex-start'>
       <MD
         root={parse(fixText(post?.truncated_message || ''))}
         post={post}
@@ -56,16 +56,16 @@ function MD({
   postsInThread: Post[];
   root: ReturnType<typeof parse>;
 }) {
-  const children = root.children as ReturnType<typeof parse>[];
+  const children = root.children as unknown as ReturnType<typeof parse>[];
 
-  switch (root.type) {
+  switch (root.type as Syntax) {
     case Syntax.BlockQuote:
       const raw = root.raw.replace('>', '');
       const num = Number(raw);
 
       if (isNaN(num)) {
         return (
-          <Text color='colorGreen' variant={TextVariant.textBody1}>
+          <Text $color='colorGreen' $variant={TextVariant.textBody1}>
             {'>'}
 
             {children.map((subRoot) => (
@@ -85,7 +85,7 @@ function MD({
 
       return (
         <Link href={`#post_${num}`}>
-          <Text variant={TextVariant.textBody1} color='colorGreen'>
+          <Text $variant={TextVariant.textBody1} $color='colorGreen'>
             {'>>'}
 
             {num}
@@ -95,7 +95,7 @@ function MD({
 
     case Syntax.Paragraph:
       return (
-        <Text variant={TextVariant.textBody1}>
+        <Text $variant={TextVariant.textBody1}>
           {children.map((subRoot) => (
             <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
@@ -107,7 +107,7 @@ function MD({
 
     case Syntax.Emphasis:
       return (
-        <Text variant={TextVariant.textBody1} fontStyle='italic'>
+        <Text $variant={TextVariant.textBody1} $fontStyle='italic'>
           {children.map((subRoot) => (
             <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
@@ -116,7 +116,7 @@ function MD({
 
     case Syntax.Strong:
       return (
-        <Text variant={TextVariant.textBodyBold1}>
+        <Text $variant={TextVariant.textBodyBold1}>
           {children.map((subRoot) => (
             <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
@@ -126,7 +126,7 @@ function MD({
     case Syntax.Delete:
       return (
         <Text
-          variant={TextVariant.textBody1}
+          $variant={TextVariant.textBody1}
           style={{
             textDecoration: 'line-through',
           }}
@@ -174,6 +174,8 @@ function MD({
             color: 'white',
           }}
         >
+          {/* @ts-ignore */}
+
           {root.value}
         </pre>
       );
@@ -197,9 +199,14 @@ function MD({
 
           <pre style={style}>
             <code key='code'>
+              {/* @ts-ignore */}
+
               {root.lang ? (
+                // @ts-ignore
                 <Text as='code' key='lang' style={{ color: 'gray' }}>{`lang=${root.lang}\n`}</Text>
               ) : null}
+
+              {/* @ts-ignore */}
 
               {String(root.value).replaceAll('\n\n', '\n').replace('\n', '')}
             </code>
@@ -210,11 +217,12 @@ function MD({
     case Syntax.Link:
       return (
         <A
-          variant={TextVariant.textBodyBold1}
+          $variant={TextVariant.textBodyBold1}
+          // @ts-ignore
           href={String(root.url).replaceAll('.../', '')}
           target='_blank'
           rel='noreferrer'
-          color='colorTextLink'
+          $color='colorTextLink'
         >
           {children.map((subRoot) => (
             <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />

@@ -64,12 +64,12 @@ export const RadioPlayer = ({ mount }: Props) => {
 
   const content = radioData.data?.streaming ? (
     <>
-      <Box flexDirection='column' alignItems='center' width='100%' gap='4px'>
-        <Text variant={TextVariant.textBodyBold1}>{`${name} `}</Text>
+      <Box $flexDirection='column' $alignItems='center' $width='100%' $gap='4px'>
+        <Text $variant={TextVariant.textBodyBold1}>{`${name} `}</Text>
 
         {Boolean(radioData.data?.playlistData?.name) && (
           <Text
-            variant={TextVariant.textBody1}
+            $variant={TextVariant.textBody1}
             style={{
               whiteSpace: 'pre',
               maxWidth: '100%',
@@ -82,8 +82,8 @@ export const RadioPlayer = ({ mount }: Props) => {
         )}
       </Box>
 
-      <Box gap='8px' width='100%' justifyContent='center'>
-        <Comp borderRadius='100%' overflow='hidden'>
+      <Box $gap='8px' $width='100%' $justifyContent='center'>
+        <Comp $borderRadius='100%' $overflow='hidden'>
           {type === 'nesorter' && (
             <Img
               src={`${apiBasePath}api/scanner/image/${radioData.data.currentFile}`}
@@ -102,15 +102,15 @@ export const RadioPlayer = ({ mount }: Props) => {
         </Comp>
       </Box>
 
-      <Box alignItems='center'>
+      <Box $alignItems='center'>
         {radioData.data?.fileData?.metadata ? (
           <Text
-            variant={TextVariant.textBodyBold1}
+            $variant={TextVariant.textBodyBold1}
             style={{ textAlign: 'center' }}
           >{`${radioData.data?.fileData?.metadata?.artist} - ${radioData.data?.fileData?.metadata?.title}`}</Text>
         ) : (
           <Text
-            variant={TextVariant.textBodyBold1}
+            $variant={TextVariant.textBodyBold1}
             style={{ textAlign: 'center' }}
           >{`${radioData.data?.fileData?.id3Artist} ${radioData.data?.fileData?.id3Title}`}</Text>
         )}
@@ -124,7 +124,7 @@ export const RadioPlayer = ({ mount }: Props) => {
         />
       )}
 
-      <Box gap='8px'>
+      <Box $gap='8px'>
         <button
           type='button'
           onClick={() => {
@@ -171,12 +171,12 @@ export const RadioPlayer = ({ mount }: Props) => {
 
   return (
     <Box
-      flexDirection='column'
-      alignItems='center'
-      justifyContent='flex-start'
-      padding='8px'
-      gap='8px'
-      width='100%'
+      $flexDirection='column'
+      $alignItems='center'
+      $justifyContent='flex-start'
+      $padding='8px'
+      $gap='8px'
+      $width='100%'
     >
       {content}
     </Box>

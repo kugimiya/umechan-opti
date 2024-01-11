@@ -74,13 +74,18 @@ export const ThreadPage = function ThreadPageMemoized(
       </Head>
 
       <PostsContext.Provider value={{ posts: thread.replies || [] }}>
-        <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
+        <Box
+          $border='colorBgSecondary'
+          $borderRadius='4px'
+          $overflow='hidden'
+          $flexDirection='column'
+        >
           <Tab
             title={`Тред: ${thread.subject}`}
             action={{ title: 'Ответить', on: () => setIsFormVisible((_) => !_) }}
             as='main'
           >
-            <Box gap='10px' flexDirection='column' alignItems='flex-start'>
+            <Box $gap='10px' $flexDirection='column' $alignItems='flex-start'>
               {isFormVisible && (
                 <CreatePostForm
                   mode='post'

@@ -61,14 +61,14 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
   }, []);
 
   return (
-    <Box width='100%' flexDirection='column' gap='10px' minWidth='300px' as='aside'>
+    <Box $width='100%' $flexDirection='column' $gap='10px' $minWidth='300px' as='aside'>
       <Box
-        width='100%'
-        flexDirection='column'
-        justifyContent='flex-start'
-        border='colorBgSecondary'
-        borderRadius='4px'
-        overflow='hidden'
+        $width='100%'
+        $flexDirection='column'
+        $justifyContent='flex-start'
+        $border='colorBgSecondary'
+        $borderRadius='4px'
+        $overflow='hidden'
       >
         <Tab title='Досочки' as='nav'>
           <Link key={'Глагне'} href='/'>
@@ -103,11 +103,11 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
 
       {settings.show_login && (
         <Box
-          justifyContent='center'
-          width='100%'
-          border='colorBgSecondary'
-          borderRadius='4px'
-          overflow='hidden'
+          $justifyContent='center'
+          $width='100%'
+          $border='colorBgSecondary'
+          $borderRadius='4px'
+          $overflow='hidden'
         >
           <PassportView />
         </Box>
@@ -115,11 +115,11 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
 
       {settings.show_banners && (
         <Box
-          justifyContent='center'
-          width='100%'
-          border='colorBgSecondary'
-          borderRadius='4px'
-          overflow='hidden'
+          $justifyContent='center'
+          $width='100%'
+          $border='colorBgSecondary'
+          $borderRadius='4px'
+          $overflow='hidden'
         >
           <Image alt='Banner' height={100} src={bannerSrc} width={300} />
         </Box>

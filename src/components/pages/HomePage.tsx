@@ -38,14 +38,19 @@ export const HomePage = function HomePageMemoized(
         <meta property='og:title' content={`Юмечан`} />
       </Head>
 
-      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
+      <Box
+        $border='colorBgSecondary'
+        $borderRadius='4px'
+        $overflow='hidden'
+        $flexDirection='column'
+      >
         <Tab title='Глагне' as='main'>
-          <Box gap='10px' flexDirection='column' alignItems='flex-start'>
-            <Text variant={TextVariant.textHeading1} as='h1'>
+          <Box $gap='10px' $flexDirection='column' $alignItems='flex-start'>
+            <Text $variant={TextVariant.textHeading1} as='h1'>
               Добро пожаловать на Юмечан
             </Text>
 
-            <Text variant={TextVariant.textBodyBold1} as='h3'>
+            <Text $variant={TextVariant.textBodyBold1} as='h3'>
               Новости этого клиента чана:
             </Text>
 

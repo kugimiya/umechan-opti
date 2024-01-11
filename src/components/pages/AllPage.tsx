@@ -24,10 +24,15 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
 
   if (!board) {
     return (
-      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
+      <Box
+        $border='colorBgSecondary'
+        $borderRadius='4px'
+        $overflow='hidden'
+        $flexDirection='column'
+      >
         <Tab title={`Последнее`}>
-          <Box gap='20px' flexDirection='column' alignItems='flex-start'>
-            <Box width='100%'>
+          <Box $gap='20px' $flexDirection='column' $alignItems='flex-start'>
+            <Box $width='100%'>
               <Text>Грузим</Text>
             </Box>
           </Box>
@@ -75,9 +80,14 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
         <meta property='og:title' content={`Юмечан : Лента последних постов`} />
       </Head>
 
-      <Box border='colorBgSecondary' borderRadius='4px' overflow='hidden' flexDirection='column'>
+      <Box
+        $border='colorBgSecondary'
+        $borderRadius='4px'
+        $overflow='hidden'
+        $flexDirection='column'
+      >
         <Tab title={`Последнее`} as='main'>
-          <Box gap='20px' flexDirection='column' alignItems='flex-start'>
+          <Box $gap='20px' $flexDirection='column' $alignItems='flex-start'>
             <Pager pages={pages} />
 
             <hr

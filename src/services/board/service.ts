@@ -4,7 +4,15 @@ import { ApiResponse } from 'src/types/utils/ApiResponse';
 
 import { Passport } from '../../hooks/usePassportContext';
 import { PostPassword } from '../../hooks/usePostsPasswordsContext';
-import { Board, BoardData, IcestatsResponse, Post, RadioStatus, ThreadData, TuiStatsResponse } from './types';
+import {
+  Board,
+  BoardData,
+  IcestatsResponse,
+  Post,
+  RadioStatus,
+  ThreadData,
+  TuiStatsResponse,
+} from './types';
 
 export const BoardService = {
   async getAll(page: number, filter = true) {

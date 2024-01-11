@@ -80,12 +80,12 @@ export const CommonLayout = function CommonLayoutMemoized({
 
   return (
     <MainContainer
-      justifyContent='center'
-      gap='10px'
-      padding='10px'
-      minHeight='100vh'
-      backgroundColor='colorBgPrimary'
-      alignItems='flex-start'
+      $justifyContent='center'
+      $gap='10px'
+      $padding='10px'
+      $minHeight='100vh'
+      $backgroundColor='colorBgPrimary'
+      $alignItems='flex-start'
     >
       <NavbarContainer className='navbar'>
         <Navbar boards={allBoardsData.data?.payload?.boards || []} />
@@ -94,10 +94,10 @@ export const CommonLayout = function CommonLayoutMemoized({
           RADIOS_LINKS.map((mount) => (
             <Box
               key={`${mount.name}-${mount.link}`}
-              justifyContent='center'
-              border='colorBgSecondary'
-              borderRadius='4px'
-              overflow='hidden'
+              $justifyContent='center'
+              $border='colorBgSecondary'
+              $borderRadius='4px'
+              $overflow='hidden'
             >
               <RadioPlayer mount={mount} />
             </Box>
