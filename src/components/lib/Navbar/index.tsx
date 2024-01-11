@@ -1,7 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { A } from 'src/components/common/A';
 import { Box } from 'src/components/common/Box';
 import { Text } from 'src/components/common/Text';
 import { LINKS } from 'src/constants';
@@ -91,9 +90,9 @@ export const Navbar = function NavbarMemoized({ boards }: NavbarProps): JSX.Elem
         {settings.show_links && (
           <Tab title='Ссылочки' as='nav'>
             {LINKS.map((item) => (
-              <A key={item.text} href={item.href} target='_blank'>
+              <Text as='a' key={item.text} href={item.href} target='_blank'>
                 {item.text}
-              </A>
+              </Text>
             ))}
           </Tab>
         )}

@@ -25,7 +25,7 @@ export const ReplyTreeItem = ({
   color?: keyof typeof theme.colors;
 }) => {
   const [visible, setVisible] = useState(false);
-  const [pointer, setPointer] = useState<NodeJS.Timer>();
+  const [pointer, setPointer] = useState<number>();
 
   return (
     <Box
@@ -37,7 +37,7 @@ export const ReplyTreeItem = ({
         const ptr = setTimeout(() => {
           setVisible(false);
         }, 750);
-        setPointer(ptr);
+        setPointer(ptr as unknown as number);
       }}
       style={{ cursor: 'pointer', position: 'relative' }}
     >
