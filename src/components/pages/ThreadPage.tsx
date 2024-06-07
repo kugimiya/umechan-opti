@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { Text } from 'src/components/common/Text';
-import { ADMIN_EMAIL } from 'src/constants';
+import { ADMIN_EMAIL, HIDDEN_POSTS } from 'src/constants';
 import { PostsContext } from 'src/hooks/usePostsContext';
 import { ThreadData, useThreadData } from 'src/services';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
@@ -33,6 +33,10 @@ export const ThreadPage = function ThreadPageMemoized(
       }, 250);
     }
   }, [scrollTo, thread, thread?.replies, threadData.isFetched]);
+
+  if (HIDDEN_POSTS.includes(router.query.id?.toString() || '')) {
+    return <></>;
+  }
 
   if (!thread) {
     return <Text>Грузим</Text>;

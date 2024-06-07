@@ -2,7 +2,7 @@ import { format, fromUnixTime, getYear } from 'date-fns';
 import { useMemo } from 'react';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
-import { ADMIN_EMAIL } from 'src/constants';
+import { ADMIN_EMAIL, HIDDEN_POSTS } from 'src/constants';
 import { usePostsContext } from 'src/hooks/usePostsContext';
 import { BoardService, Post } from 'src/services';
 
@@ -38,6 +38,10 @@ export function PostComponent({
     password
       ? BoardService.deletePost(password).then(() => alert('Удолено, страницу сам обновишь'))
       : null;
+
+  if (HIDDEN_POSTS.includes(Number(post.id).toString())) {
+    return <></>;
+  }
 
   return (
     <Box

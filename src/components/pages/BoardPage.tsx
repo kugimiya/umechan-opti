@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { Fragment, useState } from 'react';
 import { Text } from 'src/components/common/Text';
-import { ADMIN_EMAIL, PAGE_SIZE } from 'src/constants';
+import { ADMIN_EMAIL, HIDDEN_POSTS, PAGE_SIZE } from 'src/constants';
 import { BoardData, useBoardData } from 'src/services';
 import { theme } from 'src/theme';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
@@ -96,26 +96,28 @@ export const BoardPage = function BoardPageMemoized(props: ApiResponse<BoardData
               }}
             />
 
-            {board.posts?.map((thread, index) => (
-              <Fragment key={thread.id}>
-                <BoardThread
-                  post={thread}
-                  onRefetch={() => {
-                    boardData.refetch().catch(console.error);
-                  }}
-                />
-
-                {Number(board.posts?.length) - 1 !== index && (
-                  <hr
-                    style={{
-                      width: '100%',
-                      border: 'none',
-                      borderTop: `1px solid ${theme.colors.colorBgSecondary}`,
+            {board.posts
+              ?.filter((t) => !HIDDEN_POSTS.includes(Number(t.id).toString()))
+              ?.map((thread, index) => (
+                <Fragment key={thread.id}>
+                  <BoardThread
+                    post={thread}
+                    onRefetch={() => {
+                      boardData.refetch().catch(console.error);
                     }}
                   />
-                )}
-              </Fragment>
-            ))}
+
+                  {Number(board.posts?.length) - 1 !== index && (
+                    <hr
+                      style={{
+                        width: '100%',
+                        border: 'none',
+                        borderTop: `1px solid ${theme.colors.colorBgSecondary}`,
+                      }}
+                    />
+                  )}
+                </Fragment>
+              ))}
 
             <hr
               style={{

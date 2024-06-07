@@ -2,7 +2,7 @@ import { format, fromUnixTime, getYear } from 'date-fns';
 import Link from 'next/link';
 import { Box } from 'src/components/common/Box';
 import { Text, TextVariant } from 'src/components/common/Text';
-import { ADMIN_EMAIL } from 'src/constants';
+import { ADMIN_EMAIL, HIDDEN_POSTS } from 'src/constants';
 import { usePostReplyActions } from 'src/hooks/usePostReplyActions';
 import { Post } from 'src/services';
 
@@ -22,10 +22,14 @@ export function BoardThread({
   post: Post;
   onRefetch: () => void;
   showTag?: boolean;
-}): JSX.Element {
+}): JSX.Element | null {
   const { handleReply, isFormVisible, setIsFormVisible } = usePostReplyActions();
   const date = fromUnixTime(Number(post.timestamp));
   const time = format(date, currentYear === getYear(date) ? 'HH:mm LLLL dd' : 'HH:mm dd.LL.yyyy');
+
+  if (HIDDEN_POSTS.includes(Number(post.id).toString())) {
+    return null;
+  }
 
   const isThreadPostAction = (
     <Link href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}`}>
