@@ -5,7 +5,7 @@ import { Box } from 'src/components/common/Box';
 import { Text } from 'src/components/common/Text';
 import { useAllPosts } from 'src/services';
 
-import { ADMIN_EMAIL, PAGE_SIZE } from '../../constants';
+import { ADMIN_EMAIL, HIDDEN_POSTS, PAGE_SIZE } from '../../constants';
 import { theme } from '../../theme';
 import { isServer } from '../../utils/isServer';
 import { BoardThread } from '../lib/BoardThread';
@@ -109,15 +109,16 @@ export const AllPage = function HomePageMemoized(): JSX.Element {
                     }}
                   />
 
-                  {Number(board.posts?.length) - 1 !== index && (
-                    <hr
-                      style={{
-                        width: '100%',
-                        border: 'none',
-                        borderTop: `1px solid ${theme.colors.colorBgSecondary}`,
-                      }}
-                    />
-                  )}
+                  {Number(board.posts?.length) - 1 !== index &&
+                    !HIDDEN_POSTS.includes(Number(thread.id).toString()) && (
+                      <hr
+                        style={{
+                          width: '100%',
+                          border: 'none',
+                          borderTop: `1px solid ${theme.colors.colorBgSecondary}`,
+                        }}
+                      />
+                    )}
                 </Fragment>
               ))}
 

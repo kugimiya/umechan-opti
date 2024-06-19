@@ -107,15 +107,16 @@ export const BoardPage = function BoardPageMemoized(props: ApiResponse<BoardData
                     }}
                   />
 
-                  {Number(board.posts?.length) - 1 !== index && (
-                    <hr
-                      style={{
-                        width: '100%',
-                        border: 'none',
-                        borderTop: `1px solid ${theme.colors.colorBgSecondary}`,
-                      }}
-                    />
-                  )}
+                  {Number(board.posts?.length) - 1 !== index &&
+                    !HIDDEN_POSTS.includes(Number(thread.id).toString()) && (
+                      <hr
+                        style={{
+                          width: '100%',
+                          border: 'none',
+                          borderTop: `1px solid ${theme.colors.colorBgSecondary}`,
+                        }}
+                      />
+                    )}
                 </Fragment>
               ))}
 
