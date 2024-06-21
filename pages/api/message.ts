@@ -5,6 +5,8 @@ import fs from 'fs';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { BoardService } from 'src/services';
 
+import { apiBaseUrl } from '../../config';
+
 const formidableConfig = {
   keepExtensions: true,
   maxFileSize: 500_000_000_0,
@@ -47,7 +49,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       postResponse = await axios
         .post<{ original_file: string; thumbnail_file: string }>('/filestore', form, {
-          baseURL: 'https://scheoble.xyz/',
+          baseURL: `${apiBaseUrl.replace('/api', '')}`,
           headers: form.getHeaders(),
         })
         .then((result) => {

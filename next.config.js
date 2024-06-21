@@ -1,3 +1,5 @@
+const { apiBaseUrl } = require('./config');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -14,7 +16,7 @@ const nextConfig = {
   },
   rewrites: async () => ({
     beforeFiles: [
-      { source: '/back-api/:path*', destination: 'https://scheoble.xyz/api/:path*' },
+      { source: '/back-api/:path*', destination: `${apiBaseUrl}/:path*` },
     ],
   }),
 };

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { CUSTOM_NEWS, HIDDEN_BOARDS_TAGS, NEWS_THREAD, PAGE_SIZE } from 'src/constants';
 import { ApiResponse } from 'src/types/utils/ApiResponse';
 
+import { apiBaseUrl } from '../../../config';
 import { Passport } from '../../hooks/usePassportContext';
 import { PostPassword } from '../../hooks/usePostsPasswordsContext';
 import {
@@ -14,23 +15,28 @@ import {
   TuiStatsResponse,
 } from './types';
 
+const request = axios.create({ baseURL: apiBaseUrl });
+
 export const BoardService = {
   async getAll(page: number, filter = true) {
     const boards = await BoardService.getAllBoards(filter);
     const concatenated = boards.payload.boards.map((_) => _.tag).join('+');
 
     return (
-      await axios.get<ApiResponse<{ posts: Post[]; count: number }>>(`/v2/board/${concatenated}`, {
-        params: {
-          limit: 20,
-          offset: page * 20,
+      await request.get<ApiResponse<{ posts: Post[]; count: number }>>(
+        `/v2/board/${concatenated}`,
+        {
+          params: {
+            limit: 20,
+            offset: page * 20,
+          },
         },
-      })
+      )
     ).data;
   },
 
   async getAllBoards(filter = true) {
-    const boards = await axios.get<ApiResponse<{ boards: Board[]; posts: Post[] }>>('/v2/board');
+    const boards = await request.get<ApiResponse<{ boards: Board[]; posts: Post[] }>>('/v2/board');
     if (filter) {
       boards.data.payload.boards = boards.data.payload.boards.filter(
         (_) => !HIDDEN_BOARDS_TAGS.includes(_.tag),
@@ -42,20 +48,20 @@ export const BoardService = {
 
   async getBoard(tag: string, page = 0, size = PAGE_SIZE) {
     return (
-      await axios.get<ApiResponse<BoardData>>(`/v2/board/${tag}`, {
+      await request.get<ApiResponse<BoardData>>(`/v2/board/${tag}`, {
         params: { offset: page * size, limit: size },
       })
     ).data;
   },
 
   async getThread(threadId: string) {
-    return (await axios.get<ApiResponse<{ thread_data: ThreadData }>>(`/post/${threadId || '0'}`))
+    return (await request.get<ApiResponse<{ thread_data: ThreadData }>>(`/post/${threadId || '0'}`))
       .data;
   },
 
   async getLatestNews() {
     const threadData = (
-      await axios.get<ApiResponse<{ thread_data: ThreadData }>>(`/post/${NEWS_THREAD.threadId}`)
+      await request.get<ApiResponse<{ thread_data: ThreadData }>>(`/post/${NEWS_THREAD.threadId}`)
     ).data;
 
     threadData.payload.thread_data.replies = threadData.payload.thread_data.replies
@@ -76,11 +82,10 @@ export const BoardService = {
   },
 
   async createPost(data: Record<string, unknown>) {
-    const res = await axios.post<ApiResponse<{ post_id: number; password: string }>>(
+    const res = await request.post<ApiResponse<{ post_id: number; password: string }>>(
       '/post',
       data,
       {
-        baseURL: 'https://scheoble.xyz/api/',
         validateStatus: (status) => status >= 200 && status < 300,
       },
     );
@@ -155,7 +160,7 @@ export const BoardService = {
   },
 
   async registerPassport(passport: Passport) {
-    const res = await axios.post<ApiResponse<{ post_id: number; password: string }>>(
+    const res = await request.post<ApiResponse<{ post_id: number; password: string }>>(
       '/v2/passport',
       passport,
       {
@@ -167,7 +172,7 @@ export const BoardService = {
   },
 
   async deletePost(postPass: PostPassword) {
-    const res = await axios.delete<ApiResponse<{ post_id: number; password: string }>>(
+    const res = await request.delete<ApiResponse<{ post_id: number; password: string }>>(
       `/post/${postPass.post_id}`,
       {
         validateStatus: (status) => status >= 200 && status < 300,
