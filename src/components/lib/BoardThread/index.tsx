@@ -40,7 +40,7 @@ export function BoardThread({
   );
 
   return (
-    <Box $flexDirection='column' $gap='10px' as='section'>
+    <Box $flexDirection='column' $gap='10px' $maxWidth="100%" as='section'>
       <StyledPostInfo $alignItems='baseline' $gap='10px'>
         <Box $flexWrap='wrap' $gap='10px' $alignItems='baseline'>
           {Boolean(showTag) && <Text>/{post.board?.tag}/ </Text>}

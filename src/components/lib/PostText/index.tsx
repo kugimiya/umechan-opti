@@ -139,7 +139,7 @@ function MD({
 
     case Syntax.List:
       return (
-        <ul>
+        <ul style={{ maxWidth: '100%' }}>
           {children.map((subRoot) => (
             <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
@@ -148,7 +148,7 @@ function MD({
 
     case Syntax.ListItem:
       return (
-        <li>
+        <li style={{ maxWidth: '100%' }}>
           {children.map((subRoot) => (
             <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
           ))}
@@ -223,6 +223,7 @@ function MD({
           target='_blank'
           rel='noreferrer'
           $color='colorTextLink'
+          style={{ wordBreak: 'break-all' }}
         >
           {children.map((subRoot) => (
             <MD postsInThread={postsInThread} post={post} key={getKey(subRoot)} root={subRoot} />
