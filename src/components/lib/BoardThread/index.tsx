@@ -34,7 +34,9 @@ export function BoardThread({
   }
 
   const isThreadPostAction = (
-    <Link href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}${ignoreHidden ? '?ignoreHidden=true' : ''}`}>
+    <Link
+      href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}${ignoreHidden ? '?ignoreHidden=true' : ''}`}
+    >
       <Text $color='colorTextLink' $variant={TextVariant.textBodyBold1}>
         В тред
       </Text>
@@ -42,7 +44,7 @@ export function BoardThread({
   );
 
   return (
-    <Box $flexDirection='column' $gap='10px' $maxWidth="100%" as='section'>
+    <Box $flexDirection='column' $gap='10px' $maxWidth='100%' as='section'>
       <StyledPostInfo $alignItems='baseline' $gap='10px'>
         <Box $flexWrap='wrap' $gap='10px' $alignItems='baseline'>
           {Boolean(showTag) && <Text>/{post.board?.tag}/ </Text>}
@@ -98,7 +100,12 @@ export function BoardThread({
 
       {Boolean(post.replies) &&
         post.replies?.map((reply) => (
-          <PostComponent key={reply.id} post={reply} onReply={(id) => handleReply(id)} ignoreHidden={ignoreHidden} />
+          <PostComponent
+            key={reply.id}
+            post={reply}
+            onReply={(id) => handleReply(id)}
+            ignoreHidden={ignoreHidden}
+          />
         ))}
 
       {isFormVisible && (

@@ -102,10 +102,19 @@ export const ThreadPage = function ThreadPageMemoized(
                 />
               )}
 
-              <PostComponent post={thread} onReply={(id) => handleReply(id)} ignoreHidden={props.ignoreHidden} />
+              <PostComponent
+                post={thread}
+                onReply={(id) => handleReply(id)}
+                ignoreHidden={props.ignoreHidden}
+              />
 
               {thread.replies?.map((post) => (
-                <PostComponent key={post.id} post={post} onReply={(id) => handleReply(id)} ignoreHidden={props.ignoreHidden} />
+                <PostComponent
+                  key={post.id}
+                  post={post}
+                  onReply={(id) => handleReply(id)}
+                  ignoreHidden={props.ignoreHidden}
+                />
               ))}
             </Box>
           </Tab>
