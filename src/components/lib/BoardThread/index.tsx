@@ -18,21 +18,23 @@ export function BoardThread({
   post,
   onRefetch,
   showTag = true,
+  ignoreHidden = false,
 }: {
   post: Post;
   onRefetch: () => void;
   showTag?: boolean;
+  ignoreHidden?: boolean;
 }): JSX.Element | null {
   const { handleReply, isFormVisible, setIsFormVisible } = usePostReplyActions();
   const date = fromUnixTime(Number(post.timestamp));
   const time = format(date, currentYear === getYear(date) ? 'HH:mm LLLL dd' : 'HH:mm dd.LL.yyyy');
 
-  if (HIDDEN_POSTS.includes(Number(post.id).toString())) {
+  if (HIDDEN_POSTS.includes(Number(post.id).toString()) && !ignoreHidden) {
     return null;
   }
 
   const isThreadPostAction = (
-    <Link href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}`}>
+    <Link href={`/board/${post.board?.tag}/thread/${post.parent_id || post.id}${ignoreHidden ? '?ignoreHidden=true' : ''}`}>
       <Text $color='colorTextLink' $variant={TextVariant.textBodyBold1}>
         В тред
       </Text>
@@ -96,7 +98,7 @@ export function BoardThread({
 
       {Boolean(post.replies) &&
         post.replies?.map((reply) => (
-          <PostComponent key={reply.id} post={reply} onReply={(id) => handleReply(id)} />
+          <PostComponent key={reply.id} post={reply} onReply={(id) => handleReply(id)} ignoreHidden={ignoreHidden} />
         ))}
 
       {isFormVisible && (

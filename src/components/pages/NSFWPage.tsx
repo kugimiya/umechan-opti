@@ -103,6 +103,7 @@ export const NsfwPage = function HomePageMemoized(): JSX.Element {
                 <Fragment key={thread.id}>
                   <BoardThread
                     showTag
+                    ignoreHidden
                     post={thread}
                     onRefetch={() => {
                       boardData.refetch().catch(console.error);

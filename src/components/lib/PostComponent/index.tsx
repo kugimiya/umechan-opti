@@ -16,9 +16,11 @@ const currentYear = getYear(new Date());
 export function PostComponent({
   post,
   onReply,
+  ignoreHidden = false,
 }: {
   post: Post;
   onReply?: (postId: string | number) => void;
+  ignoreHidden?: boolean;
 }): JSX.Element {
   const { passwords } = usePostsPasswordsContext();
   const date = fromUnixTime(Number(post.timestamp));
@@ -39,7 +41,7 @@ export function PostComponent({
       ? BoardService.deletePost(password).then(() => alert('Удолено, страницу сам обновишь'))
       : null;
 
-  if (HIDDEN_POSTS.includes(Number(post.id).toString())) {
+  if (HIDDEN_POSTS.includes(Number(post.id).toString()) && !ignoreHidden) {
     return <></>;
   }
 

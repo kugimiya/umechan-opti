@@ -15,7 +15,7 @@ import { PostComponent } from '../lib/PostComponent';
 import { Tab } from '../lib/Tab';
 
 export const ThreadPage = function ThreadPageMemoized(
-  props: ApiResponse<{ thread_data: ThreadData }>,
+  props: ApiResponse<{ thread_data: ThreadData }> & { ignoreHidden: boolean },
 ): JSX.Element {
   const { handleReply, isFormVisible, setIsFormVisible } = usePostReplyActions();
   const router = useRouter();
@@ -34,7 +34,7 @@ export const ThreadPage = function ThreadPageMemoized(
     }
   }, [scrollTo, thread, thread?.replies, threadData.isFetched]);
 
-  if (HIDDEN_POSTS.includes(router.query.id?.toString() || '')) {
+  if (HIDDEN_POSTS.includes(router.query.id?.toString() || '') && !props.ignoreHidden) {
     return <></>;
   }
 
@@ -102,10 +102,10 @@ export const ThreadPage = function ThreadPageMemoized(
                 />
               )}
 
-              <PostComponent post={thread} onReply={(id) => handleReply(id)} />
+              <PostComponent post={thread} onReply={(id) => handleReply(id)} ignoreHidden={props.ignoreHidden} />
 
               {thread.replies?.map((post) => (
-                <PostComponent key={post.id} post={post} onReply={(id) => handleReply(id)} />
+                <PostComponent key={post.id} post={post} onReply={(id) => handleReply(id)} ignoreHidden={props.ignoreHidden} />
               ))}
             </Box>
           </Tab>
