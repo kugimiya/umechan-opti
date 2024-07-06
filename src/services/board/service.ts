@@ -55,13 +55,16 @@ export const BoardService = {
   },
 
   async getThread(threadId: string) {
-    return (await request.get<ApiResponse<{ thread_data: ThreadData }>>(`/post/${threadId || '0'}`))
-      .data;
+    return (
+      await request.get<ApiResponse<{ thread_data: ThreadData }>>(`/v2/post/${threadId || '0'}`)
+    ).data;
   },
 
   async getLatestNews() {
     const threadData = (
-      await request.get<ApiResponse<{ thread_data: ThreadData }>>(`/post/${NEWS_THREAD.threadId}`)
+      await request.get<ApiResponse<{ thread_data: ThreadData }>>(
+        `/v2/post/${NEWS_THREAD.threadId}`,
+      )
     ).data;
 
     threadData.payload.thread_data.replies = threadData.payload.thread_data.replies
@@ -82,8 +85,9 @@ export const BoardService = {
   },
 
   async createPost(data: Record<string, unknown>) {
-    const res = await request.post<ApiResponse<{ post_id: number; password: string }>>(
-      '/post',
+    const method = data.parent_id ? request.put : request.post;
+    const res = await method<ApiResponse<{ post_id: number; password: string }>>(
+      data.parent_id ? `/v2/post/${data.parent_id as string}` : '/v2/post',
       data,
       {
         validateStatus: (status) => status >= 200 && status < 300,
@@ -173,7 +177,7 @@ export const BoardService = {
 
   async deletePost(postPass: PostPassword) {
     const res = await request.delete<ApiResponse<{ post_id: number; password: string }>>(
-      `/post/${postPass.post_id}`,
+      `/v2/post/${postPass.post_id}`,
       {
         validateStatus: (status) => status >= 200 && status < 300,
         params: {
