@@ -1,10 +1,13 @@
 :root {
-
+  --card-border-width: 1px;
+  --card-border-color: black;
+  --card-border-radius: 4px;
+  --card-padding: 12px 24px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-
+    --card-border-color: white;
   }
 }
 
