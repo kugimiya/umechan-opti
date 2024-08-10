@@ -1,5 +1,0 @@
-.root {
-    border: var(--card-border-width) solid var(--card-border-color);
-    border-radius: var(--card-border-radius);
-    padding: var(--card-padding);
-}

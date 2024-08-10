@@ -1,0 +1,23 @@
+.root {
+    border: var(--card-border-width) solid var(--card-border-color);
+    border-radius: var(--card-border-radius);
+    padding: var(--card-padding);
+}
+
+.root.withTitle {
+    padding: unset;
+}
+
+.withTitleContainer {
+    width: 100%;
+}
+
+.titleElm {
+    color: var(--title-color);
+    background-color: var(--title-bg-color);
+    padding: var(--card-padding);
+}
+
+.titleChildrenElm {
+    padding: var(--card-padding);
+}

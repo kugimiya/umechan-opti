@@ -1,5 +1,5 @@
 import { Box } from "@/components/layout/Box/Box";
-import { Card } from "@/components/styled/Card/Card";
+import { Card } from "@/components/layout/Card/Card";
 import { epds_api } from "@/api/epds";
 import Link from "next/link";
 
