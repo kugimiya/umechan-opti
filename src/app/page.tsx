@@ -3,9 +3,9 @@ import { Card } from "@/components/layout/Card/Card";
 
 export default function Home() {
   return (
-    <Card title='Главная'>
+    <Card className="pageMainCardWrapper" title='Главная'>
       <Box flexDirection='column' gap='12px'>
-        <Card>юмэчан</Card>
+        Тут был цветущий сад, теперь по костям вы ходите.
       </Box>
     </Card>
   );

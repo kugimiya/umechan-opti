@@ -6,7 +6,11 @@
   --card-border-radius: 4px;
   --card-padding: 4px 8px;
 
-  --navbar-sections-gap: 4px;
+  --page-blocks-gap: 4px;
+  --page-width: 1280px;
+
+  --navbar-sections-gap: var(--page-blocks-gap);
+  --navbar-width: 300px;
 
   --title-color: white;
   --title-bg-color: black;
@@ -46,4 +50,8 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+.pageMainCardWrapper {
+  width: 100%;
 }

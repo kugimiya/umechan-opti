@@ -4,3 +4,10 @@ export type LinkItem = {
   target?: string;
   url: string;
 };
+
+export type WithPagination = {
+  searchParams: {
+    offset: string;
+    limit: string;
+  };
+};

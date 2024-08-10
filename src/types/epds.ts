@@ -1,6 +1,8 @@
-export type EpdsResponseBoards = EpdsBoard[];
-export type EpdsResponseBoardThreads = EpdsPost[];
-export type EpdsResponseThread = EpdsPost;
+export type EpdsResponseBoard = { item: EpdsBoard };
+export type EpdsResponseBoards = { items: EpdsBoard[] };
+export type EpdsResponseBoardThreads = { items: EpdsPost[], count: number };
+export type EpdsResponseThread = { item: EpdsPost };
+export type EpdsResponseFeed = { items: EpdsPost[], count: number };
 
 export type EpdsBoard = {
   id: number;

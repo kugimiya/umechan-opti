@@ -1,15 +1,17 @@
 import React from "react";
-import { Box } from "@/components/layout/Box/Box";
+import { Box, BoxProps } from "@/components/layout/Box/Box";
 import styles from './Card.module.css';
 import clsx from "clsx";
 
 type CardProps = React.PropsWithChildren & {
   title?: string;
+  rootElmProps?: BoxProps;
+  className?: string;
 }
 
 export const Card = (props: CardProps) => {
   return (
-    <Box className={clsx(styles.root, { [styles.withTitle]: Boolean(props.title) })}>
+    <Box {...(props.rootElmProps || {})} className={clsx(styles.root, props.className, { [styles.withTitle]: Boolean(props.title) })}>
       {Boolean(props.title)
         ? (
           <Box className={styles.withTitleContainer} flexDirection='column'>

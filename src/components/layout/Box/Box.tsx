@@ -1,6 +1,6 @@
 import React, { CSSProperties } from "react";
 
-type BoxProps = React.PropsWithChildren & {
+export type BoxProps = React.PropsWithChildren & {
   as?: keyof JSX.IntrinsicElements;
   className?: string;
 
@@ -8,6 +8,7 @@ type BoxProps = React.PropsWithChildren & {
   justifyContent?: CSSProperties["justifyContent"];
   alignItems?: CSSProperties["alignItems"];
   gap?: CSSProperties["gap"];
+  flexGrow?: CSSProperties["flexGrow"];
 }
 
 export const Box = (props: BoxProps) => {
@@ -21,7 +22,8 @@ export const Box = (props: BoxProps) => {
         flexDirection: props.flexDirection,
         justifyContent: props.justifyContent,
         alignItems: props.alignItems,
-        gap: props.gap
+        gap: props.gap,
+        flexGrow: props.flexGrow
       }
     },
     props.children

@@ -1,0 +1,14 @@
+.body {
+    padding-top: var(--page-blocks-gap);
+    padding-bottom: var(--page-blocks-gap);
+    gap: var(--page-blocks-gap);
+    justify-content: center;
+}
+
+.main {
+    width: calc(var(--page-width) - var(--navbar-width));
+}
+
+.navbar {
+    width: var(--navbar-width);
+}
