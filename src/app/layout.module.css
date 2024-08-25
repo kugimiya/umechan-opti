@@ -3,6 +3,7 @@
     padding-bottom: var(--page-blocks-gap);
     gap: var(--page-blocks-gap);
     justify-content: center;
+    align-items: flex-start;
 }
 
 .main {
@@ -11,4 +12,6 @@
 
 .navbar {
     width: var(--navbar-width);
+    position: sticky;
+    top: var(--page-blocks-gap);
 }

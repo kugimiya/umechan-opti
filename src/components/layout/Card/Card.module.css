@@ -3,6 +3,7 @@
     border-radius: var(--card-border-radius);
     padding: var(--card-padding);
     overflow: hidden;
+    max-width: 100%;
 }
 
 .root.withTitle {
@@ -21,4 +22,9 @@
 
 .titleChildrenElm {
     padding: var(--card-padding);
+}
+
+.filled {
+    border: none;
+    background-color: var(--post-bg-color);
 }

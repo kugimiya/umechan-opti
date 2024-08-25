@@ -14,6 +14,14 @@
 
   --title-color: white;
   --title-bg-color: black;
+
+  --color-text-quote: rgb(96, 131, 75);
+
+  --post-content-gap: 8px;
+  --post-bg-color: #ececec;
+
+  --hr-border: 0.5px solid black;
+  --hr-border-margins: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -24,6 +32,11 @@
 
     --title-color: black;
     --title-bg-color: white;
+
+    --hr-border: 0.5px solid white;
+    --hr-border-margins: 8px;
+
+    --post-bg-color: #363636;
   }
 }
 
@@ -36,7 +49,6 @@
 html,
 body {
   max-width: 100vw;
-  overflow-x: hidden;
   background-color: var(--page-bg-color);
 }
 

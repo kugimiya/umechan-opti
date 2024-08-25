@@ -7,19 +7,20 @@ type CardProps = React.PropsWithChildren & {
   title?: string;
   rootElmProps?: BoxProps;
   className?: string;
+  variant?: 'default' | 'filled';
 }
 
-export const Card = (props: CardProps) => {
+export const Card = ({ title, rootElmProps, className, variant = 'default', children }: CardProps) => {
   return (
-    <Box {...(props.rootElmProps || {})} className={clsx(styles.root, props.className, { [styles.withTitle]: Boolean(props.title) })}>
-      {Boolean(props.title)
+    <Box {...(rootElmProps || {})} className={clsx(styles.root, className, [styles[variant]], { [styles.withTitle]: Boolean(title) })}>
+      {Boolean(title)
         ? (
           <Box className={styles.withTitleContainer} flexDirection='column'>
-            <span className={styles.titleElm}>{props.title}</span>
-            <Box className={styles.titleChildrenElm}>{props.children}</Box>
+            <span className={styles.titleElm}>{title}</span>
+            <Box className={styles.titleChildrenElm}>{children}</Box>
           </Box>
         )
-        : <>{props.children}</>
+        : <>{children}</>
       }
     </Box>
   );

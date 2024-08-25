@@ -1,7 +1,7 @@
-import { Box } from "@/components/layout/Box/Box";
 import { Card } from "@/components/layout/Card/Card";
 import { epds_api } from "@/api/epds";
 import { get_thread_subject } from "@/utils/formatters/get_thread_subject";
+import { ThreadProto } from "@/components/common/ThreadProto/ThreadProto";
 
 type ThreadPageProps = {
   params: {
@@ -14,13 +14,7 @@ export default async function ThreadPage(props: ThreadPageProps) {
 
   return (
     <Card className="pageMainCardWrapper" title={get_thread_subject(thread.item)}>
-      <Box flexDirection='column' gap='12px'>
-        {thread.item.replies?.map((reply) => (
-          <Card key={reply.id}>
-            {reply.post_message || 'notext'}
-          </Card>
-        ))}
-      </Box>
+      <ThreadProto post={thread.item} is_full_version />
     </Card>
   );
 }

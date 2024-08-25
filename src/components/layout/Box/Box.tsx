@@ -9,6 +9,8 @@ export type BoxProps = React.PropsWithChildren & {
   alignItems?: CSSProperties["alignItems"];
   gap?: CSSProperties["gap"];
   flexGrow?: CSSProperties["flexGrow"];
+
+  style?: CSSProperties;
 }
 
 export const Box = (props: BoxProps) => {
@@ -17,6 +19,7 @@ export const Box = (props: BoxProps) => {
     {
       className: props.className,
       style: {
+        ...props.style,
         // TODO: move into css
         display: "flex",
         flexDirection: props.flexDirection,
