@@ -7,6 +7,8 @@ import { enrich_navbar } from "@/utils/enrichers/enrich_navbar";
 import { Navbar } from "@/components/common/Navbar/Navbar";
 import styles from './layout.module.css';
 import clsx from "clsx";
+import { AppProviders } from "@/components/providers";
+import { ModalPostForm } from "@/components/common/ModalPostForm/ModalPostForm";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,13 +28,17 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <Box as='body' className={clsx(inter.className, styles.body)}>
-        <Navbar className={styles.navbar} items={navbar_items} />
+      <AppProviders>
+        <Box as='body' className={clsx(inter.className, styles.body)}>
+          <Navbar className={styles.navbar} items={navbar_items} />
 
-        <Box className={styles.main} as='main'>
-          {children}
+          <Box className={styles.main} as='main'>
+            {children}
+          </Box>
+
+          <ModalPostForm />
         </Box>
-      </Box>
+      </AppProviders>
     </html>
   );
 }

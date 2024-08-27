@@ -22,6 +22,10 @@
 
   --hr-border: 0.5px solid black;
   --hr-border-margins: 8px;
+
+  --modal-form-top: 8px;
+  --modal-form-left: 8px;
+  --form-field-label-width: 128px;
 }
 
 @media (prefers-color-scheme: dark) {

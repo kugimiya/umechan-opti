@@ -9,7 +9,7 @@ type FeedPageLayoutProps = WithPagination & {
 export default async function FeedPageLayout(props: FeedPageLayoutProps) {
   return (
     <Card className="pageMainCardWrapper" title='Последнее'>
-      <Box flexDirection='column' gap='12px'>
+      <Box flexDirection='column' gap='12px' style={{ width: '100%' }}>
         {props.children}
       </Box>
     </Card>

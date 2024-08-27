@@ -32,7 +32,7 @@ export default async function BoardPage(props: BoardPageProps) {
 
   return (
     <Card className="pageMainCardWrapper" title={board.item.name}>
-      <Box flexDirection='column' gap='12px'>
+      <Box flexDirection='column' gap='12px' style={{ width: '100%' }}>
         {paginator}
 
         <Hr />

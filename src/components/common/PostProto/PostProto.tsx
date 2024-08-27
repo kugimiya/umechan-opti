@@ -5,6 +5,7 @@ import { PostMDContent } from "@/components/common/PostMDContent/PostMDContent";
 import { formatDateTime } from "@/types/formatDateTime";
 import { Box } from "@/components/layout/Box/Box";
 import Link from "next/link";
+import { QuickReplyLink } from "@/components/common/QuickReplyLink/QuickReplyLink";
 
 type Props = {
   post: EpdsPost;
@@ -20,9 +21,11 @@ export const PostProto = memo(function PostProtoInner(props: Props) {
     ? <Link href={`/board/${post.board_tag}/${post.id}`}>В тред</Link>
     : null;
 
+  const post_id = <QuickReplyLink post={post} is_at_thread />
+
   const content = (
     <>
-      <p>{post.poster_verified ? '🔰' : '⭕️'} {post.poster} <b>{post.post_subject}</b> {formatDateTime(post.created_at)} {is_at_feed && post.board_tag}#{post.id} {in_thread}</p>
+      <p>{post.poster_verified ? '🔰' : '⭕️'} {post.poster} <b>{post.post_subject}</b> {formatDateTime(post.created_at)} {is_at_feed && post.board_tag} {post_id} {in_thread}</p>
 
       {post.media?.map((item) => (
         <Link key={item.media_url} href={item.media_url} target="_blank">
