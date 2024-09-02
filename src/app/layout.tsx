@@ -10,10 +10,10 @@ import clsx from "clsx";
 import { AppProviders } from "@/components/providers";
 import { ModalPostForm } from "@/components/common/ModalPostForm/ModalPostForm";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin", "cyrillic-ext"], weight: "variable" });
 
 export const metadata: Metadata = {
-  title: "Юмечан v2",
+  title: process.env.NEXT_PUBLIC_CHAN_NAME,
   description: "Анонимный имиджборд",
 };
 
