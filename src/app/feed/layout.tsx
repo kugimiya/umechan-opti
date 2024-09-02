@@ -1,10 +1,9 @@
 import { Box } from "@/components/layout/Box/Box";
 import { Card } from "@/components/layout/Card/Card";
-import { WithPagination } from "@/types/utils";
 
-type FeedPageLayoutProps = WithPagination & {
+type FeedPageLayoutProps = Readonly<{
   children: React.ReactNode;
-};
+}>;
 
 export default async function FeedPageLayout(props: FeedPageLayoutProps) {
   return (
