@@ -1,7 +1,10 @@
 import { EpdsBoard } from "@/types/epds";
 import { LinkItem } from "@/types/utils";
+import { getFeatureFlags } from "../get_feature_flags";
 
 export const enrich_navbar = (boards: EpdsBoard[]) => {
+  const { IS_MODERKA_ENABLED } = getFeatureFlags();
+
   const boards_items: LinkItem[] = boards.map((board) => ({
     title: board.name,
     url: `/board/${board.tag}`,
@@ -9,9 +12,12 @@ export const enrich_navbar = (boards: EpdsBoard[]) => {
 
   const nav_items: LinkItem[] = [
     { title: 'Главная', url: '/' },
-    { title: 'Feed', url: '/feed' },
-    { title: 'Записки мочератора', url: '/moderka/logs' },
+    { title: 'Feed', url: '/feed' }
   ];
+
+  if (IS_MODERKA_ENABLED) {
+    nav_items.push({ title: 'Записки мочератора', url: '/moderka/logs' });
+  }
 
   const chans_items: LinkItem[] = [
     { title: 'Шизач', url: 'https://scheoble.xyz/', target: '_blank' },
@@ -22,8 +28,11 @@ export const enrich_navbar = (boards: EpdsBoard[]) => {
   const other_items: LinkItem[] = [
     { title: 'Дискорд', url: 'https://discord.gg/DhhjsVgXBG', target: '_blank' },
     { title: 'Исходники', url: 'https://github.com/U-Me-Chan', target: '_blank' },
-    { title: 'Модерка', url: '/moderka' },
   ];
+
+  if (IS_MODERKA_ENABLED) {
+    other_items.push({ title: 'Модерка', url: '/moderka' });
+  }
 
   return {
     'Навигация': nav_items,
