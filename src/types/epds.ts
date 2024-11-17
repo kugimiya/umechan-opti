@@ -3,6 +3,7 @@ export type EpdsResponseBoards = { items: EpdsBoard[] };
 export type EpdsResponseBoardThreads = { items: EpdsPost[], count: number };
 export type EpdsResponseThread = { item: EpdsPost };
 export type EpdsResponseFeed = { items: EpdsPost[], count: number };
+export type EpdsResponsePostById = { item: EpdsPost };
 
 export type EpdsBoard = {
   id: number;

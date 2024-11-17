@@ -10,6 +10,7 @@ export const enrich_navbar = (boards: EpdsBoard[]) => {
   const nav_items: LinkItem[] = [
     { title: 'Главная', url: '/' },
     { title: 'Feed', url: '/feed' },
+    { title: 'Записки мочератора', url: '/moderka/logs' },
   ];
 
   const chans_items: LinkItem[] = [
@@ -21,6 +22,7 @@ export const enrich_navbar = (boards: EpdsBoard[]) => {
   const other_items: LinkItem[] = [
     { title: 'Дискорд', url: 'https://discord.gg/DhhjsVgXBG', target: '_blank' },
     { title: 'Исходники', url: 'https://github.com/U-Me-Chan', target: '_blank' },
+    { title: 'Модерка', url: '/moderka' },
   ];
 
   return {

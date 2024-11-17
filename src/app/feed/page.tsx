@@ -20,7 +20,7 @@ export default async function FeedPage(props: FeedPageProps) {
       limit={props.searchParams.limit !== undefined ? Number(props.searchParams.limit) : undefined}
       offset={props.searchParams.offset !== undefined ? Number(props.searchParams.offset) : undefined}
       items_count={threads.count}
-      location={`${process.env.FRONT_BASEURL}/feed`}
+      location={`${process.env.NEXT_PUBLIC_FRONT_BASEURL}/feed`}
     />
   );
 

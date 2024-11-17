@@ -26,7 +26,7 @@ export default async function BoardPage(props: BoardPageProps) {
       limit={props.searchParams.limit !== undefined ? Number(props.searchParams.limit) : undefined}
       offset={props.searchParams.offset !== undefined ? Number(props.searchParams.offset) : undefined}
       items_count={threads.count}
-      location={`${process.env.FRONT_BASEURL}/board/${props.params.board_tag}`}
+      location={`${process.env.NEXT_PUBLIC_FRONT_BASEURL}/board/${props.params.board_tag}`}
     />
   );
 

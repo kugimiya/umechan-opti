@@ -1,26 +1,26 @@
 import { parse } from "@textlint/markdown-to-ast";
 import {
   ASTNodeTypes, TxtBlockQuoteNode,
-  TxtCodeBlockNode, TxtCodeNode, TxtEmphasisNode,
+  TxtCodeBlockNode, TxtCodeNode,
   TxtLinkNode, TxtListItemNode, TxtListNode,
-  TxtNode,
-  TxtParagraphNode,
-  TxtTextNode
+  TxtNode, TxtParagraphNode, TxtTextNode
 } from "@textlint/ast-node-types";
 import { memo } from "react";
 import Link from "next/link";
 import { Box } from "@/components/layout/Box/Box";
 import styles from './styles.module.css';
+import { tune_post_message } from "@/utils/formatters/tune_post_message";
+import { PostPointer } from "@/components/common/PostPointer/PostPointer";
 
 type Props = {
   message?: string;
 }
 
 export const PostMDContent = memo(function PostMDComponentInner(props: Props) {
-  const root = parse(props.message || '');
+  const root = parse(tune_post_message(props.message));
 
   return (
-    <Box flexDirection='column' gap='var(--post-content-gap)'>
+    <Box flexDirection='column' justifyContent='flex-start' alignItems='flex-start' gap='var(--post-content-gap)'>
       <PostContent root={root.children} path="root" />
     </Box>
   );
@@ -74,9 +74,25 @@ const PostContent = (props: InnerProps) => {
     }
 
     if (item.type === ASTNodeTypes.BlockQuote) {
-      return (
-        <span key={`${props.path}-${index}-quote`} className={styles.quote}>{(item as TxtBlockQuoteNode).raw}</span>
-      );
+      const contents = (item as TxtBlockQuoteNode).raw;
+      const is_double_quote = contents.startsWith('>>');
+
+      if (!is_double_quote) {
+        return (
+          <span key={`${props.path}-${index}-quote`} className={styles.quote}>{contents}</span>
+        );
+      }
+
+      const second_part = contents.split('>>')[1].trim();
+      const post_id = Number(second_part);
+      const is_post_pointer = !Number.isNaN(post_id);
+      if (is_post_pointer) {
+        return (
+          <PostPointer key={`${props.path}-${index}-post-pointer`} postId={post_id}>
+            <span key={`${props.path}-${index}-post-pointer-quote`} className={styles.quote}>{contents}</span>
+          </PostPointer>
+        )
+      }
     }
 
     if (item.type === ASTNodeTypes.Emphasis) {

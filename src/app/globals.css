@@ -26,18 +26,20 @@
   --modal-form-top: 8px;
   --modal-form-left: 8px;
   --form-field-label-width: 128px;
+
+  --shadow-1: -1px 1px 19px 0px rgba(0,0,0,0.75);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --page-bg-color: black;
 
-    --card-border-color: white;
+    --card-border-color: var(--post-bg-color);
 
-    --title-color: black;
-    --title-bg-color: white;
+    --title-color: white;
+    --title-bg-color: var(--post-bg-color);
 
-    --hr-border: 0.5px solid white;
+    --hr-border: 0.5px solid var(--post-bg-color);
     --hr-border-margins: 8px;
 
     --post-bg-color: #363636;
@@ -60,6 +62,10 @@ body {}
 
 a {
   color: inherit;
+}
+
+ul {
+  padding-left: 14px;
 }
 
 @media (prefers-color-scheme: dark) {

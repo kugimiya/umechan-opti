@@ -46,7 +46,7 @@ export const PostProto = memo(function PostProtoInner(props: Props) {
   }
 
   return (
-    <Card variant='filled' rootElmProps={{ flexDirection: "column", alignItems: 'flex-start', gap: "var(--post-content-gap)", style: { maxWidth: '100%' } }}>
+    <Card variant='filled' rootElmProps={{ flexDirection: "column", alignItems: 'flex-start', gap: "var(--post-content-gap)", style: { maxWidth: '100%', overflow: 'initial' } }}>
       {content}
     </Card>
   );

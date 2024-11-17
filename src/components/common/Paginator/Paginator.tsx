@@ -1,6 +1,8 @@
+'use client';
+
 import { memo } from "react";
-import Link from "next/link";
 import { Box } from "@/components/layout/Box/Box";
+import { usePaginator } from "@/components/common/Paginator/Paginator.hook";
 
 type Props = {
   limit?: number;
@@ -9,29 +11,35 @@ type Props = {
   location: string;
 }
 
+const MAX_ITEMS = Number(process.env.NEXT_PUBLIC_PAGINATOR_MAX_ITEMS);
+
+const FunctionalText = (props: { children: string, onClick: () => void }) => {
+  return (
+    <span
+      onClick={props.onClick}
+      style={{ cursor: "pointer", textDecoration: "underline" }}
+    >{props.children}</span>
+  );
+};
+
 export const Paginator = memo(function PaginatorInner(props: Props) {
-  const { location, limit = Number(process.env.DEFAULT_LIMIT), offset = 0, items_count } = props;
-  const pages = Math.ceil(items_count / limit);
+  const { isShowingAllItems, handleShowAll, paging_items } = usePaginator(props);
+  const content = paging_items.length <= MAX_ITEMS
+    ? <>{paging_items}</>
+    : (
+      <>
+        {paging_items.slice(0, MAX_ITEMS)}
 
-  const url = new URL(location);
-  url.searchParams.delete('limit');
-  url.searchParams.delete('offset');
+        {isShowingAllItems && <FunctionalText onClick={handleShowAll}>[скрыть]</FunctionalText>}
+        {isShowingAllItems && paging_items.slice(MAX_ITEMS)}
 
-  const paging_items = [];
-
-  for (let i = 0; i < pages; i++) {
-    const url_next = new URL(url);
-    url_next.searchParams.set('limit', limit.toString());
-    url_next.searchParams.set('offset', (limit * i).toString());
-
-    const is_current_page = limit * i === offset;
-
-    paging_items.push(is_current_page ? <span>{i}</span> : <Link key={i} href={url_next.toString()}>{i}</Link>);
-  }
+        {!isShowingAllItems && <FunctionalText onClick={handleShowAll}>[ещё]</FunctionalText>}
+      </>
+    );
 
   return (
     <Box gap="8px" style={{ maxWidth: "100%", flexWrap: 'wrap' }}>
-      Пагинация: {paging_items}
+      Пагинация: {content}
     </Box>
   );
 });

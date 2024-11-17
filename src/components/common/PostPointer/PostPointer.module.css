@@ -1,0 +1,20 @@
+.root {
+    display: inline-block;
+    position: relative;
+}
+
+.text {
+    cursor: pointer;
+}
+
+.popover {
+    position: absolute;
+    z-index: 1;
+    top: 16px;
+    left: 32px;
+    width: 640px;
+
+    border: var(--card-border-width) solid var(--card-border-color);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--shadow-1);
+}
