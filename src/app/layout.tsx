@@ -16,9 +16,6 @@ export const metadata: Metadata = {
 
 export default async function RootLayout(props: Readonly<{ children: React.ReactNode; }>) {
   const { children } = props;
-  // todo: can we move it out from layout?
-  const boards = await epds_api.boards_list();
-  const navbar_items = enrich_navbar(boards.items);
 
   return (
     <html lang="en">
