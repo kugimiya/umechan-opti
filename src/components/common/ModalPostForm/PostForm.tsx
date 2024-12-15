@@ -10,6 +10,7 @@ import { modalPostFormContext, modalPostFormContextDefaultValue } from "@/utils/
 
 import styles from './PostForm.module.css';
 import { pissykaka_api, PissykakaCreatePostPayload } from "@/api/pissykaka";
+import { epds_api } from "@/api/epds";
 
 export const PostForm = () => {
   const router = useRouter();
@@ -95,7 +96,7 @@ export const PostForm = () => {
       pushToLog('something went wrong!');
     } finally {
       pushToLog('posting done... awaiting changes!');
-      await sleep(2000);
+      await epds_api.force_sync(Number(modalState.target_id));
 
       pushToLog('triggering page reload...');
       router.refresh();

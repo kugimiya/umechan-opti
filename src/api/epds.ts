@@ -36,4 +36,8 @@ export const epds_api = {
     const { data } = await epds_request.get<EpdsResponsePostById>(`/v1/post/${post_id}`, { params: { unmod } });
     return data;
   },
+  force_sync: async (thread_id: number) => {
+    const { data } = await epds_request.post<EpdsResponsePostById>(`/v1/util/force_sync`, { thread_id });
+    return data;
+  }
 };
