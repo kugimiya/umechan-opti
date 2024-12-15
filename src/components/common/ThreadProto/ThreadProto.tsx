@@ -8,6 +8,7 @@ type Props = {
   post: EpdsPost;
   is_full_version?: boolean;
   is_at_feed?: boolean;
+  is_unmod?: boolean;
 };
 
 export const ThreadProto = memo(function ThreadProtoInner(props: Props) {
@@ -24,9 +25,9 @@ export const ThreadProto = memo(function ThreadProtoInner(props: Props) {
 
   return (
     <Box flexDirection='column' gap='12px' style={{ maxWidth: '100%' }}>
-      <PostProto post={props.post} is_op_post is_at_feed={props.is_at_feed} is_at_thread_list={!props.is_full_version} />
+      <PostProto post={props.post} is_op_post is_at_feed={props.is_at_feed} is_at_thread_list={!props.is_full_version} is_unmod={props.is_unmod} />
       {truncated_posts}
-      {props.post.replies?.map((reply) => <PostProto key={reply.id} post={reply} />)}
+      {props.post.replies?.map((reply) => <PostProto key={reply.id} post={reply} is_unmod={props.is_unmod} />)}
     </Box>
   );
 });

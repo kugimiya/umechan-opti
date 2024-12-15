@@ -7,7 +7,7 @@ import clsx from "clsx";
 
 type Props = {
   items: Record<string, LinkItem[]>;
-  className?: string
+  className?: string;
 }
 
 export const Navbar = (props: Props) => {

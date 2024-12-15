@@ -8,11 +8,12 @@ type Props = {
   offset?: number;
   items_count: number;
   location: string;
+  is_unmod?: boolean;
 }
 
 export const usePaginator = (props: Props) => {
   const [isShowingAllItems, setIsShowingAllItems] = useState(false);
-  const { location, limit = Number(process.env.NEXT_PUBLIC_DEFAULT_LIMIT), offset = 0, items_count } = props;
+  const { location, limit = Number(process.env.NEXT_PUBLIC_DEFAULT_LIMIT), offset = 0, items_count, is_unmod } = props;
   const pages = Math.ceil(items_count / limit);
 
   const url = new URL(location);
@@ -25,6 +26,10 @@ export const usePaginator = (props: Props) => {
     const url_next = new URL(url);
     url_next.searchParams.set('limit', limit.toString());
     url_next.searchParams.set('offset', (limit * i).toString());
+
+    if (is_unmod) {
+      url_next.searchParams.set('unmod', 'true');
+    }
 
     const is_current_page = limit * i === offset;
 

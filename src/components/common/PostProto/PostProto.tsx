@@ -12,13 +12,14 @@ type Props = {
   is_op_post?: boolean;
   is_at_thread_list?: boolean;
   is_at_feed?: boolean;
+  is_unmod?: boolean;
 };
 
 export const PostProto = memo(function PostProtoInner(props: Props) {
   const { post, is_op_post = false, is_at_thread_list = false, is_at_feed = false } = props;
 
   const in_thread = is_at_thread_list
-    ? <Link href={`/board/${post.board_tag}/${post.id}`}>В тред</Link>
+    ? <Link href={props.is_unmod ? `/board/${post.board_tag}/${post.id}?unmod=true` : `/board/${post.board_tag}/${post.id}`}>В тред</Link>
     : null;
 
   const post_id = <QuickReplyLink post={post} is_at_thread />
@@ -29,7 +30,7 @@ export const PostProto = memo(function PostProtoInner(props: Props) {
 
       {post.media?.map((item) => (
         <Link key={item.media_url} href={item.media_url} target="_blank">
-          <img src={item.preview_image_url} />
+          <img src={item.preview_image_url} alt="post img" />
         </Link>
       ))}
 

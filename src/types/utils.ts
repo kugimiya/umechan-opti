@@ -11,3 +11,9 @@ export type WithPagination = {
     limit: string;
   };
 };
+
+export type WithUnmod = {
+  searchParams: {
+    unmod: 'true' | 'false';
+  };
+};

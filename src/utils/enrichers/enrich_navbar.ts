@@ -2,21 +2,21 @@ import { EpdsBoard } from "@/types/epds";
 import { LinkItem } from "@/types/utils";
 import { getFeatureFlags } from "../get_feature_flags";
 
-export const enrich_navbar = (boards: EpdsBoard[]) => {
+export const enrich_navbar = (boards: EpdsBoard[], unmod: 'true' | 'false') => {
   const { IS_MODERKA_ENABLED } = getFeatureFlags();
 
   const boards_items: LinkItem[] = boards.map((board) => ({
     title: board.name,
-    url: `/board/${board.tag}`,
+    url: unmod === 'true' ? `/board/${board.tag}?unmod=true` : `/board/${board.tag}`,
   }));
 
   const nav_items: LinkItem[] = [
-    { title: 'Главная', url: '/' },
-    { title: 'Feed', url: '/feed' }
+    { title: 'Главная', url: unmod === 'true' ? '/?unmod=true' : '/' },
+    { title: 'Feed', url: unmod === 'true' ? '/feed?unmod=true' : '/feed' }
   ];
 
   if (IS_MODERKA_ENABLED) {
-    nav_items.push({ title: 'Записки мочератора', url: '/moderka/logs' });
+    nav_items.push({ title: 'Записки мочератора', url: unmod === 'true' ? '/moderka/logs?unmod=true' : '/moderka/logs' });
   }
 
   const chans_items: LinkItem[] = [

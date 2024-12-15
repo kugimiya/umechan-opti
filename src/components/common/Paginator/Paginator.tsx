@@ -9,6 +9,7 @@ type Props = {
   offset?: number;
   items_count: number;
   location: string;
+  is_unmod?: boolean;
 }
 
 const MAX_ITEMS = Number(process.env.NEXT_PUBLIC_PAGINATOR_MAX_ITEMS);

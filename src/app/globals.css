@@ -77,3 +77,11 @@ ul {
 .pageMainCardWrapper {
   width: 100%;
 }
+
+.body {
+    padding-top: var(--page-blocks-gap);
+    padding-bottom: var(--page-blocks-gap);
+    gap: var(--page-blocks-gap);
+    justify-content: center;
+    align-items: flex-start;
+}
