@@ -107,7 +107,7 @@ export const PostForm = () => {
 
   return (
     <Box flexDirection='column' gap='var(--page-blocks-gap)' className={styles.formRoot}>
-      <Box className={styles.formControl}>
+      <Box className={styles.formControl} style={{ display: modalState.target === 'board' ? 'none' : 'flex' }}>
         <div className={styles.fieldName}>не поднимать</div>
         <div className={styles.fieldControl}>
           <input disabled={is_form_locked} type='checkbox' name='sage' checked={modalState.sage ?? false} onChange={(ev) => modalState.set({ ...modalState, sage: ev.target.checked })} />
@@ -142,7 +142,7 @@ export const PostForm = () => {
         </div>
       </Box>
 
-      <Box className={styles.formControl}>
+      <Box className={styles.formControl} style={{ display: modalState.target === 'board' ? 'none' : 'flex' }}>
         <div className={styles.fieldName}>separate pics</div>
         <div className={styles.fieldControl}>
           <input disabled={is_form_locked} type="checkbox" name='separate_pictures' checked={modalState.separate_pictures ?? false} onChange={(ev) => modalState.set({ ...modalState, separate_pictures: ev.target.checked })} />

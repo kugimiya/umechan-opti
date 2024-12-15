@@ -7,6 +7,7 @@ import { Hr } from "@/components/common/Hr/Hr";
 import { Fragment } from "react";
 import { Paginator } from "@/components/common/Paginator/Paginator";
 import { Layout } from "@/components/layout/Layout/Layout";
+import { CreateThread } from "@/components/common/CreateThread/CreateThread";
 
 type BoardPageProps = WithPagination & WithUnmod & {
   params: {
@@ -37,6 +38,8 @@ export default async function BoardPage(props: BoardPageProps) {
     <Layout unmod={props.searchParams.unmod}>
       <Card className="pageMainCardWrapper" title={board.item.name}>
         <Box flexDirection='column' gap='12px' style={{ width: '100%' }}>
+          <CreateThread board_tag={board.item.tag} />
+
           {paginator}
 
           <Hr />

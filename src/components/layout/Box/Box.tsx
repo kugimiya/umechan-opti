@@ -19,14 +19,14 @@ export const Box = (props: BoxProps) => {
     {
       className: props.className,
       style: {
-        ...props.style,
         // TODO: move into css
         display: "flex",
         flexDirection: props.flexDirection,
         justifyContent: props.justifyContent,
         alignItems: props.alignItems,
         gap: props.gap,
-        flexGrow: props.flexGrow
+        flexGrow: props.flexGrow,
+        ...props.style,
       }
     },
     props.children
