@@ -8,6 +8,8 @@ import { Fragment } from "react";
 import { Paginator } from "@/components/common/Paginator/Paginator";
 import { Layout } from "@/components/layout/Layout/Layout";
 import { CreateThread } from "@/components/common/CreateThread/CreateThread";
+import { make_images_map } from "@/utils/make_images_map";
+import { ImagesOnPageWrapper } from "@/components/providers";
 
 type BoardPageProps = WithPagination & WithUnmod & {
   params: {
@@ -23,6 +25,7 @@ export default async function BoardPage(props: BoardPageProps) {
     props.searchParams.limit !== undefined ? Number(props.searchParams.limit) : undefined,
     props.searchParams.unmod,
   );
+  const images_map = make_images_map(threads.items);
 
   const paginator = (
     <Paginator
@@ -37,24 +40,26 @@ export default async function BoardPage(props: BoardPageProps) {
   return (
     <Layout unmod={props.searchParams.unmod}>
       <Card className="pageMainCardWrapper" title={board.item.name}>
-        <Box flexDirection='column' gap='12px' style={{ width: '100%' }}>
-          <CreateThread board_tag={board.item.tag} />
+        <ImagesOnPageWrapper images_map={images_map}>
+          <Box flexDirection='column' gap='12px' style={{ width: '100%' }}>
+            <CreateThread board_tag={board.item.tag} />
 
-          {paginator}
+            {paginator}
 
-          <Hr />
+            <Hr />
 
-          {threads.items.map((thread, index) => (
-            <Fragment key={thread.id}>
-              <ThreadProto post={thread} is_full_version={false} is_unmod={props.searchParams.unmod === 'true'} />
-              <Hr display={index !== threads.items.length - 1} />
-            </Fragment>
-          ))}
+            {threads.items.map((thread, index) => (
+              <Fragment key={thread.id}>
+                <ThreadProto post={thread} is_full_version={false} is_unmod={props.searchParams.unmod === 'true'} />
+                <Hr display={index !== threads.items.length - 1} />
+              </Fragment>
+            ))}
 
-          <Hr />
+            <Hr />
 
-          {paginator}
-        </Box>
+            {paginator}
+          </Box>
+        </ImagesOnPageWrapper>
       </Card>
     </Layout>
   );

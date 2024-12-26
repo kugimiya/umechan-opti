@@ -1,6 +1,6 @@
 'use client';
 
-import { modalPostFormContext } from "@/utils/contexts/modal-post-form";
+import { modalPostFormContext } from "@/utils/contexts/modal_post_form";
 import { useContext } from "react";
 
 type Props = {

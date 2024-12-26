@@ -25,7 +25,7 @@ export type EpdsPost = {
   media?: EpdsPostMedia[];
 }
 
-type EpdsPostMedia = {
+export type EpdsPostMedia = {
   type: EpdsPostMediaType;
   media_url: string;
   preview_image_url?: string;

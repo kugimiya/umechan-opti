@@ -2,6 +2,8 @@
 
 import { PropsWithChildren } from "react";
 
+import { Popover } from "react-tiny-popover";
+
 import { usePostPointer } from "./PostPointer.hook";
 import styles from "./PostPointer.module.css";
 import { PostProto } from "@/components/common/PostProto/PostProto";
@@ -35,11 +37,16 @@ export const PostPointer = ({ children, postId }: Props) => {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <span className={styles.text}>
-        {children}
-      </span>
-
-      {isVisible && render_popover()}
+      <Popover
+        isOpen={isVisible}
+        positions={['bottom', 'right', 'top', 'left']}
+        align="start"
+        content={render_popover()}
+      >
+        <span className={styles.text}>
+          {children}
+        </span>
+      </Popover>
     </div>
   );
 }

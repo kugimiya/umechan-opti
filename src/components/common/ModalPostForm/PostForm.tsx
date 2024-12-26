@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { Box } from "@/components/layout/Box/Box";
 
-import { modalPostFormContext, modalPostFormContextDefaultValue } from "@/utils/contexts/modal-post-form";
+import { modalPostFormContext, modalPostFormContextDefaultValue } from "@/utils/contexts/modal_post_form";
 
 import styles from './PostForm.module.css';
 import { pissykaka_api, PissykakaCreatePostPayload } from "@/api/pissykaka";

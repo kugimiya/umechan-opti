@@ -7,6 +7,8 @@ import { Hr } from "@/components/common/Hr/Hr";
 import { Fragment } from "react";
 import { Paginator } from "@/components/common/Paginator/Paginator";
 import { Layout } from "@/components/layout/Layout/Layout";
+import { make_images_map } from "@/utils/make_images_map";
+import { ImagesOnPageWrapper } from "@/components/providers";
 
 type FeedPageProps = WithPagination & WithUnmod & {};
 
@@ -16,6 +18,8 @@ export default async function FeedPage(props: FeedPageProps) {
     props.searchParams.limit !== undefined ? Number(props.searchParams.limit) : undefined,
     props.searchParams.unmod,
   );
+
+  const images_map = make_images_map(threads.items);
 
   const paginator = (
     <Paginator
@@ -30,22 +34,24 @@ export default async function FeedPage(props: FeedPageProps) {
   return (
     <Layout unmod={props.searchParams.unmod}>
       <Card className="pageMainCardWrapper" title='Последнее'>
-        <Box flexDirection='column' gap='12px' style={{ width: '100%' }}>
-          {paginator}
+        <ImagesOnPageWrapper images_map={images_map}>
+          <Box flexDirection='column' gap='12px' style={{ width: '100%' }}>
+            {paginator}
 
-          <Hr />
+            <Hr />
 
-          {threads.items.map((thread, index) => (
-            <Fragment key={thread.id}>
-              <ThreadProto post={thread} is_full_version={false} is_at_feed is_unmod={props.searchParams.unmod === 'true'} />
-              <Hr display={index !== threads.items.length - 1} />
-            </Fragment>
-          ))}
+            {threads.items.map((thread, index) => (
+              <Fragment key={thread.id}>
+                <ThreadProto post={thread} is_full_version={false} is_at_feed is_unmod={props.searchParams.unmod === 'true'} />
+                <Hr display={index !== threads.items.length - 1} />
+              </Fragment>
+            ))}
 
-          <Hr />
+            <Hr />
 
-          {paginator}
-        </Box>
+            {paginator}
+          </Box>
+        </ImagesOnPageWrapper>
       </Card>
     </Layout>
   );

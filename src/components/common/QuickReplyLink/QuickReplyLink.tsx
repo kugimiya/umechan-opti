@@ -2,7 +2,7 @@
 
 import { EpdsPost } from "@/types/epds";
 import styles from './styles.module.css';
-import { modalPostFormContext } from "@/utils/contexts/modal-post-form";
+import { modalPostFormContext } from "@/utils/contexts/modal_post_form";
 import { useContext } from "react";
 
 type Props = {
@@ -30,7 +30,7 @@ export const QuickReplyLink = (props: Props) => {
   };
 
   return (
-    <span className={styles.root} onClick={handleClick}>
+    <span className={styles.root} onClick={handleClick} data-post-id={props.post.id}>
       #{props.post.id}
     </span>
   );

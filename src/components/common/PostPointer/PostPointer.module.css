@@ -8,10 +8,6 @@
 }
 
 .popover {
-    position: absolute;
-    z-index: 1;
-    top: 16px;
-    left: 32px;
     width: 640px;
 
     border: var(--card-border-width) solid var(--card-border-color);
