@@ -22,7 +22,7 @@ export const PostReplies = (props: Props) => {
       <span><i>Ответы: </i></span>
       {replies_list.map((reply_id) => (
         <PostPointer key={reply_id} postId={reply_id}>
-          <span style={{ fontSize: 12, fontWeight: 600 }}><i>{`>>${reply_id}`}</i></span>
+          <span style={{ fontSize: 12, fontWeight: 600 }}><i><b>{`>>${reply_id}`}</b></i></span>
         </PostPointer>
       ))}
     </Box>
