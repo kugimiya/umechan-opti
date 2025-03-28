@@ -34,4 +34,5 @@ export type EpdsPostMedia = {
 export enum EpdsPostMediaType {
   PISSYKAKA_IMAGE = 0,
   YOUTUBE = 1,
+  VIDEO = 2,
 }

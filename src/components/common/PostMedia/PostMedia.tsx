@@ -67,7 +67,7 @@ export const PostMedia = (props: Props) => {
     return null;
   }
 
-  const is_video = props.media_item.type === EpdsPostMediaType.YOUTUBE;
+  const is_video = props.media_item.type === EpdsPostMediaType.YOUTUBE || props.media_item.type === EpdsPostMediaType.VIDEO;
 
   return (
     <div

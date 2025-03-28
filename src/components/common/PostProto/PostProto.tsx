@@ -6,7 +6,6 @@ import { formatDateTime } from "@/types/formatDateTime";
 import { Box } from "@/components/layout/Box/Box";
 import Link from "next/link";
 import { QuickReplyLink } from "@/components/common/QuickReplyLink/QuickReplyLink";
-import { PostPointer } from "../PostPointer/PostPointer";
 import { PostReplies } from "../PostReplies/PostReplies";
 import { PostMedia } from "../PostMedia/PostMedia";
 
@@ -25,7 +24,7 @@ export const PostProto = memo(function PostProtoInner(props: Props) {
     ? <Link href={props.is_unmod ? `/board/${post.board_tag}/${post.id}?unmod=true` : `/board/${post.board_tag}/${post.id}`}>В тред</Link>
     : null;
 
-  const post_id = <QuickReplyLink post={post} is_at_thread />
+  const post_id = <QuickReplyLink post={post} is_at_thread />;
 
   const content = (
     <>
