@@ -7,7 +7,7 @@ import { Hr } from "@/components/common/Hr/Hr";
 import { Fragment } from "react";
 import { Paginator } from "@/components/common/Paginator/Paginator";
 import { Layout } from "@/components/layout/Layout/Layout";
-import { make_images_map } from "@/utils/make_images_map";
+import { make_media_map } from "@/utils/make_media_map";
 import { ImagesOnPageWrapper } from "@/components/providers";
 
 type FeedPageProps = WithPagination & WithUnmod & {};
@@ -19,7 +19,7 @@ export default async function FeedPage(props: FeedPageProps) {
     props.searchParams.unmod,
   );
 
-  const images_map = make_images_map(threads.items);
+  const images_map = make_media_map(threads.items);
 
   const paginator = (
     <Paginator

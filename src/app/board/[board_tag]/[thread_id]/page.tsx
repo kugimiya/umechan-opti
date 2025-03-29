@@ -4,7 +4,7 @@ import { get_thread_subject } from "@/utils/formatters/get_thread_subject";
 import { ThreadProto } from "@/components/common/ThreadProto/ThreadProto";
 import { Layout } from "@/components/layout/Layout/Layout";
 import { WithUnmod } from "@/types/utils";
-import { make_images_map } from "@/utils/make_images_map";
+import { make_media_map } from "@/utils/make_media_map";
 import { ImagesOnPageWrapper } from "@/components/providers";
 
 type ThreadPageProps = WithUnmod & {
@@ -15,7 +15,7 @@ type ThreadPageProps = WithUnmod & {
 
 export default async function ThreadPage(props: ThreadPageProps) {
   const thread = await epds_api.thread_with_replies(Number(props.params.thread_id), props.searchParams.unmod);
-  const images_map = make_images_map([thread.item]);
+  const images_map = make_media_map([thread.item]);
 
   return (
     <Layout unmod={props.searchParams.unmod}>

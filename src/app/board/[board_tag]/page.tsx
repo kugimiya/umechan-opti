@@ -8,7 +8,7 @@ import { Fragment } from "react";
 import { Paginator } from "@/components/common/Paginator/Paginator";
 import { Layout } from "@/components/layout/Layout/Layout";
 import { CreateThread } from "@/components/common/CreateThread/CreateThread";
-import { make_images_map } from "@/utils/make_images_map";
+import { make_media_map } from "@/utils/make_media_map";
 import { ImagesOnPageWrapper } from "@/components/providers";
 
 type BoardPageProps = WithPagination & WithUnmod & {
@@ -25,7 +25,7 @@ export default async function BoardPage(props: BoardPageProps) {
     props.searchParams.limit !== undefined ? Number(props.searchParams.limit) : undefined,
     props.searchParams.unmod,
   );
-  const images_map = make_images_map(threads.items);
+  const images_map = make_media_map(threads.items);
 
   const paginator = (
     <Paginator
