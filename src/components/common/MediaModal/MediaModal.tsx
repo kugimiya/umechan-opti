@@ -1,7 +1,7 @@
 'use client';
 
 import { ImagesMapItem } from "@/utils/contexts/images_on_page";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EpdsPostMediaType } from "@/types/epds";
 
 type Props = {
@@ -18,8 +18,22 @@ const makeYouTubeEmbedLink = (link: string) => {
   return `https://www.youtube.com/embed${path}`;
 };
 
+const getStoredVideoVolume = (): number => {
+  if (typeof window === "undefined") {
+    return 1;
+  }
+
+  const storedValue = localStorage.getItem("videoVolume") ?? '1';
+  return isNaN(Number(storedValue)) ? 1 : Number(storedValue);
+};
+
 export const MediaModal = (props: Props) => {
   const ref = useRef<HTMLDivElement>(null);
+  const [videoVolume, setVideoVolume] = useState(getStoredVideoVolume);
+
+  useEffect(() => {
+    localStorage.setItem("videoVolume", videoVolume.toString());
+  }, [videoVolume]);
 
   useEffect(() => {
     if (ref.current && props.is_open) {
@@ -94,6 +108,15 @@ export const MediaModal = (props: Props) => {
               src={props.item[0]}
               controls
               autoPlay
+              loop
+              onPlay={(ev) => {
+                const target = ev.nativeEvent.target as HTMLVideoElement;
+                target.volume = videoVolume;
+              }}
+              onVolumeChange={(ev) => {
+                const target = ev.nativeEvent.target as HTMLVideoElement;
+                setVideoVolume(target.volume);
+              }}
               style={{
                 maxWidth: 'calc(100vw - 160px)',
                 maxHeight: 'calc(100vh - 86px)',
