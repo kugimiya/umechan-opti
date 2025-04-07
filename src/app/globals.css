@@ -1,0 +1,87 @@
+:root {
+  --page-bg-color: white;
+
+  --card-border-width: 1px;
+  --card-border-color: black;
+  --card-border-radius: 4px;
+  --card-padding: 4px 8px;
+
+  --page-blocks-gap: 4px;
+  --page-width: 1280px;
+
+  --navbar-sections-gap: var(--page-blocks-gap);
+  --navbar-width: 300px;
+
+  --title-color: white;
+  --title-bg-color: black;
+
+  --color-text-quote: rgb(96, 131, 75);
+
+  --post-content-gap: 8px;
+  --post-bg-color: #ececec;
+
+  --hr-border: 0.5px solid black;
+  --hr-border-margins: 8px;
+
+  --modal-form-top: 8px;
+  --modal-form-left: 8px;
+  --form-field-label-width: 128px;
+
+  --shadow-1: -1px 1px 19px 0px rgba(0,0,0,0.75);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg-color: black;
+
+    --card-border-color: var(--post-bg-color);
+
+    --title-color: white;
+    --title-bg-color: var(--post-bg-color);
+
+    --hr-border: 0.5px solid var(--post-bg-color);
+    --hr-border-margins: 8px;
+
+    --post-bg-color: #363636;
+  }
+}
+
+*, *:before, *:after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  background-color: var(--page-bg-color);
+}
+
+body {}
+
+a {
+  color: inherit;
+}
+
+ul {
+  padding-left: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+.pageMainCardWrapper {
+  width: 100%;
+}
+
+.body {
+    padding-top: var(--page-blocks-gap);
+    padding-bottom: var(--page-blocks-gap);
+    gap: var(--page-blocks-gap);
+    justify-content: center;
+    align-items: flex-start;
+}

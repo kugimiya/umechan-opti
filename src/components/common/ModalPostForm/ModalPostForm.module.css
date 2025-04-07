@@ -1,0 +1,10 @@
+.root {
+    position: fixed;
+    top: var(--modal-form-top);
+    left: var(--modal-form-left);
+
+    width: calc(calc(calc(calc(100vw - var(--page-width)) / 2) + var(--navbar-width)) - var(--modal-form-left));
+    min-width: 640px;
+    box-shadow: var(--shadow-1);
+    border-radius: var(--card-border-radius);
+}

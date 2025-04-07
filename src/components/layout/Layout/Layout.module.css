@@ -1,0 +1,9 @@
+.main {
+    width: calc(var(--page-width) - var(--navbar-width));
+}
+
+.navbar {
+    width: var(--navbar-width);
+    position: sticky;
+    top: var(--page-blocks-gap);
+}

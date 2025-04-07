@@ -1,0 +1,35 @@
+.fieldName {
+    width: var(--form-field-label-width);
+}
+
+.fieldControl {
+    width: calc(100% - var(--form-field-label-width));
+}
+
+.formRoot {
+    width: 100%;
+}
+
+.formControl {
+    width: 100%;
+}
+
+.elmInput {
+    width: 100%;
+}
+
+.elmTextarea {
+    width: 100%;
+    height: 200px;
+}
+
+.formButtons {
+    gap: var(--page-blocks-gap);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.formLogs {
+    display: flex;
+    flex-direction: column;
+}
