@@ -1,7 +1,7 @@
 import { Box } from "@/components/layout/Box/Box";
 import { Card } from "@/components/layout/Card/Card";
 import { epds_api } from "@/api/epds";
-import { WithPagination, WithUnmod } from "@/types/utils";
+import { WithPagination } from "@/types/utils";
 import { ThreadProto } from "@/components/common/ThreadProto/ThreadProto";
 import { Hr } from "@/components/common/Hr/Hr";
 import { Fragment } from "react";
@@ -11,10 +11,10 @@ import { CreateThread } from "@/components/common/CreateThread/CreateThread";
 import { make_media_map } from "@/utils/make_media_map";
 import { ImagesOnPageWrapper } from "@/components/providers";
 
-type BoardPageProps = WithPagination & WithUnmod & {
-  params: {
+type BoardPageProps = WithPagination & {
+  params: Promise<{
     board_tag: string;
-  };
+  }>;
 };
 
 export default async function BoardPage(props: BoardPageProps) {

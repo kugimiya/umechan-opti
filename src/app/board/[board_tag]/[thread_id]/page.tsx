@@ -3,14 +3,14 @@ import { epds_api } from "@/api/epds";
 import { get_thread_subject } from "@/utils/formatters/get_thread_subject";
 import { ThreadProto } from "@/components/common/ThreadProto/ThreadProto";
 import { Layout } from "@/components/layout/Layout/Layout";
-import { WithUnmod } from "@/types/utils";
+import { WithPagination } from '@/types/utils';
 import { make_media_map } from "@/utils/make_media_map";
 import { ImagesOnPageWrapper } from "@/components/providers";
 
-type ThreadPageProps = WithUnmod & {
-  params: {
+type ThreadPageProps = WithPagination & {
+  params: Promise<{
     thread_id: string;
-  }
+  }>
 }
 
 export default async function ThreadPage(props: ThreadPageProps) {

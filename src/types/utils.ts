@@ -6,14 +6,9 @@ export type LinkItem = {
 };
 
 export type WithPagination = {
-  searchParams: {
+  searchParams: Promise<{
     offset: string;
     limit: string;
-  };
-};
-
-export type WithUnmod = {
-  searchParams: {
     unmod: 'true' | 'false';
-  };
+  }>;
 };
