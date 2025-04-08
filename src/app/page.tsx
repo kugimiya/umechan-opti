@@ -5,9 +5,11 @@ import { WithUnmod } from "@/types/utils";
 
 type Props = WithUnmod & {};
 
-export default function Home(props: Props) {
+export default async function Home(props: Props) {
+  const searchParams = await props.searchParams;
+
   return (
-    <Layout unmod={props.searchParams.unmod}>
+    <Layout unmod={searchParams.unmod}>
       <Card className="pageMainCardWrapper" title='Главная'>
         <Box flexDirection='column' gap='12px'>
           Тут был цветущий сад, теперь по костям вы ходите.

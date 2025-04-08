@@ -13,26 +13,28 @@ import { ImagesOnPageWrapper } from "@/components/providers";
 type FeedPageProps = WithPagination & WithUnmod & {};
 
 export default async function FeedPage(props: FeedPageProps) {
+  const searchParams = await props.searchParams;
+
   const threads = await epds_api.feed(
-    props.searchParams.offset !== undefined ? Number(props.searchParams.offset) : undefined,
-    props.searchParams.limit !== undefined ? Number(props.searchParams.limit) : undefined,
-    props.searchParams.unmod,
+    searchParams.offset !== undefined ? Number(searchParams.offset) : undefined,
+    searchParams.limit !== undefined ? Number(searchParams.limit) : undefined,
+    searchParams.unmod,
   );
 
   const images_map = make_media_map(threads.items);
 
   const paginator = (
     <Paginator
-      limit={props.searchParams.limit !== undefined ? Number(props.searchParams.limit) : undefined}
-      offset={props.searchParams.offset !== undefined ? Number(props.searchParams.offset) : undefined}
+      limit={searchParams.limit !== undefined ? Number(searchParams.limit) : undefined}
+      offset={searchParams.offset !== undefined ? Number(searchParams.offset) : undefined}
       items_count={threads.count}
       location={`${process.env.NEXT_PUBLIC_FRONT_BASEURL}/feed`}
-      is_unmod={props.searchParams.unmod === 'true'}
+      is_unmod={searchParams.unmod === 'true'}
     />
   );
 
   return (
-    <Layout unmod={props.searchParams.unmod}>
+    <Layout unmod={searchParams.unmod}>
       <Card className="pageMainCardWrapper" title='Последнее'>
         <ImagesOnPageWrapper images_map={images_map}>
           <Box flexDirection='column' gap='12px' style={{ width: '100%' }}>
@@ -42,7 +44,7 @@ export default async function FeedPage(props: FeedPageProps) {
 
             {threads.items.map((thread, index) => (
               <Fragment key={thread.id}>
-                <ThreadProto post={thread} is_full_version={false} is_at_feed is_unmod={props.searchParams.unmod === 'true'} />
+                <ThreadProto post={thread} is_full_version={false} is_at_feed is_unmod={searchParams.unmod === 'true'} />
                 <Hr display={index !== threads.items.length - 1} />
               </Fragment>
             ))}

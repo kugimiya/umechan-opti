@@ -18,27 +18,29 @@ type BoardPageProps = WithPagination & WithUnmod & {
 };
 
 export default async function BoardPage(props: BoardPageProps) {
-  const board = await epds_api.board(props.params.board_tag, props.searchParams.unmod);
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+  const board = await epds_api.board(params.board_tag, searchParams.unmod);
   const threads = await epds_api.threads_list(
-    props.params.board_tag,
-    props.searchParams.offset !== undefined ? Number(props.searchParams.offset) : undefined,
-    props.searchParams.limit !== undefined ? Number(props.searchParams.limit) : undefined,
-    props.searchParams.unmod,
+    params.board_tag,
+    searchParams.offset !== undefined ? Number(searchParams.offset) : undefined,
+    searchParams.limit !== undefined ? Number(searchParams.limit) : undefined,
+    searchParams.unmod,
   );
   const images_map = make_media_map(threads.items);
 
   const paginator = (
     <Paginator
-      limit={props.searchParams.limit !== undefined ? Number(props.searchParams.limit) : undefined}
-      offset={props.searchParams.offset !== undefined ? Number(props.searchParams.offset) : undefined}
+      limit={searchParams.limit !== undefined ? Number(searchParams.limit) : undefined}
+      offset={searchParams.offset !== undefined ? Number(searchParams.offset) : undefined}
       items_count={threads.count}
-      location={`${process.env.NEXT_PUBLIC_FRONT_BASEURL}/board/${props.params.board_tag}`}
-      is_unmod={props.searchParams.unmod === 'true'}
+      location={`${process.env.NEXT_PUBLIC_FRONT_BASEURL}/board/${params.board_tag}`}
+      is_unmod={searchParams.unmod === 'true'}
     />
   );
 
   return (
-    <Layout unmod={props.searchParams.unmod}>
+    <Layout unmod={searchParams.unmod}>
       <Card className="pageMainCardWrapper" title={board.item.name}>
         <ImagesOnPageWrapper images_map={images_map}>
           <Box flexDirection='column' gap='12px' style={{ width: '100%' }}>
@@ -50,7 +52,7 @@ export default async function BoardPage(props: BoardPageProps) {
 
             {threads.items.map((thread, index) => (
               <Fragment key={thread.id}>
-                <ThreadProto post={thread} is_full_version={false} is_unmod={props.searchParams.unmod === 'true'} />
+                <ThreadProto post={thread} is_full_version={false} is_unmod={searchParams.unmod === 'true'} />
                 <Hr display={index !== threads.items.length - 1} />
               </Fragment>
             ))}

@@ -15,7 +15,7 @@
     "@types/react-modal-image": "^2.6.3",
     "axios": "^1.7.3",
     "clsx": "^2.1.1",
-    "next": "14.2.5",
+    "next": "15.2.4",
     "react": "^18",
     "react-dom": "^18",
     "react-modal-image": "^2.6.0",

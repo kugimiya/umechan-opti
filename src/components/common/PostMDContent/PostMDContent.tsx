@@ -5,7 +5,7 @@ import {
   TxtLinkNode, TxtListItemNode, TxtListNode,
   TxtNode, TxtParagraphNode, TxtTextNode
 } from "@textlint/ast-node-types";
-import { memo } from "react";
+import React, { memo } from "react";
 import Link from "next/link";
 import { Box } from "@/components/layout/Box/Box";
 import styles from './styles.module.css';
@@ -127,6 +127,6 @@ const PostContent = (props: InnerProps) => {
       );
     }
 
-    return <></>;
+    return <React.Fragment key={`${props.path}-${index}-unknown`} />;
   });
 }

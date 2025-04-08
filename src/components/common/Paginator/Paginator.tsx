@@ -31,10 +31,10 @@ export const Paginator = memo(function PaginatorInner(props: Props) {
       <>
         {paging_items.slice(0, MAX_ITEMS)}
 
-        {isShowingAllItems && <FunctionalText onClick={handleShowAll}>[скрыть]</FunctionalText>}
+        {isShowingAllItems && <FunctionalText key="hide" onClick={handleShowAll}>[скрыть]</FunctionalText>}
         {isShowingAllItems && paging_items.slice(MAX_ITEMS)}
 
-        {!isShowingAllItems && <FunctionalText onClick={handleShowAll}>[ещё]</FunctionalText>}
+        {!isShowingAllItems && <FunctionalText key="more" onClick={handleShowAll}>[ещё]</FunctionalText>}
       </>
     );
 

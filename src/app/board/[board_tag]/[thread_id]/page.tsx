@@ -14,14 +14,16 @@ type ThreadPageProps = WithUnmod & {
 }
 
 export default async function ThreadPage(props: ThreadPageProps) {
-  const thread = await epds_api.thread_with_replies(Number(props.params.thread_id), props.searchParams.unmod);
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+  const thread = await epds_api.thread_with_replies(Number(params.thread_id), searchParams.unmod);
   const images_map = make_media_map([thread.item]);
 
   return (
-    <Layout unmod={props.searchParams.unmod}>
+    <Layout unmod={searchParams.unmod}>
       <Card className="pageMainCardWrapper" title={get_thread_subject(thread.item)}>
         <ImagesOnPageWrapper images_map={images_map}>
-          <ThreadProto post={thread.item} is_full_version is_unmod={props.searchParams.unmod === 'true'} />
+          <ThreadProto post={thread.item} is_full_version is_unmod={searchParams.unmod === 'true'} />
         </ImagesOnPageWrapper>
       </Card>
     </Layout>
