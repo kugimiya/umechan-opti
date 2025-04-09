@@ -11,8 +11,7 @@ export const enrich_navbar = (boards: EpdsBoard[], unmod: 'true' | 'false') => {
   }));
 
   const nav_items: LinkItem[] = [
-    { title: 'Главная', url: unmod === 'true' ? '/?unmod=true' : '/' },
-    { title: 'Feed', url: unmod === 'true' ? '/feed?unmod=true' : '/feed' }
+    { title: 'Главная', url: unmod === 'true' ? '/feed?unmod=true' : '/feed' },
   ];
 
   if (IS_MODERKA_ENABLED) {
