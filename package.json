@@ -1,32 +1,27 @@
 {
-  "name": "umechan-opti",
-  "version": "0.1.0",
-  "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "vike dev",
+    "build": "vike build",
+    "preview": "vike preview",
+    "lint": "eslint ."
   },
   "dependencies": {
-    "@textlint/ast-node-types": "^14.2.0",
-    "@textlint/markdown-to-ast": "^14.2.0",
-    "@types/axios": "^0.14.0",
-    "@types/react-modal-image": "^2.6.3",
-    "axios": "^1.7.3",
-    "clsx": "^2.1.1",
-    "next": "15.2.4",
-    "react": "^18",
-    "react-dom": "^18",
-    "react-modal-image": "^2.6.0",
-    "react-tiny-popover": "^8.1.4"
+    "vike": "^0.4.228",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "vike-react": "^0.6.1"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.5",
-    "typescript": "^5"
-  }
+    "typescript": "^5.8.3",
+    "vite": "^6.2.5",
+    "eslint": "^9.24.0",
+    "@eslint/js": "^9.24.0",
+    "typescript-eslint": "^8.29.0",
+    "globals": "^16.0.0",
+    "eslint-plugin-react": "^7.37.5",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.1"
+  },
+  "type": "module"
 }
