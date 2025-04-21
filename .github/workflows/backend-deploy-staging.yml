@@ -1,0 +1,56 @@
+name: BACK Build and deploy Docker image when code pushed to staging
+run-name: BACK Staging deploy triggered by ${{ github.actor }}
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  build_docker_image:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build docker image
+        run: | 
+          cd packages/backend
+          docker build \
+            --build-arg NODE_ENV=production \
+            --build-arg PISSYKAKA_HOSTNAME=$BACK_STAGING_PISSYKAKA_HOSTNAME \
+            --build-arg PISSYKAKA_API=$BACK_STAGING_PISSYKAKA_API \
+            --build-arg DELAY_AFTER_UPDATE_TICK=$BACK_STAGING_DELAY_AFTER_UPDATE_TICK \
+            --build-arg FETCH_ENTITIES_FROM_API_BASE_LIMIT=$BACK_STAGING_FETCH_ENTITIES_FROM_API_BASE_LIMIT \
+            --build-arg FETCH_ENTITIES_MAX_PARALLEL_JOBS=$BACK_STAGING_FETCH_ENTITIES_MAX_PARALLEL_JOBS \
+            --build-arg DATABASE_URL=$BACK_STAGING_DATABASE_URL \
+            --build-arg DEFAULT_LIMIT=$BACK_STAGING_DEFAULT_LIMIT \
+            --build-arg DEFAULT_THREAD_SIZE=$BACK_STAGING_DEFAULT_THREAD_SIZE \
+            --build-arg API_DEFAULT_LISTEN_PORT=$BACK_STAGING_API_DEFAULT_LISTEN_PORT \
+            --build-arg API_DEFAULT_LISTEN_HOST=$BACK_STAGING_API_DEFAULT_LISTEN_HOST \
+            --build-arg MODERATION_SECRET_PASS=$BACK_STAGING_MODERATION_SECRET_PASS \
+            -t chan_backend_staging .
+        env:
+          BACK_STAGING_PISSYKAKA_HOSTNAME: ${{ vars.BACK_STAGING_PISSYKAKA_HOSTNAME }}
+          BACK_STAGING_PISSYKAKA_API: ${{ vars.BACK_STAGING_PISSYKAKA_API }}
+          BACK_STAGING_DELAY_AFTER_UPDATE_TICK: ${{ vars.BACK_STAGING_DELAY_AFTER_UPDATE_TICK }}
+          BACK_STAGING_FETCH_ENTITIES_FROM_API_BASE_LIMIT: ${{ vars.BACK_STAGING_FETCH_ENTITIES_FROM_API_BASE_LIMIT }}
+          BACK_STAGING_FETCH_ENTITIES_MAX_PARALLEL_JOBS: ${{ vars.BACK_STAGING_FETCH_ENTITIES_MAX_PARALLEL_JOBS }}
+          BACK_STAGING_DATABASE_URL: ${{ vars.BACK_STAGING_DATABASE_URL }}
+          BACK_STAGING_DEFAULT_LIMIT: ${{ vars.BACK_STAGING_DEFAULT_LIMIT }}
+          BACK_STAGING_DEFAULT_THREAD_SIZE: ${{ vars.BACK_STAGING_DEFAULT_THREAD_SIZE }}
+          BACK_STAGING_API_DEFAULT_LISTEN_PORT: ${{ vars.BACK_STAGING_API_DEFAULT_LISTEN_PORT }}
+          BACK_STAGING_API_DEFAULT_LISTEN_HOST: ${{ vars.BACK_STAGING_API_DEFAULT_LISTEN_HOST }}
+          BACK_STAGING_MODERATION_SECRET_PASS: ${{ vars.BACK_STAGING_MODERATION_SECRET_PASS }}
+
+  restart_builded_image:
+    runs-on: self-hosted
+    needs: build_docker_image
+    steps:
+      - name: Stop old container (if exists)
+        run: |
+          docker stop chan_backend_staging_container || true
+          docker rm chan_backend_staging_container || true
+      - name: Run new container
+        run: |
+          docker run -d \
+            --name chan_backend_staging_container \
+            --restart unless-stopped \
+            -p 3031:3000 \
+            chan_backend_staging
