@@ -1,5 +1,5 @@
-name: Janitor checks code smell
-run-name: Janitor run triggered by ${{ github.actor }}
+name: FRONT Janitor checks code smell
+run-name: FRONT Janitor run triggered by ${{ github.actor }}
 on: [push]
 jobs:
   lint:
@@ -9,8 +9,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm i
-      - run: npm run lint
+      - run: |
+          cd packages/frontend
+          npm i
+          npm run lint
   build:
     runs-on: self-hosted
     steps:
@@ -18,5 +20,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm i
-      - run: npm run build
+      - run: |
+          cd packages/frontend
+          npm i
+          npm run build
