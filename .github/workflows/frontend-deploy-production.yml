@@ -1,5 +1,5 @@
 name: FRONT Build and deploy Docker image when code pushed to production
-run-name: FRONT Staging deploy triggered by ${{ github.actor }}
+run-name: FRONT Production deploy triggered by ${{ github.actor }}
 on:
   push:
     branches:
