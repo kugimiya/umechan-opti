@@ -41,7 +41,7 @@ export const create_pissykaka_service = (params: CPS_Params) => {
         limit: FETCH_ENTITIES_FROM_API_BASE_LIMIT,
       }
     });
-    return response.data.payload.posts;
+    return response.data.payload.events;
   };
 
   return { get_boards_list, get_threads_list, get_thread_posts_list, get_events };
