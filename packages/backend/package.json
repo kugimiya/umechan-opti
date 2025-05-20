@@ -5,26 +5,23 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc && node --env-file=.env dist/index.js",
-    "start-ci": "npm run migrate up; node --env-file=.env dist/index.js",
+    "start-ci": "npm run migrate; node --env-file=.env dist/index.js",
     "start:no-tick-sync": "tsc && node --env-file=.env dist/index.js --no-tick-sync",
     "start:no-full-sync": "tsc && node --env-file=.env dist/index.js --no-full-sync",
     "test": "tsc && node --env-file=.env --test dist",
-    "migrate": "node --env-file=.env node_modules/.bin/node-pg-migrate"
+    "migrate": "prisma migrate dev"
   },
   "keywords": [],
   "author": "kugichka",
   "license": "WTFPL",
   "description": "experimental pissykaka database syncer",
   "dependencies": {
-    "@fastify/cors": "^9.0.1",
-    "@textlint/ast-node-types": "^14.0.4",
-    "@textlint/markdown-to-ast": "^14.0.4",
-    "@types/node": "^20.14.2",
-    "@types/pg": "^8.11.6",
-    "axios": "^1.7.2",
-    "fastify": "^4.28.1",
-    "node-pg-migrate": "^7.4.0",
-    "pg": "^8.12.0",
-    "typescript": "^5.4.5"
+    "@types/node": "^22.15.19",
+    "@fastify/cors": "^11.0.1",
+    "@prisma/client": "^6.8.2",
+    "prisma": "^6.8.2",
+    "axios": "^1.9.0",
+    "fastify": "^5.3.3",
+    "typescript": "^5.8.3"
   }
 }

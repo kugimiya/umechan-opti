@@ -1,6 +1,6 @@
 export type ResponseEventsList = {
   count: number;
-  posts: ResponseEvent[];
+  events: ResponseEvent[];
 };
 
 export enum ResponseEventType {

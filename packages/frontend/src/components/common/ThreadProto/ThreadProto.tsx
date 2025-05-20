@@ -14,7 +14,7 @@ type Props = {
 };
 
 export const ThreadProto = memo(function ThreadProtoInner(props: Props) {
-  const truncated_posts_count = Number(props.post.replies_total) - Number(props.post.replies?.length);
+  const truncated_posts_count = Number(props.post._count?.replies ?? 0) - Number(props.post.replies?.length);
   const reply_map = make_reply_map(props.post);
 
   const posts_count_pluralized = pluralize(
@@ -22,7 +22,7 @@ export const ThreadProto = memo(function ThreadProtoInner(props: Props) {
     ['пост', 'поста', 'постов']
   );
 
-  const truncated_posts_message = !props.is_full_version && Number(props.post.replies?.length) < Number(props.post.replies_total)
+  const truncated_posts_message = !props.is_full_version && Number(props.post.replies?.length) < Number(props.post._count?.replies ?? 0)
     ? <i>Пропущено {truncated_posts_count} {posts_count_pluralized}</i>
     : null;
 

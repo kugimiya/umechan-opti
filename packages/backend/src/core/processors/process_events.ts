@@ -39,11 +39,5 @@ export const process_events = async (
   const latest_timestamp = (events[0].timestamp + 1).toString();
   db.settings.set('current_timestamp', latest_timestamp);
 
-  for (let event of events) {
-    if (!(await db.events.is_exist(event))) {
-      await db.events.insert(event);
-    }
-  }
-
   logger.info(`TICK: postprocessing finished with ${measure_time('tick_postprocessing', 'end')}ms`);
 };

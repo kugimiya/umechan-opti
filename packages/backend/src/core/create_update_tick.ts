@@ -8,9 +8,15 @@ import { process_posts } from "./processors/process_posts";
 
 export type CreateUpdateTickReturn = Awaited<ReturnType<typeof create_update_tick>>;
 
-export const create_update_tick = async (base_url: string, database_url: string) => {
+export const create_update_tick = async (base_url: string) => {
   const pissykaka_service = create_pissykaka_service({ base_url });
-  const db = await create_db_connection(database_url);
+  const db = await create_db_connection();
+
+  try {
+    await db.settings.get('current_timestamp');
+  } catch {
+    await db.settings.create('current_timestamp', 'number', '0');
+  }
 
   const update_all = async () => {
     logger.info("Get all data...");

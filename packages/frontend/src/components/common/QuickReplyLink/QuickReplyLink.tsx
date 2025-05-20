@@ -23,7 +23,7 @@ export const QuickReplyLink = (props: Props) => {
         isOpen: true,
         message: `>>${props.post.id}\n\n`,
         target: props.is_at_thread ? 'thread' : props.is_at_board ? 'board' : null,
-        target_id: props.is_at_thread ? Number(props.post.parent_id) || Number(props.post.id) : null,
+        target_id: props.is_at_thread ? Number(props.post.parentId) || Number(props.post.id) : null,
         target_tag: props.is_at_board ? String(props.board_tag) : null,
       });
     }

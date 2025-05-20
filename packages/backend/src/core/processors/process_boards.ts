@@ -12,10 +12,7 @@ export const process_boards = async (boards: ResponseBoard[], db: Awaited<Return
   for (let board of boards) {
     checked += 1;
     if (await db.boards.is_exist(board)) {
-      if (await db.boards.is_need_update(board)) {
-        await db.boards.update(board);
-        updated += 1;
-      }
+      await db.boards.update(board);
     } else {
       await db.boards.insert(board);
       created += 1;

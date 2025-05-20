@@ -9,6 +9,7 @@ export type BoxProps = React.PropsWithChildren & {
   alignItems?: CSSProperties["alignItems"];
   gap?: CSSProperties["gap"];
   flexGrow?: CSSProperties["flexGrow"];
+  flexWrap?: CSSProperties["flexWrap"];
 
   style?: CSSProperties;
 }
@@ -26,6 +27,7 @@ export const Box = (props: BoxProps) => {
         alignItems: props.alignItems,
         gap: props.gap,
         flexGrow: props.flexGrow,
+        flexWrap: props.flexWrap,
         ...props.style,
       }
     },
