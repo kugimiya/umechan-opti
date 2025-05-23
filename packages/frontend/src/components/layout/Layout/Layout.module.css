@@ -7,3 +7,14 @@
     position: sticky;
     top: var(--page-blocks-gap);
 }
+
+@media (max-width: 420px) {
+    .navbar {
+        width: 100%;
+        position: relative;
+    }
+
+    .main {
+        width: 100%;
+    }
+}

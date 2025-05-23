@@ -31,6 +31,10 @@
 }
 
 @media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+
   :root {
     --page-bg-color: black;
 
@@ -68,20 +72,20 @@ ul {
   padding-left: 14px;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
-
 .pageMainCardWrapper {
   width: 100%;
 }
 
 .body {
-    padding-top: var(--page-blocks-gap);
-    padding-bottom: var(--page-blocks-gap);
-    gap: var(--page-blocks-gap);
-    justify-content: center;
-    align-items: flex-start;
+  padding-top: var(--page-blocks-gap);
+  padding-bottom: var(--page-blocks-gap);
+  gap: var(--page-blocks-gap);
+  justify-content: center;
+  align-items: flex-start;
+}
+
+@media (max-width: 420px) {
+  .body {
+    flex-direction: column;
+  }
 }

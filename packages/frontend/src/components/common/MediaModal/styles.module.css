@@ -1,0 +1,32 @@
+.root {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    gap: var(--post-content-gap);
+}
+
+.media {
+    max-width: calc(100vw - 160px);
+    max-height: calc(100vh - 86px);
+}
+
+@media (max-width: 420px) {
+    .media {
+        max-width: calc(100vw - 60px);
+        max-height: calc(100vh - 20px);
+    }
+}

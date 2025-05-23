@@ -8,3 +8,12 @@
     box-shadow: var(--shadow-1);
     border-radius: var(--card-border-radius);
 }
+
+@media (max-width: 420px) {
+    .root {
+        top: 0;
+        left: 0;
+        width: 100vw;
+        min-width: unset;
+    }
+}
