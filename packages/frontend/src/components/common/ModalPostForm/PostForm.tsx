@@ -30,7 +30,6 @@ export const PostForm = () => {
   };
 
   const handleSend = async () => {
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
     const sender = async (message: string, md_images_joined: string) => {
       const data: PissykakaCreatePostPayload = {
         message: `${message}\n${md_images_joined}`,
@@ -54,9 +53,7 @@ export const PostForm = () => {
         data.tag = String(modalState.target_tag);
       }
 
-      const response = await pissykaka_api.send_post(data);
-      console.log({ response: response.payload });
-      return response;
+      return await pissykaka_api.send_post(data);
     }
 
     set_send_logs([]);
@@ -70,9 +67,12 @@ export const PostForm = () => {
       try {
         for (let i = 0; i < modalState.files.length; i++) {
           const file = modalState.files[i];
-          md_images.push(
-            await pissykaka_api.upload_image(file)
-          );
+          try {
+            const md_uri = await pissykaka_api.upload_image(file);
+            md_images.push(md_uri);
+          } catch (error) {
+            pushToLog(`error while uploading file: ${file.name} ${(error as Error).message}`);
+          }
         }
       } catch (err) {
         pushToLog('image upload failed!');
@@ -89,14 +89,22 @@ export const PostForm = () => {
         pushToLog('creating post with picture separating');
         for (let md_image of md_images) {
           pushToLog('send message...');
-          await sender(modalState.message ?? ' \n ', md_image);
+          try {
+            await sender(modalState.message ?? ' \n ', md_image);
+          } catch (error) {
+            pushToLog(`error while sending post: ${(error as Error).message}`);
+          }
         }
       }
-    } catch {
-      pushToLog('something went wrong!');
+    } catch (error) {
+      pushToLog(`error while sending post: ${(error as Error).message}`);
     } finally {
       pushToLog('posting done... awaiting changes!');
-      await epds_api.force_sync(Number(modalState.target_id));
+      try {
+        await epds_api.force_sync(Number(modalState.target_id));
+      } catch (error) {
+        pushToLog(`error while fetching changes: ${(error as Error).message}`);
+      }
 
       pushToLog('triggering page reload...');
       router.refresh();
