@@ -35,7 +35,7 @@ export const create_pissykaka_service = (params: CPS_Params) => {
   };
 
   const get_events = async (params: { from_timestamp: number }) => {
-    const response = await request.get<ApiTemplate<ResponseEventsList>>("/v2/events", {
+    const response = await request.get<ApiTemplate<ResponseEventsList>>("/v2/event", {
       params: {
         from_timestamp: params.from_timestamp,
         limit: FETCH_ENTITIES_FROM_API_BASE_LIMIT,
