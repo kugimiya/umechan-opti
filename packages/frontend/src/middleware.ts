@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 const requests = {
@@ -10,6 +9,10 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/metrics')) {
+    if (request.headers.get('Authorization') !== process.env.METRICS_PASSWORD) {
+      return Response.error();
+    }
+
     const responseString = [
       '# HELP http_requests Number of all HTTP requests',
       '# TYPE http_requests gauge',
@@ -27,7 +30,8 @@ export async function middleware(request: NextRequest) {
     const response = new Response(responseString);
     response.headers.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
 
-    console.log(request.headers.get('Authorization'), request.nextUrl.username, request.nextUrl.password, process.env.METRICS_USERNAME, process.env.METRICS_PASSWORD);
+    requests.static = 0;
+    requests.pages = 0;
 
     return response;
   }
