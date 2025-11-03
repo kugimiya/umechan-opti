@@ -27,8 +27,7 @@ export async function middleware(request: NextRequest) {
     const response = new Response(responseString);
     response.headers.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
 
-    // @ts-ignore
-    console.log(request.headers.entries().forEach(console.log), request.nextUrl.username, request.nextUrl.password, process.env.METRICS_USERNAME, process.env.METRICS_PASSWORD);
+    console.log(request.headers.get('Authorization'), request.nextUrl.username, request.nextUrl.password, process.env.METRICS_USERNAME, process.env.METRICS_PASSWORD);
 
     return response;
   }
