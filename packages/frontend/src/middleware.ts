@@ -10,10 +10,6 @@ export async function middleware(request: NextRequest) {
 
   if (pathname.startsWith('/metrics')) {
     if (request.headers.get('Authorization') !== process.env.METRICS_PASSWORD) {
-      console.log({
-        'process.env.METRICS_PASSWORD': process.env.METRICS_PASSWORD,
-        "request.headers.get('Authorization')": request.headers.get('Authorization'),
-      });
       return Response.error();
     }
 
