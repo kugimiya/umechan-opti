@@ -7,6 +7,7 @@ import { PostPointer } from "../PostPointer/PostPointer";
 
 type Props = {
   id: number;
+  is_unmod: string;
 }
 
 export const PostReplies = (props: Props) => {
@@ -21,7 +22,7 @@ export const PostReplies = (props: Props) => {
     <Box gap={8} style={{ flexWrap: "wrap" }}>
       <span><i>Ответы: </i></span>
       {replies_list.map((reply_id) => (
-        <PostPointer key={reply_id} postId={reply_id}>
+        <PostPointer key={reply_id} postId={reply_id} is_unmod={"true"}>
           <span style={{ fontSize: 12, fontWeight: 600 }}><i><b>{`>>${reply_id}`}</b></i></span>
         </PostPointer>
       ))}

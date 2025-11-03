@@ -14,6 +14,7 @@ import { PostPointer } from "@/components/common/PostPointer/PostPointer";
 
 type Props = {
   message?: string;
+  is_unmod: string;
 }
 
 export const PostMDContent = memo(function PostMDComponentInner(props: Props) {
@@ -21,7 +22,7 @@ export const PostMDContent = memo(function PostMDComponentInner(props: Props) {
 
   return (
     <Box flexDirection='column' justifyContent='flex-start' alignItems='flex-start' gap='var(--post-content-gap)'>
-      <PostContent root={root.children} path="root" />
+      <PostContent root={root.children} path="root" is_unmod={props.is_unmod} />
     </Box>
   );
 });
@@ -29,6 +30,7 @@ export const PostMDContent = memo(function PostMDComponentInner(props: Props) {
 type InnerProps = {
   root: TxtNode[];
   path: string;
+  is_unmod: string;
 }
 
 const PostContent = (props: InnerProps) => {
@@ -36,7 +38,7 @@ const PostContent = (props: InnerProps) => {
     if (item.type === ASTNodeTypes.Paragraph) {
       return (
         <p key={`${props.path}-${index}-p`}>
-          <PostContent root={(item as TxtParagraphNode).children} path={`${props.path}-${index}-p`} />
+          <PostContent root={(item as TxtParagraphNode).children} path={`${props.path}-${index}-p`} is_unmod={props.is_unmod} />
         </p>
       );
     }
@@ -52,7 +54,7 @@ const PostContent = (props: InnerProps) => {
     if (item.type === ASTNodeTypes.Link) {
       return (
         <Link key={`${props.path}-${index}-link`} href={(item as TxtLinkNode).url} target="_blank" rel="noopener noreferrer">
-          <PostContent root={(item as TxtLinkNode).children} path={`${props.path}-${index}-link`} />
+          <PostContent root={(item as TxtLinkNode).children} path={`${props.path}-${index}-link`} is_unmod={props.is_unmod} />
         </Link>
       );
     }
@@ -88,7 +90,7 @@ const PostContent = (props: InnerProps) => {
       const is_post_pointer = !Number.isNaN(post_id);
       if (is_post_pointer) {
         return (
-          <PostPointer key={`${props.path}-${index}-post-pointer`} postId={post_id}>
+          <PostPointer key={`${props.path}-${index}-post-pointer`} postId={post_id} is_unmod={props.is_unmod}>
             <span key={`${props.path}-${index}-post-pointer-quote`} className={styles.quote}>{contents}</span>
           </PostPointer>
         )
@@ -98,7 +100,7 @@ const PostContent = (props: InnerProps) => {
     if (item.type === ASTNodeTypes.Emphasis) {
       return (
         <b key={`${props.path}-${index}-emphasis`}>
-          <PostContent root={(item as TxtLinkNode).children} path={`${props.path}-${index}-emphasis`} />
+          <PostContent root={(item as TxtLinkNode).children} path={`${props.path}-${index}-emphasis`} is_unmod={props.is_unmod} />
         </b>
       );
     }
@@ -106,7 +108,7 @@ const PostContent = (props: InnerProps) => {
     if (item.type === ASTNodeTypes.Strong) {
       return (
         <i key={`${props.path}-${index}-strong`}>
-          <PostContent root={(item as TxtLinkNode).children} path={`${props.path}-${index}-strong`} />
+          <PostContent root={(item as TxtLinkNode).children} path={`${props.path}-${index}-strong`} is_unmod={props.is_unmod} />
         </i>
       );
     }
@@ -114,7 +116,7 @@ const PostContent = (props: InnerProps) => {
     if (item.type === ASTNodeTypes.List) {
       return (
         <ul className={styles.ul} key={`${props.path}-${index}-list`}>
-          <PostContent root={(item as TxtListNode).children} path={`${props.path}-${index}-list`} />
+          <PostContent root={(item as TxtListNode).children} path={`${props.path}-${index}-list`} is_unmod={props.is_unmod} />
         </ul>
       );
     }
@@ -122,7 +124,7 @@ const PostContent = (props: InnerProps) => {
     if (item.type === ASTNodeTypes.ListItem) {
       return (
         <li className={styles.li} key={`${props.path}-${index}-listitem`}>
-          <PostContent root={(item as TxtListItemNode).children} path={`${props.path}-${index}-listitem`} />
+          <PostContent root={(item as TxtListItemNode).children} path={`${props.path}-${index}-listitem`} is_unmod={props.is_unmod} />
         </li>
       );
     }
