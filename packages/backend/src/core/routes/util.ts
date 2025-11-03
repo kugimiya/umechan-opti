@@ -46,6 +46,12 @@ export const bind_util_routes = (fastify: FastifyInstance, tick_service: CreateU
   });
 
   fastify.get('/metrics', async (request, reply) => {
+    console.log({
+      "request.headers": request.headers,
+      "request.headers['Authorization']": request.headers['Authorization'],
+      "process.env.METRICS_PASSWORD": process.env.METRICS_PASSWORD,
+    });
+
     try {
       if (request.headers['Authorization'] !== process.env.METRICS_PASSWORD) {
         reply.code(404);
