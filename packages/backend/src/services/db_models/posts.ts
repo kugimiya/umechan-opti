@@ -18,11 +18,13 @@ export const db_model_posts = (client: PrismaClient) => ({
         subject: post.subject,
         timestamp: Number(post.timestamp),
         parent: post.parent_id
-          ? {
-            connect: {
-              id: post.parent_id,
-            },
-          }
+          ? post.parent_id < post.id // case когда по какой-то причине пост в треде появился раньше оп поста;
+                                     // при втором запуске это дообновится, однако позже надо нормально обработать
+            ? {
+              connect: {
+                id: post.parent_id,
+              },
+            } : undefined
           : undefined,
         updatedAt: post.updated_at,
       }
