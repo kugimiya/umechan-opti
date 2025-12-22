@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { create_api_server } from "./core/create_api_server";
 import { create_update_tick } from "./core/create_update_tick";
 import {

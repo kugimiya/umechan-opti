@@ -9,19 +9,23 @@
     "start:no-tick-sync": "tsc && node --env-file=.env dist/index.js --no-tick-sync",
     "start:no-full-sync": "tsc && node --env-file=.env dist/index.js --no-full-sync",
     "test": "tsc && node --env-file=.env --test dist",
-    "migrate": "prisma migrate dev"
+    "migrate": "tsc && node --env-file=.env dist/db/cli.js migrate",
+    "migration:generate": "tsc && typeorm-ts-node-commonjs migration:generate -d dist/db/data-source.js",
+    "migration:create": "typeorm-ts-node-commonjs migration:create"
   },
   "keywords": [],
   "author": "kugichka",
   "license": "WTFPL",
   "description": "experimental pissykaka database syncer",
   "dependencies": {
-    "@types/node": "^22.15.19",
-    "@fastify/cors": "^11.0.1",
-    "@prisma/client": "^6.8.2",
-    "prisma": "^6.8.2",
-    "axios": "^1.9.0",
-    "fastify": "^5.3.3",
-    "typescript": "^5.8.3"
+    "@fastify/cors": "^11.2.0",
+    "@prisma/client": "^7.2.0",
+    "@types/node": "^25.0.3",
+    "axios": "^1.13.2",
+    "fastify": "^5.6.2",
+    "reflect-metadata": "^0.2.2",
+    "sqlite3": "^5.1.7",
+    "typeorm": "^0.3.28",
+    "typescript": "^5.9.3"
   }
 }

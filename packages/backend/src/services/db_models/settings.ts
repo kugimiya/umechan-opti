@@ -1,16 +1,16 @@
-import type { PrismaClient } from "@prisma/client";
+import { DataSource } from "typeorm";
+import { Settings } from "../../db/entities/Settings";
 
-export const db_model_settings = (client: PrismaClient) => ({
+export const db_model_settings = (dataSource: DataSource) => ({
   get: async (name: string) => {
-    const row = await client.settings.findFirstOrThrow({
-      select: {
-        value: true,
-        type: true,
-      },
-      where: {
-        name,
-      },
+    const settingsRepository = dataSource.getRepository(Settings);
+    const row = await settingsRepository.findOne({
+      where: { name },
     });
+
+    if (!row) {
+      throw new Error(`Setting with name "${name}" not found`);
+    }
 
     switch (row.type) {
       case 'number':
@@ -21,22 +21,19 @@ export const db_model_settings = (client: PrismaClient) => ({
     }
   },
   create: async (name: string, type: 'string' | 'number', value: string) => {
-    return client.settings.create({
-      data: {
-        name,
-        type,
-        value,
-      },
+    const settingsRepository = dataSource.getRepository(Settings);
+    const newSetting = settingsRepository.create({
+      name,
+      type,
+      value,
     });
+    return settingsRepository.save(newSetting);
   },
   set: async (name: string, value: string) => {
-    await client.settings.updateMany({
-      where: {
-        name,
-      },
-      data: {
-        value,
-      },
-    });
+    const settingsRepository = dataSource.getRepository(Settings);
+    await settingsRepository.update(
+      { name },
+      { value }
+    );
   },
 });

@@ -1,33 +1,33 @@
 import { ResponseBoard } from "../../types/ResponseBoardsList";
-import type { PrismaClient } from "@prisma/client";
+import { DataSource } from "typeorm";
+import { Board } from "../../db/entities/Board";
 
-export const db_model_boards = (client: PrismaClient) => ({
+export const db_model_boards = (dataSource: DataSource) => ({
   insert: async (board: ResponseBoard) => {
-    return client.board.create({
-      data: {
-        tag: board.tag,
-        name: board.name,
-        id: board.id,
-      },
+    const boardRepository = dataSource.getRepository(Board);
+    const newBoard = boardRepository.create({
+      id: board.id,
+      tag: board.tag,
+      name: board.name,
     });
+    return boardRepository.save(newBoard);
   },
   update: async (board: ResponseBoard) => {
-    return client.board.update({
-      where: {
-        id: board.id,
-      },
-      data: {
+    const boardRepository = dataSource.getRepository(Board);
+    await boardRepository.update(
+      { id: board.id },
+      {
         tag: board.tag,
         name: board.name,
-        id: board.id,
-      },
-    });
+      }
+    );
+    return boardRepository.findOne({ where: { id: board.id } });
   },
   is_exist: async (board: ResponseBoard) => {
-    return 0 < await client.board.count({
-      where: {
-        id: board.id,
-      },
+    const boardRepository = dataSource.getRepository(Board);
+    const count = await boardRepository.count({
+      where: { id: board.id },
     });
+    return count > 0;
   },
 });

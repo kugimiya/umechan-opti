@@ -1,27 +1,23 @@
 import { ResponseMedia } from "../../types/ResponseThreadsList";
 import { MediaType } from "../../types/Tables";
-import type { PrismaClient } from "@prisma/client";
+import { DataSource } from "typeorm";
+import { Media } from "../../db/entities/Media";
 
-export const db_model_media = (client: PrismaClient) => ({
+export const db_model_media = (dataSource: DataSource) => ({
   insert: async (media_data: ResponseMedia, post_id: number, media_type: MediaType) => {
-    return client.media.create({
-      data: {
-        mediaType: media_type,
-        urlOrigin: media_data.link,
-        urlPreview: media_data.preview,
-        post: {
-          connect: {
-            id: post_id,
-          },
-        },
-      },
+    const mediaRepository = dataSource.getRepository(Media);
+    const newMedia = mediaRepository.create({
+      mediaType: media_type,
+      urlOrigin: media_data.link,
+      urlPreview: media_data.preview,
+      postId: post_id,
     });
+    return mediaRepository.save(newMedia);
   },
   drop_by_post_id: async (post_id: number) => {
-    return client.media.deleteMany({
-      where: {
-        postId: post_id,
-      },
+    const mediaRepository = dataSource.getRepository(Media);
+    return mediaRepository.delete({
+      postId: post_id,
     });
   },
 });

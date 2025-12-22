@@ -48,11 +48,19 @@ export const process_posts = async (posts: ResponsePost[], db: Awaited<ReturnTyp
   };
 
   for (let post of posts) {
-    await process(post);
+    try {
+      await process(post);
+    } catch (error) {
+      logger.error(`Error processing post ${post.id}: ${error}`);
+    }
 
     if (post.replies.length) {
       for (let reply of post.replies) {
-        await process(reply);
+        try {
+          await process(reply);
+        } catch (error) {
+          logger.error(`Error processing reply ${reply.id}: ${error}`);
+        }
       }
     }
   }
