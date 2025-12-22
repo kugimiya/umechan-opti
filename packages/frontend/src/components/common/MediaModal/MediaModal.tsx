@@ -3,6 +3,7 @@
 import { ImagesMapItem } from "@/utils/contexts/images_on_page";
 import { useEffect, useRef, useState } from "react";
 import { EpdsPostMediaType } from "@/types/epds";
+import styles from './styles.module.css'
 
 type Props = {
   item: ImagesMapItem;
@@ -46,9 +47,11 @@ export const MediaModal = (props: Props) => {
   }
 
   return (
-    <div ref={ref}>
+    <div ref={ref} style={{ zIndex: 1 }}>
       <div
         onClick={props.on_close}
+        className={styles.root}
+        tabIndex={-1}
         onKeyDown={(ev) => {
           if (ev.key === 'Escape') {
             props.on_close();
@@ -62,29 +65,10 @@ export const MediaModal = (props: Props) => {
             props.on_forward();
           }
         }}
-        tabIndex={-1}
-        style={{
-          position: 'fixed',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-        }}
       >
         <div
           onClick={(ev) => ev.stopPropagation()}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 'var(--post-content-gap)',
-            flexDirection: 'row',
-          }}
+          className={styles.inner}
         >
           <button onClick={props.on_back} style={{ padding: '4px' }}>{"<"}</button>
 
@@ -93,9 +77,8 @@ export const MediaModal = (props: Props) => {
               onClick={(ev) => ev.stopPropagation()}
               key={props.item[0]}
               src={props.item[0]}
+              className={styles.media}
               style={{
-                maxWidth: 'calc(100vw - 160px)',
-                maxHeight: 'calc(100vh - 86px)',
                 background: 'rgba(0, 0, 0, 0.9)'
               }}
             />
@@ -117,9 +100,8 @@ export const MediaModal = (props: Props) => {
                 const target = ev.nativeEvent.target as HTMLVideoElement;
                 setVideoVolume(target.volume);
               }}
+              className={styles.media}
               style={{
-                maxWidth: 'calc(100vw - 160px)',
-                maxHeight: 'calc(100vh - 86px)',
                 background: 'rgba(0, 0, 0, 0.9)'
               }}
             />
@@ -128,10 +110,7 @@ export const MediaModal = (props: Props) => {
           {props.item[2] === EpdsPostMediaType.YOUTUBE && (
             <iframe
               key={props.item[0]}
-              style={{
-                minWidth: 'calc(100vw - 160px)',
-                minHeight: 'calc(100vh - 86px)',
-              }}
+              className={styles.media}
               width="100%"
               height="100%"
               src={makeYouTubeEmbedLink(props.item[0])}

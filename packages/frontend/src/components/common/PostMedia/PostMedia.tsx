@@ -7,18 +7,19 @@ import { MediaModal } from "@/components/common/MediaModal/MediaModal";
 
 type Props = {
   media_item: EpdsPostMedia;
+  disable_modal?: boolean;
 }
 
 export const PostMedia = (props: Props) => {
   const [is_open, set_is_open] = useState(false);
   const { images_map } = useContext(imagesOnPageContext);
-  const [index, set_index] = useState(images_map.findIndex((item) => item[0] === props.media_item.media_url));
+  const [index, set_index] = useState(images_map.findIndex((item) => item[0] === props.media_item.urlOrigin));
 
-  if (!props.media_item.preview_image_url || !props.media_item.media_url) {
+  if (!props.media_item.urlPreview || !props.media_item.urlOrigin) {
     return null;
   }
 
-  const is_youtube_video = props.media_item.type === EpdsPostMediaType.YOUTUBE;
+  const is_youtube_video = props.media_item.mediaType === EpdsPostMediaType.YOUTUBE;
 
   return (
     <>
@@ -54,12 +55,16 @@ export const PostMedia = (props: Props) => {
           cursor: 'pointer'
         }}
         onClick={() => {
-          set_index(images_map.findIndex((item) => item[0] === props.media_item.media_url));
+          if (props.disable_modal !== undefined) {
+            return;
+          }
+
+          set_index(images_map.findIndex((item) => item[0] === props.media_item.urlOrigin));
           set_is_open(true);
         }}
       >
         <img
-          src={props.media_item.preview_image_url}
+          src={props.media_item.urlPreview}
           style={{ objectFit: 'contain', maxWidth: '100%', maxHeight: '100%' }}
           alt="post media"
         />

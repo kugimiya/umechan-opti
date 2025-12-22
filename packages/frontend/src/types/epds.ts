@@ -13,26 +13,36 @@ export type EpdsBoard = {
 
 export type EpdsPost = {
   id: number;
-  board_tag: string;
-  parent_id?: number;
   poster: string;
-  poster_verified: boolean;
-  post_subject: string;
-  post_message: string;
-  created_at: number;
-  replies_total?: number;
+  posterVerified: boolean;
+  subject: string;
+  message: string;
+  messageTruncated: string;
+  timestamp: number;
+  updatedAt: number;
+  boardId: number;
+  parentId: number | null;
   replies?: EpdsPost[];
   media?: EpdsPostMedia[];
+  board: EpdsBoard;
+  _count?: EpdsPostCount;
 }
 
 export type EpdsPostMedia = {
-  type: EpdsPostMediaType;
-  media_url: string;
-  preview_image_url?: string;
+  id: number;
+  urlOrigin: string;
+  urlPreview: string;
+  mediaType: EpdsPostMediaType;
+  postId: number;
 }
 
 export enum EpdsPostMediaType {
-  PISSYKAKA_IMAGE = 0,
-  YOUTUBE = 1,
-  VIDEO = 2,
+  PISSYKAKA_IMAGE = 'image',
+  YOUTUBE = 'youtube',
+  VIDEO = 'video',
+}
+
+type EpdsPostCount = {
+  media: number;
+  replies: number;
 }

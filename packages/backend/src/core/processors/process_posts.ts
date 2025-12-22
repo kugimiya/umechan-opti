@@ -16,10 +16,8 @@ export const process_posts = async (posts: ResponsePost[], db: Awaited<ReturnTyp
     checked += 1;
 
     if (await db.posts.is_exist(post)) {
-      if (await db.posts.is_need_update(post)) {
-        await db.posts.update(post);
-        updated += 1;
-      }
+      await db.posts.update(post);
+      updated += 1;
     } else {
       await db.posts.insert(post);
       created += 1;
@@ -28,33 +26,41 @@ export const process_posts = async (posts: ResponsePost[], db: Awaited<ReturnTyp
     await db.media.drop_by_post_id(post.id);
 
     if (post.media?.images?.length) {
-      for (let image of post.media.images) {
+      for (let item of post.media.images) {
         media_checked += 1;
-        await db.media.insert(image, post.id, MediaType.Image);
+        await db.media.insert(item, post.id, MediaType.Image);
       }
     }
 
     if (post.media?.youtubes?.length) {
-      for (let image of post.media.youtubes) {
+      for (let item of post.media.youtubes) {
         media_checked += 1;
-        await db.media.insert(image, post.id, MediaType.YouTube);
+        await db.media.insert(item, post.id, MediaType.YouTube);
       }
     }
 
     if (post.media?.videos?.length) {
-      for (let image of post.media.videos) {
+      for (let item of post.media.videos) {
         media_checked += 1;
-        await db.media.insert(image, post.id, MediaType.Video);
+        await db.media.insert(item, post.id, MediaType.Video);
       }
     }
   };
 
   for (let post of posts) {
-    await process(post);
+    try {
+      await process(post);
+    } catch (error) {
+      logger.error(`Error processing post ${post.id}: ${error}`);
+    }
 
     if (post.replies.length) {
       for (let reply of post.replies) {
-        await process(reply);
+        try {
+          await process(reply);
+        } catch (error) {
+          logger.error(`Error processing reply ${reply.id}: ${error}`);
+        }
       }
     }
   }

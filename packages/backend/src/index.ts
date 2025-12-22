@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { create_api_server } from "./core/create_api_server";
 import { create_update_tick } from "./core/create_update_tick";
 import {
@@ -23,7 +24,7 @@ if (process.argv.includes('--help')) {
     '',
     'npm run start -- --no-tick-sync      disable all sync methods (full and event short-polling)',
     'npm run start -- --no-full-sync      disable full sync',
-    'npm run start -- --no-api-server     disable api server and mod-ui',
+    'npm run start -- --no-api-server     disable api server',
     '',
     'For configuration look at .env.example file',
   ];
@@ -44,7 +45,7 @@ const main = async () => {
 
   // SYNC part
   let current_tick = 0;
-  const tick_service = await create_update_tick(PISSYKAKA_API, process.env.DATABASE_URL || "");
+  const tick_service = await create_update_tick(PISSYKAKA_API);
   const { tick, update_all } = tick_service;
 
   // API part
@@ -52,7 +53,6 @@ const main = async () => {
     const { start_listen } = await create_api_server(
       API_DEFAULT_LISTEN_PORT,
       API_DEFAULT_LISTEN_HOST,
-      process.env.DATABASE_URL || "",
       tick_service,
     );
     start_listen();

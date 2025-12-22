@@ -1,32 +1,39 @@
-import { Client } from "pg";
-import { SettingType, TableSettings } from "../../types/Tables";
+import { DataSource } from "typeorm";
+import { Settings } from "../../db/entities/Settings";
 
-export const db_model_settings = (client: Client) => {
-  const settings = {
-    get: async (name: string) => {
-      const result = await client.query<TableSettings>({
-        text: "SELECT * FROM srvsettings WHERE name = $1",
-        values: [name],
-      });
-      const row = result.rows[0];
+export const db_model_settings = (dataSource: DataSource) => ({
+  get: async (name: string) => {
+    const settingsRepository = dataSource.getRepository(Settings);
+    const row = await settingsRepository.findOne({
+      where: { name },
+    });
 
-      switch (row.type) {
-        case SettingType.Number:
-          return Number(row.value);
-
-        default:
-          return row.value;
-      }
-    },
-    set: async (name: string, value: string) => {
-      const result = await client.query<TableSettings>({
-        text: "UPDATE srvsettings set value=$1 WHERE name=$2 RETURNING *",
-        values: [value, name],
-      });
-
-      return result.rows[0];
+    if (!row) {
+      throw new Error(`Setting with name "${name}" not found`);
     }
-  };
 
-  return settings;
-}
+    switch (row.type) {
+      case 'number':
+        return Number(row.value);
+
+      default:
+        return row.value;
+    }
+  },
+  create: async (name: string, type: 'string' | 'number', value: string) => {
+    const settingsRepository = dataSource.getRepository(Settings);
+    const newSetting = settingsRepository.create({
+      name,
+      type,
+      value,
+    });
+    return settingsRepository.save(newSetting);
+  },
+  set: async (name: string, value: string) => {
+    const settingsRepository = dataSource.getRepository(Settings);
+    await settingsRepository.update(
+      { name },
+      { value }
+    );
+  },
+});

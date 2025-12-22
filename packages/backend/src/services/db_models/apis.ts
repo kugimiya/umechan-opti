@@ -1,227 +1,172 @@
-import { Client, QueryResult } from "pg";
-import { TableBoards, TableMedia, TablePosts } from "../../types/Tables";
-import { parallel_executor } from "../../utils/parallel_executor";
-import { DEFAULT_LIMIT, DEFAULT_THREAD_SIZE, FETCH_ENTITIES_MAX_PARALLEL_JOBS } from "../../utils/config";
-import { PostDto } from "../../core/dtos/PostDto/PostDto";
+import { DEFAULT_LIMIT, DEFAULT_THREAD_SIZE } from "../../utils/config";
+import { DataSource } from "typeorm";
+import { Board } from "../../db/entities/Board";
+import { Post } from "../../db/entities/Post";
 
-type ResultAsEntries = [number, [number, TablePosts[]]];
+const banned_board_tags = ['fff', 'uwu'];
 
-export const db_model_apis = (client: Client) => {
-  const enrich_threads_with_replies = async (result: QueryResult<TablePosts>, moderated: boolean, thread_size: number) => {
-    const result_with_replies = await parallel_executor<ResultAsEntries, TablePosts>(
-      result.rows,
-      FETCH_ENTITIES_MAX_PARALLEL_JOBS,
-      thread => async () => {
-        const replies_total_count_result = await client.query<{ count: number }>({
-          text: [
-            "SELECT COUNT(*) FROM posts",
-            moderated ? "LEFT JOIN moderated ON moderated.post_id = posts.id" : "",
-            `WHERE posts.parent_id=$1 ${moderated ? 'and moderated.post_id is NULL or moderated.allowed is TRUE' : ''}`,
-          ].join('\n'),
-          values: [thread.id],
-        });
-        const replies_total_count = replies_total_count_result.rows[0].count;
+export const db_model_apis = (dataSource: DataSource) => ({
+  boards: {
+    get_all: async (moderated: boolean) => {
+      const boardRepository = dataSource.getRepository(Board);
+      const queryBuilder = boardRepository.createQueryBuilder("board");
 
-        const sub_result = await client.query<TablePosts & { media: TableMedia[] }>({
-          text: [
-            "SELECT posts.*, boards.tag FROM posts",
-            moderated ? "LEFT JOIN moderated ON moderated.post_id = posts.id" : "",
-            "LEFT JOIN boards on boards.id = posts.board_id",
-            `WHERE posts.parent_id=$1 ${moderated ? 'and moderated.post_id is NULL or moderated.allowed is TRUE' : ''}`,
-            "ORDER BY posts.updated_at DESC",
-            "LIMIT $2 OFFSET 0",
-          ].join('\n'),
-          values: [thread.id, thread_size],
-        });
-
-        for (let rowIndex in sub_result.rows) {
-          const row = sub_result.rows[rowIndex];
-          const medias = await client.query<TableMedia>({
-            text: "SELECT media.* FROM media WHERE media.post_id = $1",
-            values: [row.id],
-          });
-
-          sub_result.rows[rowIndex].media = medias.rows ?? [];
-        }
-
-        return [
-          thread.id,
-          [replies_total_count, sub_result.rows.reverse()],
-        ] as ResultAsEntries;
+      if (moderated) {
+        queryBuilder.where("board.tag NOT IN (:...bannedTags)", { bannedTags: banned_board_tags });
       }
-    );
 
-    const result_normalized = Object.fromEntries(result_with_replies);
-    return result.rows.map((thread) => new PostDto({
-      ...thread,
-      replies_total: result_normalized[thread.id][0],
-      replies: result_normalized[thread.id][1] || []
-    }));
-  };
+      return queryBuilder.getMany();
+    },
+    get_by_tag: async (moderated: boolean, tag: string) => {
+      const boardRepository = dataSource.getRepository(Board);
+      const queryBuilder = boardRepository.createQueryBuilder("board");
 
-  const apis = {
-    boards: {
-      get_all: async (moderated: boolean) => {
-        const result = await client.query<TableBoards>({
-          text: [
-            "SELECT boards.* FROM boards",
-            moderated ? "LEFT JOIN moderated ON moderated.board_id = boards.id" : "",
-            moderated ? "WHERE moderated.board_id is NULL or moderated.allowed is TRUE" : "",
-          ].join('\n'),
-        });
-
-        return result.rows;
-      },
-      get_by_tag: async (moderated: boolean, tag: string) => {
-        const result = await client.query<TableBoards>({
-          text: [
-            "SELECT boards.* FROM boards",
-            moderated ? "LEFT JOIN moderated ON moderated.board_id = boards.id" : "",
-            `WHERE tag=$1 ${moderated ? "and moderated.board_id is NULL or moderated.allowed is TRUE" : ""}`,
-            ].join('\n'),
-          values: [tag]
-        });
-
-        return result.rows[0];
+      if (moderated) {
+        queryBuilder.where("board.tag = :tag", { tag })
+          .andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: banned_board_tags });
+      } else {
+        queryBuilder.where("board.tag = :tag", { tag });
       }
+
+      return queryBuilder.getOne();
     },
-    posts: {
-      get_by_id: async (moderated: boolean, post_id: number) => {
-        const result = await client.query<TablePosts>({
-          text: [
-            "SELECT posts.*, boards.tag FROM posts",
-            moderated ? "LEFT JOIN moderated ON moderated.post_id = posts.id" : "",
-            "LEFT JOIN boards on boards.id = posts.board_id",
-            `WHERE posts.id=$1 ${moderated ? 'and moderated.post_id is NULL or moderated.allowed is TRUE' : ''}`,
-          ].join('\n'),
-          values: [post_id],
-        });
+  },
+  posts: {
+    get_by_id: async (moderated: boolean, post_id: number) => {
+      const postRepository = dataSource.getRepository(Post);
+      const queryBuilder = postRepository
+        .createQueryBuilder("post")
+        .leftJoinAndSelect("post.replies", "replies")
+        .leftJoinAndSelect("post.media", "media")
+        .leftJoinAndSelect("post.board", "board")
+        .where("post.id = :postId", { postId: post_id });
 
-        const medias = await client.query<TableMedia>({
-          text: "SELECT media.* FROM media WHERE media.post_id = $1",
-          values: [post_id],
-        });
-
-        const post_dto = new PostDto({ ...result.rows[0], media: medias.rows });
-        return post_dto;
-      },
-    },
-    threads: {
-      get_by_board_tag: async (moderated: boolean, tag: string, offset = 0, limit = DEFAULT_LIMIT, thread_size = DEFAULT_THREAD_SIZE) => {
-        const board = await apis.boards.get_by_tag(moderated, tag);
-        const board_id = board.id;
-
-        const result = await client.query<TablePosts & { media: TableMedia[] }>({
-          text: [
-            "SELECT posts.*, boards.tag FROM posts",
-            moderated ? "LEFT JOIN moderated ON moderated.post_id = posts.id" : "",
-            "LEFT JOIN boards on boards.id = posts.board_id",
-            `WHERE posts.board_id=$1 and posts.parent_id is NULL ${moderated ? 'and moderated.post_id is NULL or moderated.allowed is TRUE' : ''}`,
-            "ORDER BY posts.updated_at DESC",
-            "LIMIT $2 OFFSET $3",
-          ].join('\n'),
-          values: [board_id, limit, offset],
-        });
-
-        for (let rowIndex in result.rows) {
-          const row = result.rows[rowIndex];
-          const medias = await client.query<TableMedia>({
-            text: "SELECT media.* FROM media WHERE media.post_id = $1",
-            values: [row.id],
-          });
-
-          result.rows[rowIndex].media = medias.rows ?? [];
-        }
-
-        return await enrich_threads_with_replies(result, moderated, thread_size);
-      },
-      get_count_by_board_tag: async (moderated: boolean, tag: string) => {
-        const board = await apis.boards.get_by_tag(moderated, tag);
-        const board_id = board.id;
-
-        const result = await client.query<{ count: number }>({
-          text: [
-            "SELECT COUNT(posts.*) FROM posts",
-            moderated ? "LEFT JOIN moderated ON moderated.post_id = posts.id" : "",
-            "LEFT JOIN boards on boards.id = posts.board_id",
-            `WHERE posts.board_id=$1 and posts.parent_id is NULL ${moderated ? 'and moderated.post_id is NULL or moderated.allowed is TRUE' : ''}`,
-          ].join('\n'),
-          values: [board_id],
-        });
-
-        return result.rows[0];
-      },
-      get_by_id: async (moderated: boolean, post_id: number) => {
-        const result = await client.query<TablePosts & { media: TableMedia[] }>({
-          text: [
-            "SELECT posts.*, boards.tag FROM posts",
-            moderated ? "LEFT JOIN moderated ON moderated.post_id = posts.id" : "",
-            "LEFT JOIN boards on boards.id = posts.board_id",
-            `WHERE posts.id=$1 ${moderated ? 'and moderated.post_id is NULL or moderated.allowed is TRUE' : ''}`,
-            "ORDER BY posts.updated_at DESC"
-          ].join('\n'),
-          values: [post_id],
-        });
-
-        for (let rowIndex in result.rows) {
-          const row = result.rows[rowIndex];
-          const medias = await client.query<TableMedia>({
-            text: "SELECT media.* FROM media WHERE media.post_id = $1",
-            values: [row.id],
-          });
-
-          result.rows[rowIndex].media = medias.rows ?? [];
-        }
-
-        // fixme: оч большой limit в данном случае сработает, но надо подумать о решении получше
-        const posts = await enrich_threads_with_replies(result, moderated, 1000000);
-
-        return posts[0];
-      },
-    },
-    feed: {
-      get_all: async (moderated: boolean, offset = 0, limit = DEFAULT_LIMIT, thread_size = DEFAULT_THREAD_SIZE) => {
-        const result = await client.query<TablePosts & { media: TableMedia[] }>({
-          text: [
-            "SELECT posts.*, boards.tag FROM posts",
-            moderated ? "LEFT JOIN moderated ON moderated.post_id = posts.id" : "",
-            "LEFT JOIN boards on boards.id = posts.board_id",
-            moderated ? "LEFT JOIN moderated as moderated_board ON moderated_board.board_id = boards.id" : "",
-            `WHERE posts.parent_id is NULL `,
-            moderated ? "and (moderated.post_id is NULL or moderated.allowed is TRUE)" : "",
-            moderated ? "and (moderated_board.board_id is NULL or moderated_board.allowed is TRUE)" : "",
-            "ORDER BY posts.updated_at DESC",
-            "LIMIT $1 OFFSET $2",
-          ].join('\n'),
-          values: [limit, offset],
-        });
-
-        for (let rowIndex in result.rows) {
-          const row = result.rows[rowIndex];
-          const medias = await client.query<TableMedia>({
-            text: "SELECT media.* FROM media WHERE media.post_id = $1",
-            values: [row.id],
-          });
-
-          result.rows[rowIndex].media = medias.rows ?? [];
-        }
-
-        return await enrich_threads_with_replies(result, moderated, thread_size);
-      },
-      get_count: async (moderated: boolean) => {
-        const result = await client.query<{ count: number }>({
-          text: [
-            "SELECT COUNT(posts.*) FROM posts",
-            moderated ? "LEFT JOIN moderated ON moderated.post_id = posts.id" : "",
-            "LEFT JOIN boards on boards.id = posts.board_id",
-            `WHERE posts.parent_id is NULL ${moderated ? "and moderated.post_id is NULL or moderated.allowed is TRUE" : ""}`,
-          ].join('\n'),
-        });
-
-        return result.rows[0];
+      if (moderated) {
+        queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: banned_board_tags });
       }
-    },
-  };
 
-  return apis;
-}
+      return queryBuilder.getOne();
+    },
+  },
+  threads: {
+    get_by_board_tag: async (moderated: boolean, board_tag: string, offset = 0, limit = DEFAULT_LIMIT, thread_size = DEFAULT_THREAD_SIZE) => {
+      if (moderated && banned_board_tags.includes(board_tag)) {
+        return [];
+      }
+
+      const postRepository = dataSource.getRepository(Post);
+      const threads = await postRepository
+        .createQueryBuilder("thread")
+        .leftJoinAndSelect("thread.board", "board")
+        .leftJoinAndSelect("thread.media", "media")
+        .where("thread.parentId IS NULL")
+        .andWhere("board.tag = :boardTag", { boardTag: board_tag })
+        .orderBy("thread.updatedAt", "DESC")
+        .skip(offset)
+        .take(limit)
+        .getMany();
+
+      // Загружаем replies для каждого thread отдельно с ограничением
+      for (const thread of threads) {
+        const replies = await postRepository
+          .createQueryBuilder("reply")
+          .leftJoinAndSelect("reply.media", "media")
+          .leftJoinAndSelect("reply.board", "board")
+          .where("reply.parentId = :threadId", { threadId: thread.id })
+          .orderBy("reply.id", "DESC")
+          .take(thread_size)
+          .getMany();
+
+        thread.replies = replies.reverse();
+      }
+
+      return threads;
+    },
+    get_count_by_board_tag: async (moderated: boolean, board_tag: string) => {
+      if (moderated && banned_board_tags.includes(board_tag)) {
+        return 0;
+      }
+
+      const postRepository = dataSource.getRepository(Post);
+      return postRepository
+        .createQueryBuilder("thread")
+        .leftJoin("thread.board", "board")
+        .where("thread.parentId IS NULL")
+        .andWhere("board.tag = :boardTag", { boardTag: board_tag })
+        .getCount();
+    },
+    get_by_id: async (moderated: boolean, post_id: number) => {
+      const postRepository = dataSource.getRepository(Post);
+      const queryBuilder = postRepository
+        .createQueryBuilder("thread")
+        .leftJoinAndSelect("thread.replies", "replies")
+        .leftJoinAndSelect("replies.media", "replyMedia")
+        .leftJoinAndSelect("replies.board", "replyBoard")
+        .leftJoinAndSelect("thread.media", "media")
+        .leftJoinAndSelect("thread.board", "board")
+        .where("thread.id = :postId", { postId: post_id });
+
+      if (moderated) {
+        queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: banned_board_tags });
+      }
+
+      const thread = await queryBuilder.getOne();
+
+      if (thread && thread.replies) {
+        // Сортируем replies по id asc
+        thread.replies.sort((a: Post, b: Post) => a.id - b.id);
+      }
+
+      return thread;
+    },
+  },
+  feed: {
+    get_all: async (moderated: boolean, offset = 0, limit = DEFAULT_LIMIT, thread_size = DEFAULT_THREAD_SIZE) => {
+      const postRepository = dataSource.getRepository(Post);
+      const queryBuilder = postRepository
+        .createQueryBuilder("thread")
+        .leftJoinAndSelect("thread.board", "board")
+        .leftJoinAndSelect("thread.media", "media")
+        .where("thread.parentId IS NULL");
+
+      if (moderated) {
+        queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: banned_board_tags });
+      }
+
+      const threads = await queryBuilder
+        .orderBy("thread.updatedAt", "DESC")
+        .skip(offset)
+        .take(limit)
+        .getMany();
+
+      // Загружаем replies для каждого thread отдельно с ограничением
+      for (const thread of threads) {
+        const replies = await postRepository
+          .createQueryBuilder("reply")
+          .leftJoinAndSelect("reply.media", "media")
+          .leftJoinAndSelect("reply.board", "board")
+          .where("reply.parentId = :threadId", { threadId: thread.id })
+          .orderBy("reply.id", "DESC")
+          .take(thread_size)
+          .getMany();
+
+        thread.replies = replies.reverse();
+      }
+
+      return threads;
+    },
+    get_count: async (moderated: boolean) => {
+      const postRepository = dataSource.getRepository(Post);
+      const queryBuilder = postRepository
+        .createQueryBuilder("thread")
+        .leftJoin("thread.board", "board")
+        .where("thread.parentId IS NULL");
+
+      if (moderated) {
+        queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: banned_board_tags });
+      }
+
+      return queryBuilder.getCount();
+    },
+  },
+});

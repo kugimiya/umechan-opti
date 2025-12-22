@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type {Metadata, Viewport} from "next";
 import { epds_api } from "@/api/epds";
 import { enrich_navbar } from "@/utils/enrichers/enrich_navbar";
 import { AppProviders } from "@/components/providers";
@@ -12,6 +12,11 @@ const inter = Inter({ subsets: ["latin", "cyrillic-ext"], weight: "variable" });
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_CHAN_NAME,
   description: "Анонимный имиджборд",
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default async function RootLayout(props: Readonly<{ children: React.ReactNode; }>) {

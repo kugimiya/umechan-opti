@@ -15,28 +15,31 @@ type Props = {
   is_at_thread_list?: boolean;
   is_at_feed?: boolean;
   is_unmod?: boolean;
+  disable_modal?: boolean;
 };
 
 export const PostProto = memo(function PostProtoInner(props: Props) {
   const { post, is_op_post = false, is_at_thread_list = false, is_at_feed = false } = props;
 
   const in_thread = is_at_thread_list
-    ? <Link href={props.is_unmod ? `/board/${post.board_tag}/${post.id}?unmod=true` : `/board/${post.board_tag}/${post.id}`}>В тред</Link>
+    ? <Link href={props.is_unmod ? `/board/${post.board.tag}/${post.id}?unmod=true` : `/board/${post.board.tag}/${post.id}`}>В тред</Link>
     : null;
 
   const post_id = <QuickReplyLink post={post} is_at_thread />;
 
   const content = (
     <>
-      <p>{post.poster_verified ? '🔰' : '⭕️'} {post.poster} <b>{post.post_subject}</b> {formatDateTime(post.created_at)} {is_at_feed && post.board_tag} {post_id} {in_thread}</p>
+      <p>{post.posterVerified ? '🔰' : '⭕️'} {post.poster} <b>{post.subject}</b> {formatDateTime(post.timestamp)} {is_at_feed && post.board.tag} {post_id} {in_thread}</p>
 
-      {post.media?.map((item) => (
-        <PostMedia key={item.preview_image_url} media_item={item} />
-      ))}
+      <Box gap={8} flexWrap="wrap">
+        {post.media?.map((item) => (
+          <PostMedia key={item.urlPreview} media_item={item} disable_modal={props.disable_modal} />
+        ))}
+      </Box>
 
-      <PostMDContent message={post.post_message} />
+      <PostMDContent message={post.message} is_unmod={props.is_unmod ? 'true' : 'false'} />
 
-      <PostReplies id={post.id} />
+      <PostReplies id={post.id} is_unmod={props.is_unmod ? 'true' : 'false'} />
     </>
   );
 
