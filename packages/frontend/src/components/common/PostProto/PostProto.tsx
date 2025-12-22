@@ -15,6 +15,7 @@ type Props = {
   is_at_thread_list?: boolean;
   is_at_feed?: boolean;
   is_unmod?: boolean;
+  disable_modal?: boolean;
 };
 
 export const PostProto = memo(function PostProtoInner(props: Props) {
@@ -32,13 +33,13 @@ export const PostProto = memo(function PostProtoInner(props: Props) {
 
       <Box gap={8} flexWrap="wrap">
         {post.media?.map((item) => (
-          <PostMedia key={item.urlPreview} media_item={item} />
+          <PostMedia key={item.urlPreview} media_item={item} disable_modal={props.disable_modal} />
         ))}
       </Box>
 
-      <PostMDContent message={post.message} />
+      <PostMDContent message={post.message} is_unmod={props.is_unmod ? 'true' : 'false'} />
 
-      <PostReplies id={post.id} />
+      <PostReplies id={post.id} is_unmod={props.is_unmod ? 'true' : 'false'} />
     </>
   );
 

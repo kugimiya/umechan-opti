@@ -8,20 +8,20 @@ import { usePostPointer } from "./PostPointer.hook";
 import styles from "./PostPointer.module.css";
 import { PostProto } from "@/components/common/PostProto/PostProto";
 
-type Props = PropsWithChildren<{ postId: number }>;
+type Props = PropsWithChildren<{ postId: number, is_unmod: string }>;
 
-export const PostPointer = ({ children, postId }: Props) => {
+export const PostPointer = ({ children, postId, is_unmod }: Props) => {
   const {
     isLoading, isVisible,
     handleMouseEnter, handleMouseLeave,
     post
-  } = usePostPointer(postId);
+  } = usePostPointer(postId, is_unmod);
 
   const render_popover = () => {
     let content = isLoading
       ? <>Загрузка...</>
       : post !== undefined
-        ? <PostProto post={post} />
+        ? <PostProto post={post} disable_modal />
         : <></>;
 
     return (

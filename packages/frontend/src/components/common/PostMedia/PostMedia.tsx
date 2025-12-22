@@ -7,6 +7,7 @@ import { MediaModal } from "@/components/common/MediaModal/MediaModal";
 
 type Props = {
   media_item: EpdsPostMedia;
+  disable_modal?: boolean;
 }
 
 export const PostMedia = (props: Props) => {
@@ -54,6 +55,10 @@ export const PostMedia = (props: Props) => {
           cursor: 'pointer'
         }}
         onClick={() => {
+          if (props.disable_modal !== undefined) {
+            return;
+          }
+
           set_index(images_map.findIndex((item) => item[0] === props.media_item.urlOrigin));
           set_is_open(true);
         }}
