@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  skipMiddlewareUrlNormalize: true,
+  skipProxyUrlNormalize: true,
   async redirects() {
     return [
       {

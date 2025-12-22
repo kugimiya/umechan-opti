@@ -1,7 +1,7 @@
 import React, { CSSProperties } from "react";
 
 export type BoxProps = React.PropsWithChildren & {
-  as?: keyof JSX.IntrinsicElements;
+  as?: keyof React.JSX.IntrinsicElements;
   className?: string;
 
   flexDirection?: CSSProperties["flexDirection"];
