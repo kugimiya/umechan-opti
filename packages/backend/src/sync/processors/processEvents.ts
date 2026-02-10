@@ -16,7 +16,7 @@ export const processEvents = async (
 
   const threadUpdateEvents = events
     .filter((event: ResponseEvent) => event.event_type === ResponseEventType.ThreadUpdateTriggered || event.event_type === ResponseEventType.PostCreated)
-    .reduce((acc, cur) => {
+    .reduce((acc, cur: ResponseEvent) => {
       return acc.every((event) => event.post_id !== cur.post_id)
         ? [...acc, cur]
         : acc;
