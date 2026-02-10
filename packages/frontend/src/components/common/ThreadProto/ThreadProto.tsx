@@ -1,48 +1,48 @@
 import { memo } from "react";
-import { EpdsPost } from "@/types/epds";
+import { EpdsPost } from "@umechan/shared";
 import { PostProto } from "@/components/common/PostProto/PostProto";
 import { Box } from "@/components/layout/Box/Box";
 import { pluralize } from "@/utils/formatters/pluralize";
-import { make_reply_map } from "@/utils/make_reply_map";
+import { makeReplyMap } from "@/utils/makeReplyMap";
 import { ThreadReplyMapWrapper } from "@/components/providers";
 
 type Props = {
   post: EpdsPost;
-  is_full_version?: boolean;
-  is_at_feed?: boolean;
-  is_unmod?: boolean;
+  isFullVersion?: boolean;
+  isAtFeed?: boolean;
+  isUnmod?: "true" | "false";
 };
 
 export const ThreadProto = memo(function ThreadProtoInner(props: Props) {
-  const truncated_posts_count = Number(props.post._count?.replies ?? 0) - Number(props.post.replies?.length);
-  const reply_map = make_reply_map(props.post);
+  const truncatedPostsCount = Number(props.post._count?.replies ?? 0) - Number(props.post.replies?.length);
+  const replyMap = makeReplyMap(props.post);
 
-  const posts_count_pluralized = pluralize(
-    truncated_posts_count,
+  const postsCountPluralized = pluralize(
+    truncatedPostsCount,
     ['пост', 'поста', 'постов']
   );
 
-  const truncated_posts_message = !props.is_full_version && Number(props.post.replies?.length) < Number(props.post._count?.replies ?? 0)
-    ? <i>Пропущено {truncated_posts_count} {posts_count_pluralized}</i>
+  const truncatedPostsMessage = !props.isFullVersion && Number(props.post.replies?.length) < Number(props.post._count?.replies ?? 0)
+    ? <i>Пропущено {truncatedPostsCount} {postsCountPluralized}</i>
     : null;
 
   return (
-    <ThreadReplyMapWrapper reply_map={reply_map}>
+    <ThreadReplyMapWrapper replyMap={replyMap}>
       <Box flexDirection='column' gap='12px' style={{ maxWidth: '100%' }}>
         <PostProto
           post={props.post}
-          is_op_post is_at_feed={props.is_at_feed}
-          is_at_thread_list={!props.is_full_version}
-          is_unmod={props.is_unmod}
+          isOpPost isAtFeed={props.isAtFeed}
+          isAtThreadList={!props.isFullVersion}
+          isUnmod={props.isUnmod === "true" ? "true" : "false"}
         />
 
-        {truncated_posts_message}
+        {truncatedPostsMessage}
 
         {props.post.replies?.map((reply) => (
           <PostProto
             key={reply.id}
             post={reply}
-            is_unmod={props.is_unmod}
+            isUnmod={props.isUnmod === "true" ? "true" : "false"}
           />
         ))}
       </Box>

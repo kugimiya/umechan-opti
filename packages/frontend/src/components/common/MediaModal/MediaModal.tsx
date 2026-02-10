@@ -1,16 +1,16 @@
 'use client';
 
-import { ImagesMapItem } from "@/utils/contexts/images_on_page";
+import { ImagesMapItem } from "@/utils/contexts/imagesOnPage";
 import { useEffect, useRef, useState } from "react";
-import { EpdsPostMediaType } from "@/types/epds";
+import { EpdsPostMediaType } from "@umechan/shared";
 import styles from './styles.module.css'
 
 type Props = {
   item: ImagesMapItem;
-  is_open: boolean;
-  on_close: () => void;
-  on_back: () => void;
-  on_forward: () => void;
+  isOpen: boolean;
+  onClose: () => void;
+  onBack: () => void;
+  onForward: () => void;
 };
 
 const makeYouTubeEmbedLink = (link: string) => {
@@ -37,32 +37,32 @@ export const MediaModal = (props: Props) => {
   }, [videoVolume]);
 
   useEffect(() => {
-    if (ref.current && props.is_open) {
+    if (ref.current && props.isOpen) {
       (ref.current.firstChild as HTMLDivElement).focus();
     }
-  }, [ref.current, props.is_open]);
+  }, [ref.current, props.isOpen]);
 
-  if (!props.is_open) {
+  if (!props.isOpen) {
     return null;
   }
 
   return (
     <div ref={ref} style={{ zIndex: 1 }}>
       <div
-        onClick={props.on_close}
+        onClick={props.onClose}
         className={styles.root}
         tabIndex={-1}
         onKeyDown={(ev) => {
           if (ev.key === 'Escape') {
-            props.on_close();
+            props.onClose();
           }
 
           if (ev.key === 'ArrowLeft') {
-            props.on_back();
+            props.onBack();
           }
 
           if (ev.key === 'ArrowRight') {
-            props.on_forward();
+            props.onForward();
           }
         }}
       >
@@ -70,7 +70,7 @@ export const MediaModal = (props: Props) => {
           onClick={(ev) => ev.stopPropagation()}
           className={styles.inner}
         >
-          <button onClick={props.on_back} style={{ padding: '4px' }}>{"<"}</button>
+          <button onClick={props.onBack} style={{ padding: '4px' }}>{"<"}</button>
 
           {props.item[2] === EpdsPostMediaType.PISSYKAKA_IMAGE && (
             <img
@@ -122,7 +122,7 @@ export const MediaModal = (props: Props) => {
             />
           )}
 
-          <button onClick={props.on_forward} style={{ padding: '4px' }}>{">"}</button>
+          <button onClick={props.onForward} style={{ padding: '4px' }}>{">"}</button>
         </div>
 
         {props.item[0]}

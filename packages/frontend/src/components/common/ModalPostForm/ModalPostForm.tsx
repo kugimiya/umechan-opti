@@ -1,6 +1,6 @@
 'use client';
 
-import { modalPostFormContext } from "@/utils/contexts/modal_post_form";
+import { modalPostFormContext } from "@/utils/contexts/modalPostForm";
 import { useContext } from "react";
 
 import { Card } from "@/components/layout/Card/Card";

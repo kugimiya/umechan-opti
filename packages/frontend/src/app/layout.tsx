@@ -1,7 +1,5 @@
 import "./globals.css";
 import type {Metadata, Viewport} from "next";
-import { epds_api } from "@/api/epds";
-import { enrich_navbar } from "@/utils/enrichers/enrich_navbar";
 import { AppProviders } from "@/components/providers";
 import { Box } from "@/components/layout/Box/Box";
 import clsx from "clsx";

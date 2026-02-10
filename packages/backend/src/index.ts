@@ -1,14 +1,15 @@
 import "reflect-metadata";
-import { create_api_server } from "./core/create_api_server";
-import { create_update_tick } from "./core/create_update_tick";
+import { createApiServer } from "./api";
+import { createUpdateTick } from "./sync";
 import {
-  API_DEFAULT_LISTEN_HOST,
-  API_DEFAULT_LISTEN_PORT,
-  DELAY_AFTER_UPDATE_TICK,
-  PISSYKAKA_API
+  apiDefaultListenHost,
+  apiDefaultListenPort,
+  delayAfterUpdateTick,
+  fullSyncIntervalSeconds,
+  pissykakaApi
 } from "./utils/config";
 import { logger } from "./utils/logger";
-import { measure_time } from "./utils/measure_time";
+import { measureTime } from "./utils/measureTime";
 import { sleep } from "./utils/sleep";
 
 if (!process.env.DATABASE_URL) {
@@ -22,69 +23,76 @@ if (process.argv.includes('--help')) {
     '',
     'Usage:',
     '',
-    'npm run start -- --no-tick-sync      disable all sync methods (full and event short-polling)',
-    'npm run start -- --no-full-sync      disable full sync',
-    'npm run start -- --no-api-server     disable api server',
+    'pnpm run start -- --no-tick-sync      disable event sync tick only (periodic full sync still runs if enabled)',
+    'pnpm run start -- --no-full-sync      disable full sync only (initial + periodic; event tick still runs)',
+    'pnpm run start -- --no-api-server     disable api server',
     '',
     'For configuration look at .env.example file',
   ];
   console.log(help.join('\n'));
-  process.exit(1);
+  process.exit(0);
 }
 
-let NO_FULL_SYNC = process.argv.includes('--no-full-sync');
-let NO_TICK_SYNC = process.argv.includes('--no-tick-sync');
-let NO_API_SERVER = process.argv.includes('--no-api-server');
-
-if (NO_TICK_SYNC) {
-  NO_FULL_SYNC = true;
-}
+const noFullSync = process.argv.includes('--no-full-sync');
+const noTickSync = process.argv.includes('--no-tick-sync');
+const noApiServer = process.argv.includes('--no-api-server');
 
 const main = async () => {
   logger.info("Starting app...");
 
-  // SYNC part
-  let current_tick = 0;
-  const tick_service = await create_update_tick(PISSYKAKA_API);
-  const { tick, update_all } = tick_service;
+  let currentTick = 0;
+  const tickService = await createUpdateTick(pissykakaApi);
+  const { tick, updateAll } = tickService;
 
-  // API part
-  if (!NO_API_SERVER) {
-    const { start_listen } = await create_api_server(
-      API_DEFAULT_LISTEN_PORT,
-      API_DEFAULT_LISTEN_HOST,
-      tick_service,
+  if (!noApiServer) {
+    const { startListen } = await createApiServer(
+      apiDefaultListenPort,
+      apiDefaultListenHost,
+      tickService,
     );
-    start_listen();
+    startListen();
   }
 
-  if (!NO_FULL_SYNC) {
+  let lastFullSyncTime = 0;
+  if (!noFullSync) {
     logger.info('Before first tick we should fetch all!');
-    measure_time("fetch_all", "start");
-    await update_all();
-    logger.info(`Fetch ended with ${measure_time("fetch_all", "end")}ms`);
+    measureTime("fetch_all", "start");
+    await updateAll();
+    lastFullSyncTime = Date.now();
+    logger.info(`Fetch ended with ${measureTime("fetch_all", "end")}ms`);
   } else {
-    logger.info('--no-tick-sync or --no-full-sync flag provided, skip full sync');
+    logger.info('--no-full-sync flag provided, skip full sync');
   }
 
-  if (!NO_TICK_SYNC) {
-    while (true) {
-      try {
-        logger.info(`Start tick #${current_tick}`);
-        measure_time("upd_tick", "start");
+  const fullSyncIntervalMs = fullSyncIntervalSeconds * 1000;
+  if (noTickSync && noFullSync) {
+    logger.info('Both --no-tick-sync and --no-full-sync: only API is active, no sync loop work');
+  }
+  while (true) {
+    try {
+      if (!noTickSync) {
+        logger.info(`Start tick #${currentTick}`);
+        measureTime("upd_tick", "start");
         await tick();
-        const time_taken = measure_time("upd_tick", "end");
-
-        logger.info(`Update tick #${current_tick} completed with ${time_taken}ms`);
-        logger.info(`Sleeping ${DELAY_AFTER_UPDATE_TICK}ms before next tick`);
-        current_tick += 1;
-        await sleep(DELAY_AFTER_UPDATE_TICK);
-      } catch (e) {
-        logger.error(`Error at tick: ${e}`);
+        const timeTaken = measureTime("upd_tick", "end");
+        logger.info(`Update tick #${currentTick} completed with ${timeTaken}ms`);
+        currentTick += 1;
       }
+
+      if (!noFullSync && fullSyncIntervalMs > 0 && Date.now() - lastFullSyncTime >= fullSyncIntervalMs) {
+        logger.info('Running periodic full sync...');
+        measureTime("full_sync", "start");
+        await updateAll();
+        lastFullSyncTime = Date.now();
+        logger.info(`Periodic full sync ended with ${measureTime("full_sync", "end")}ms`);
+      }
+
+      logger.info(`Sleeping ${delayAfterUpdateTick}ms before next cycle`);
+    } catch (e) {
+      logger.error(`Error in sync cycle: ${e}`);
+    } finally {
+      await sleep(delayAfterUpdateTick);
     }
-  } else {
-    logger.info('--no-sync or flag provided, skip sync tick');
   }
 };
 

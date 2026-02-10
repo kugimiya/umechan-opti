@@ -2,5 +2,7 @@
 dist
 node_modules
 .idea
-src/prisma
-prisma/dev.db*
+data/*.db
+data/*.db-*
+package-lock.json
+dev.db

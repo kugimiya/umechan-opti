@@ -1,0 +1,17 @@
+{
+  "name": "umechan-opti-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": ["better-sqlite3"]
+  },
+  "scripts": {
+    "dev": "pnpm --filter @umechan/shared run build && concurrently \"pnpm --filter @umechan/shared run dev\" \"pnpm --filter epds run dev\" \"pnpm --filter umechan-opti run dev\"",
+    "build": "pnpm -r run build",
+    "lint": "pnpm --filter umechan-opti run lint",
+    "test": "pnpm --filter epds run test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

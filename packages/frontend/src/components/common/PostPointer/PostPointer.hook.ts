@@ -1,12 +1,12 @@
 'use client';
 
-import { EpdsPost } from "@/types/epds";
+import { EpdsPost, UnmodFlag } from "@umechan/shared";
 import { MouseEventHandler, useState } from "react";
-import { epds_api } from "@/api/epds";
+import { epdsApi } from "@/api/epds";
 
 const postsStorage: Record<number, EpdsPost> = {};
 
-export const usePostPointer = (postId: number, is_unmod: string) => {
+export const usePostPointer = (postId: number, isUnmod: UnmodFlag) => {
   const [timer, setTimer] = useState<number | null>(null);
   const [post, setPost] = useState<EpdsPost | undefined>(undefined);
   const [isVisible, setVisibility] = useState<boolean>(false);
@@ -24,7 +24,7 @@ export const usePostPointer = (postId: number, is_unmod: string) => {
       return;
     } else {
       setIsLoading(true);
-      epds_api.get_post(postId, is_unmod)
+      epdsApi.getPost(postId, isUnmod)
         .then(({ item: responsePost }) => {
           postsStorage[postId] = responsePost;
           setPost(responsePost);

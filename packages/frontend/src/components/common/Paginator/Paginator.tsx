@@ -7,9 +7,9 @@ import { usePaginator } from "@/components/common/Paginator/Paginator.hook";
 type Props = {
   limit?: number;
   offset?: number;
-  items_count: number;
+  itemsCount: number;
   location: string;
-  is_unmod?: boolean;
+  isUnmod?: boolean;
 }
 
 const MAX_ITEMS = Number(process.env.NEXT_PUBLIC_PAGINATOR_MAX_ITEMS);
@@ -24,15 +24,15 @@ const FunctionalText = (props: { children: string, onClick: () => void }) => {
 };
 
 export const Paginator = memo(function PaginatorInner(props: Props) {
-  const { isShowingAllItems, handleShowAll, paging_items } = usePaginator(props);
-  const content = paging_items.length <= MAX_ITEMS
-    ? <>{paging_items}</>
+  const { isShowingAllItems, handleShowAll, pagingItems } = usePaginator(props);
+  const content = pagingItems.length <= MAX_ITEMS
+    ? <>{pagingItems}</>
     : (
       <>
-        {paging_items.slice(0, MAX_ITEMS)}
+        {pagingItems.slice(0, MAX_ITEMS)}
 
         {isShowingAllItems && <FunctionalText key="hide" onClick={handleShowAll}>[скрыть]</FunctionalText>}
-        {isShowingAllItems && paging_items.slice(MAX_ITEMS)}
+        {isShowingAllItems && pagingItems.slice(MAX_ITEMS)}
 
         {!isShowingAllItems && <FunctionalText key="more" onClick={handleShowAll}>[ещё]</FunctionalText>}
       </>

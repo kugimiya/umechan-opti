@@ -1,26 +1,20 @@
-import { ResponseBoard } from "./ResponseBoardsList";
-
-export type ResponseThreadsList = {
-  count: number;
-  posts: ResponsePost[];
+export type ResponseMedia = {
+  link: string;
+  preview: string;
 };
 
 export type ResponsePost = {
   id: number;
+  board_id: number;
   poster: string;
-  subject: string;
+  is_verify: boolean;
   message: string;
   truncated_message: string;
-  timestamp: string;
+  subject: string;
+  timestamp: number;
+  parent_id: number | null;
   updated_at: number;
-  datetime: string;
-  board: ResponseBoard;
-  board_id: number;
-  parent_id: null | number;
-  estimate: number;
   replies: ResponsePost[];
-  replies_count: number;
-  is_verify: boolean;
   media?: {
     images?: ResponseMedia[];
     youtubes?: ResponseMedia[];
@@ -28,7 +22,6 @@ export type ResponsePost = {
   };
 };
 
-export type ResponseMedia = {
-  link: string;
-  preview: string;
+export type ResponseThreadsList = {
+  posts: ResponsePost[];
 };

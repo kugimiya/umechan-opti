@@ -1,11 +1,11 @@
-import type { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server';
 
 const requests = {
   static: 0,
   pages: 0,
-}
+};
 
-export async function proxy(request: NextRequest) {  
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/metrics')) {

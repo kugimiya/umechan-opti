@@ -1,5 +1,9 @@
+const toString = (v: unknown): string =>
+  v instanceof Error ? v.message : String(v);
+
 export const logger = {
   info: (text: string) => console.log(`INFO: ${text}`),
-  error: (text: string) => console.error(`ERRR: ${text}`),
+  error: (err: unknown) => console.error(`ERR: ${toString(err)}`),
+  warn: (text: string) => console.warn(`WRN: ${text}`),
   debug: (text: string) => console.warn(`DBUG: ${text}`),
 };

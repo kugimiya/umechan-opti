@@ -205,4 +205,3 @@ export class InitialMigration1700000000000 implements MigrationInterface {
     await queryRunner.dropTable("Board");
   }
 }
-

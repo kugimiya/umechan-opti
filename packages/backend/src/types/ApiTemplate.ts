@@ -1,5 +1,3 @@
-export type ApiTemplate<T = undefined> = {
+export type ApiTemplate<T> = {
   payload: T;
-  version: string;
-  error: unknown;
 };

@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { EpdsPost } from "@/types/epds";
+import { EpdsPost } from "@umechan/shared";
 import { Card } from "@/components/layout/Card/Card";
 import { PostMDContent } from "@/components/common/PostMDContent/PostMDContent";
 import { formatDateTime } from "@/types/formatDateTime";
@@ -11,39 +11,39 @@ import { PostMedia } from "../PostMedia/PostMedia";
 
 type Props = {
   post: EpdsPost;
-  is_op_post?: boolean;
-  is_at_thread_list?: boolean;
-  is_at_feed?: boolean;
-  is_unmod?: boolean;
-  disable_modal?: boolean;
+  isOpPost?: boolean;
+  isAtThreadList?: boolean;
+  isAtFeed?: boolean;
+  isUnmod?: "true" | "false";
+  disableModal?: boolean;
 };
 
 export const PostProto = memo(function PostProtoInner(props: Props) {
-  const { post, is_op_post = false, is_at_thread_list = false, is_at_feed = false } = props;
+  const { post, isOpPost = false, isAtThreadList = false, isAtFeed = false } = props;
 
-  const in_thread = is_at_thread_list
-    ? <Link href={props.is_unmod ? `/board/${post.board.tag}/${post.id}?unmod=true` : `/board/${post.board.tag}/${post.id}`}>В тред</Link>
+  const inThread = isAtThreadList
+    ? <Link href={props.isUnmod ? `/board/${post.board.tag}/${post.id}?unmod=true` : `/board/${post.board.tag}/${post.id}`}>В тред</Link>
     : null;
 
-  const post_id = <QuickReplyLink post={post} is_at_thread />;
+  const postIdLink = <QuickReplyLink post={post} isAtThread />;
 
   const content = (
     <>
-      <p>{post.posterVerified ? '🔰' : '⭕️'} {post.poster} <b>{post.subject}</b> {formatDateTime(post.timestamp)} {is_at_feed && post.board.tag} {post_id} {in_thread}</p>
+      <p>{post.posterVerified ? '🔰' : '⭕️'} {post.poster} <b>{post.subject}</b> {formatDateTime(post.timestamp)} {isAtFeed && post.board.tag} {postIdLink} {inThread}</p>
 
       <Box gap={8} flexWrap="wrap">
         {post.media?.map((item) => (
-          <PostMedia key={item.urlPreview} media_item={item} disable_modal={props.disable_modal} />
+          <PostMedia key={item.urlPreview} mediaItem={item} disableModal={props.disableModal} />
         ))}
       </Box>
 
-      <PostMDContent message={post.message} is_unmod={props.is_unmod ? 'true' : 'false'} />
+      <PostMDContent message={post.message} isUnmod={props.isUnmod ?? "false"} />
 
-      <PostReplies id={post.id} is_unmod={props.is_unmod ? 'true' : 'false'} />
+      <PostReplies id={post.id} isUnmod={props.isUnmod ?? "false"} />
     </>
   );
 
-  if (is_op_post) {
+  if (isOpPost) {
     return (
       <Box flexDirection='column' alignItems="flex-start" gap='var(--post-content-gap)' style={{ maxWidth: '100%' }}>
         {content}

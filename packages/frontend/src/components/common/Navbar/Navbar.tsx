@@ -1,4 +1,4 @@
-import { LinkItem } from "@/types/utils";
+import { LinkItem } from "@umechan/shared";
 import { Card } from "@/components/layout/Card/Card";
 import Link from "next/link";
 import { Box } from "@/components/layout/Box/Box";
@@ -11,12 +11,12 @@ type Props = {
 }
 
 export const Navbar = (props: Props) => {
-  const section_entries = Object.entries(props.items);
+  const sectionEntries = Object.entries(props.items);
 
-  const sections = section_entries.map(([section_title, section_items]) => (
-    <Card key={section_title} title={section_title}>
+  const sections = sectionEntries.map(([sectionTitle, sectionItems]) => (
+    <Card key={sectionTitle} title={sectionTitle}>
       <Box flexDirection='column' as='nav'>
-        {section_items.map((item: LinkItem) => (
+        {sectionItems.map((item: LinkItem) => (
           <Link key={item.url} href={item.url} title={item.hint} target={item.target}>{item.title}</Link>
         ))}
       </Box>

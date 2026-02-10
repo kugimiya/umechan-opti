@@ -1,10 +1,10 @@
 'use client';
 
-import { modalPostFormContext } from "@/utils/contexts/modal_post_form";
+import { modalPostFormContext } from "@/utils/contexts/modalPostForm";
 import { useContext } from "react";
 
 type Props = {
-  board_tag: string;
+  boardTag: string;
 }
 
 export const CreateThread = (props: Props) => {
@@ -17,8 +17,8 @@ export const CreateThread = (props: Props) => {
         isOpen: true,
         message: ``,
         target: 'board',
-        target_id: null,
-        target_tag: props.board_tag,
+        targetId: null,
+        targetTag: props.boardTag,
       });
     }
   };
@@ -28,7 +28,7 @@ export const CreateThread = (props: Props) => {
       style={{ cursor: "pointer", textDecoration: "underline" }}
       onClick={handleCreateThread}
     >
-      Создать тред в /{props.board_tag}
+      Создать тред в /{props.boardTag}
     </span>
   );
 }

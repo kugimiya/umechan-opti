@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const filestore_request = axios.create({
+const filestoreRequest = axios.create({
   baseURL: String(process.env.NEXT_PUBLIC_PISSYKAKA_API).replace('/api', ''),
 })
 
-const pissykaka_request = axios.create({
+const pissykakaRequest = axios.create({
   baseURL: process.env.NEXT_PUBLIC_PISSYKAKA_API,
 });
 
@@ -13,9 +13,7 @@ export type PissykakaCreatePostPayload = {
   subject?: string;
   message: string;
   sage?: string;
-  // post in thread
-  parent_id?: number;
-  // post in board
+  parentId?: number;
   tag?: string;
 };
 
@@ -26,31 +24,39 @@ export type PissykakaCreatePostResponse = {
   };
 };
 
-export const pissykaka_api = {
-  upload_image: async (image: File) => {
+export const pissykakaApi = {
+  uploadImage: async (image: File) => {
     const form = new FormData();
     form.append('image', image);
 
-    const post_response = await filestore_request
+    const postResponse = await filestoreRequest
       .post<{ original_file: string; thumbnail_file: string }>('/filestore', form)
       .then((result) => {
-        const original_url = result.data.original_file;
-        const thumb_url = result.data.thumbnail_file;
-        const markedImage = `[![](${thumb_url})](${original_url})`;
+        const originalUrl = result.data.original_file;
+        const thumbUrl = result.data.thumbnail_file;
+        const markedImage = `[![](${thumbUrl})](${originalUrl})`;
 
         return markedImage;
       });
 
-    return post_response;
+    return postResponse;
   },
-  send_post: async (post: PissykakaCreatePostPayload) => {
-    const method = post.parent_id !== undefined ? pissykaka_request.put : pissykaka_request.post;
-    const url = post.parent_id !== undefined ? `/v2/post/${post.parent_id}` : '/v2/post';
-    const post_response = await method<PissykakaCreatePostResponse>(
+  sendPost: async (post: PissykakaCreatePostPayload) => {
+    const method = post.parentId !== undefined ? pissykakaRequest.put : pissykakaRequest.post;
+    const url = post.parentId !== undefined ? `/v2/post/${post.parentId}` : '/v2/post';
+    const body = {
+      message: post.message,
+      poster: post.poster,
+      subject: post.subject,
+      sage: post.sage,
+      parent_id: post.parentId,
+      tag: post.tag,
+    };
+    const postResponse = await method<PissykakaCreatePostResponse>(
       url,
-      post,
+      body,
       { validateStatus: status => status >= 200 && status < 300 }
     );
-    return post_response.data as PissykakaCreatePostResponse;
+    return postResponse.data as PissykakaCreatePostResponse;
   }
 };

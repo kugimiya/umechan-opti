@@ -1,19 +1,14 @@
-export type ResponseEventsList = {
-  count: number;
-  events: ResponseEvent[];
-};
-
 export enum ResponseEventType {
-  PostCreated = 'PostCreated',
-  PostDeleted = 'PostDeleted',
-  BoardUpdateTriggered = 'BoardUpdateTriggered',
-  ThreadUpdateTriggered = 'ThreadUpdateTriggered',
-};
+  ThreadUpdateTriggered = "thread_update_triggered",
+  PostCreated = "post_created",
+}
 
 export type ResponseEvent = {
-  id: number;
-  event_type: ResponseEventType;
   timestamp: number;
-  post_id: number | null;
-  board_id: number | null;
+  event_type: ResponseEventType;
+  post_id?: number;
+};
+
+export type ResponseEventsList = {
+  events: ResponseEvent[];
 };

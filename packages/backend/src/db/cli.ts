@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import "reflect-metadata";
-import { AppDataSource } from "./data-source";
-import { runMigrations } from "./run-migrations";
+import { AppDataSource } from "./dataSource";
+import { runMigrations } from "./runMigrations";
 
 const command = process.argv[2];
 

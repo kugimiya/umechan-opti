@@ -1,21 +1,21 @@
 'use server';
 
-import { epds_api } from "@/api/epds";
-import { enrich_navbar } from "@/utils/enrichers/enrich_navbar";
+import { UnmodFlag } from "@umechan/shared";
+import { epdsApi } from "@/api/epds";
+import { enrichNavbar } from "@/utils/enrichers/enrichNavbar";
 import { Box } from "../Box/Box";
 import { Navbar } from "@/components/common/Navbar/Navbar";
 import { ModalPostForm } from "@/components/common/ModalPostForm/ModalPostForm";
 import styles from './Layout.module.css';
 
-export const Layout = async (props: Readonly<{ children: React.ReactNode; unmod: 'true' | 'false' }>) => {
+export const Layout = async (props: Readonly<{ children: React.ReactNode; unmod: UnmodFlag }>) => {
   const { children, unmod } = props;
-  // todo: can we move it out from layout?
-  const boards = await epds_api.boards_list(unmod);
-  const navbar_items = enrich_navbar(boards.items, unmod);
+  const boards = await epdsApi.boardsList(unmod);
+  const navbarItems = enrichNavbar(boards.items, unmod);
 
   return (
     <>
-      <Navbar className={styles.navbar} items={navbar_items} />
+      <Navbar className={styles.navbar} items={navbarItems} />
 
       <Box className={styles.main} as='main'>
         {children}

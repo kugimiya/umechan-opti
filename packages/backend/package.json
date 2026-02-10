@@ -10,21 +10,27 @@
     "start:no-full-sync": "tsc && node --env-file=.env dist/index.js --no-full-sync",
     "test": "tsc && node --env-file=.env --test dist",
     "migrate": "tsc && node --env-file=.env dist/db/cli.js migrate",
-    "migration:generate": "tsc && typeorm-ts-node-commonjs migration:generate -d dist/db/data-source.js",
-    "migration:create": "typeorm-ts-node-commonjs migration:create"
+    "migration:generate": "tsc && typeorm-ts-node-commonjs migration:generate -d dist/db/dataSource.js",
+    "migration:create": "typeorm-ts-node-commonjs migration:create",
+    "build:watch": "tsc --watch",
+    "dev": "pnpm run build && concurrently \"pnpm run build:watch\" \"nodemon --watch dist --watch ../shared/dist -e js,json --delay 2 --exec 'node --env-file=.env dist/index.js --no-tick-sync'\""
   },
   "keywords": [],
   "author": "kugichka",
   "license": "WTFPL",
   "description": "experimental pissykaka database syncer",
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "nodemon": "^3.1.0"
+  },
   "dependencies": {
+    "@umechan/shared": "workspace:*",
     "@fastify/cors": "^11.2.0",
-    "@prisma/client": "^7.2.0",
-    "@types/node": "^25.0.3",
-    "axios": "^1.13.2",
-    "fastify": "^5.6.2",
+    "@types/node": "^25.2.3",
+    "axios": "^1.13.5",
+    "fastify": "^5.7.4",
     "reflect-metadata": "^0.2.2",
-    "sqlite3": "^5.1.7",
+    "better-sqlite3": "^11.6.0",
     "typeorm": "^0.3.28",
     "typescript": "^5.9.3"
   }

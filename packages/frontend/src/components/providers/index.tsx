@@ -4,9 +4,9 @@ import {
   modalPostFormContext,
   modalPostFormContextDefaultValue,
   ModalPostFormContextType
-} from "@/utils/contexts/modal_post_form";
-import { ImagesMap, imagesOnPageContext } from "@/utils/contexts/images_on_page";
-import { ReplyMap, threadReplyMapContext } from "@/utils/contexts/thread_reply_map";
+} from "@/utils/contexts/modalPostForm";
+import { ImagesMap, imagesOnPageContext } from "@/utils/contexts/imagesOnPage";
+import { ReplyMap, threadReplyMapContext } from "@/utils/contexts/threadReplyMap";
 import { PropsWithChildren, useState } from "react";
 
 export const AppProviders = (props: PropsWithChildren<{}>) => {
@@ -19,17 +19,17 @@ export const AppProviders = (props: PropsWithChildren<{}>) => {
   );
 };
 
-export const ThreadReplyMapWrapper = (props: PropsWithChildren<{ reply_map: ReplyMap }>) => {
+export const ThreadReplyMapWrapper = (props: PropsWithChildren<{ replyMap: ReplyMap }>) => {
   return (
-    <threadReplyMapContext.Provider value={{ reply_map: props.reply_map }}>
+    <threadReplyMapContext.Provider value={{ replyMap: props.replyMap }}>
       {props.children}
     </threadReplyMapContext.Provider>
   );
 };
 
-export const ImagesOnPageWrapper = (props: PropsWithChildren<{ images_map: ImagesMap }>) => {
+export const ImagesOnPageWrapper = (props: PropsWithChildren<{ imagesMap: ImagesMap }>) => {
   return (
-    <imagesOnPageContext.Provider value={{ images_map: props.images_map }}>
+    <imagesOnPageContext.Provider value={{ imagesMap: props.imagesMap }}>
       {props.children}
     </imagesOnPageContext.Provider>
   );

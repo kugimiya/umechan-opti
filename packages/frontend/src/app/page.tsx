@@ -1,7 +1,7 @@
 import { Box } from "@/components/layout/Box/Box";
 import { Card } from "@/components/layout/Card/Card";
 import { Layout } from "@/components/layout/Layout/Layout";
-import { WithPagination } from '@/types/utils';
+import { WithPagination } from "@umechan/shared";
 
 type Props = WithPagination & {};
 

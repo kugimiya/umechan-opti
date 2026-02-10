@@ -3,41 +3,52 @@ import {
   EpdsResponseBoard,
   EpdsResponseBoards,
   EpdsResponseBoardThreads,
-  EpdsResponseFeed, EpdsResponsePostById,
-  EpdsResponseThread
-} from "@/types/epds";
+  EpdsResponseFeed,
+  EpdsResponsePostById,
+  EpdsResponseThread,
+  UnmodFlag,
+} from "@umechan/shared";
 
-const epds_request = axios.create({
+const epdsRequest = axios.create({
   baseURL: process.env.NEXT_PUBLIC_EPDS_API,
 });
 
-export const epds_api = {
-  board: async (board_tag: string, unmod = 'false') => {
-    const { data } = await epds_request.get<EpdsResponseBoard>(`/v2/board/${board_tag}`, { params: { unmod } });
+export const epdsApi = {
+  board: async (boardTag: string, unmod: UnmodFlag = "false") => {
+    const { data } = await epdsRequest.get<EpdsResponseBoard>(`/v2/board/${boardTag}`, { params: { unmod } });
     return data;
   },
-  boards_list: async (unmod = 'false') => {
-    const { data } = await epds_request.get<EpdsResponseBoards>('/v2/boards', { params: { unmod } });
+  boardsList: async (unmod: UnmodFlag = "false") => {
+    const { data } = await epdsRequest.get<EpdsResponseBoards>('/v2/boards', { params: { unmod } });
     return data;
   },
-  threads_list: async (board_tag: string, offset = 0, limit = Number(process.env.NEXT_PUBLIC_DEFAULT_LIMIT), unmod = 'false') => {
-    const { data } = await epds_request.get<EpdsResponseBoardThreads>(`/v2/board/${board_tag}/threads`, { params: { offset, limit, unmod } });
+  threadsList: async (
+    boardTag: string,
+    offset = 0,
+    limit = Number(process.env.NEXT_PUBLIC_DEFAULT_LIMIT),
+    unmod: UnmodFlag = "false",
+  ) => {
+    const { data } = await epdsRequest.get<EpdsResponseBoardThreads>(`/v2/board/${boardTag}/threads`, { params: { offset, limit, unmod } });
     return data;
   },
-  thread_with_replies: async (thread_id: number, unmod = 'false') => {
-    const { data } = await epds_request.get<EpdsResponseThread>(`/v2/thread/${thread_id}`, { params: { unmod } });
+  threadWithReplies: async (threadId: number, unmod: UnmodFlag = "false") => {
+    const { data } = await epdsRequest.get<EpdsResponseThread>(`/v2/thread/${threadId}`, { params: { unmod } });
     return data;
   },
-  feed: async (offset = 0, limit = Number(process.env.NEXT_PUBLIC_DEFAULT_LIMIT), unmod = 'false') => {
-    const { data } = await epds_request.get<EpdsResponseFeed>(`/v2/feed`, { params: { offset, limit, unmod } });
+  feed: async (
+    offset = 0,
+    limit = Number(process.env.NEXT_PUBLIC_DEFAULT_LIMIT),
+    unmod: UnmodFlag = "false",
+  ) => {
+    const { data } = await epdsRequest.get<EpdsResponseFeed>(`/v2/feed`, { params: { offset, limit, unmod } });
     return data;
   },
-  get_post: async (post_id: number, unmod = 'false') => {
-    const { data } = await epds_request.get<EpdsResponsePostById>(`/v2/post/${post_id}`, { params: { unmod } });
+  getPost: async (postId: number, unmod: UnmodFlag = "false") => {
+    const { data } = await epdsRequest.get<EpdsResponsePostById>(`/v2/post/${postId}`, { params: { unmod } });
     return data;
   },
-  force_sync: async (thread_id: number) => {
-    const { data } = await epds_request.post<EpdsResponsePostById>(`/v2/util/force_sync`, { thread_id });
+  forceSync: async (threadId: number) => {
+    const { data } = await epdsRequest.post<EpdsResponsePostById>(`/v2/util/force_sync`, { thread_id: threadId });
     return data;
   }
 };

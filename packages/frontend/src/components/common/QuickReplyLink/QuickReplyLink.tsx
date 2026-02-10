@@ -1,15 +1,15 @@
 'use client';
 
-import { EpdsPost } from "@/types/epds";
+import { EpdsPost } from "@umechan/shared";
 import styles from './styles.module.css';
-import { modalPostFormContext } from "@/utils/contexts/modal_post_form";
+import { modalPostFormContext } from "@/utils/contexts/modalPostForm";
 import { useContext } from "react";
 
 type Props = {
   post: EpdsPost;
-  is_at_thread?: boolean;
-  is_at_board?: boolean;
-  board_tag?: string;
+  isAtThread?: boolean;
+  isAtBoard?: boolean;
+  boardTag?: string;
 }
 
 export const QuickReplyLink = (props: Props) => {
@@ -22,9 +22,9 @@ export const QuickReplyLink = (props: Props) => {
         ...modalState,
         isOpen: true,
         message: `>>${props.post.id}\n\n`,
-        target: props.is_at_thread ? 'thread' : props.is_at_board ? 'board' : null,
-        target_id: props.is_at_thread ? Number(props.post.parentId) || Number(props.post.id) : null,
-        target_tag: props.is_at_board ? String(props.board_tag) : null,
+        target: props.isAtThread ? 'thread' : props.isAtBoard ? 'board' : null,
+        targetId: props.isAtThread ? Number(props.post.parentId) || Number(props.post.id) : null,
+        targetTag: props.isAtBoard ? String(props.boardTag) : null,
       });
     }
   };

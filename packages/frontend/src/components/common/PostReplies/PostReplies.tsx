@@ -1,29 +1,30 @@
 'use client';
 
 import { Box } from "@/components/layout/Box/Box";
-import { threadReplyMapContext } from "@/utils/contexts/thread_reply_map";
+import { threadReplyMapContext } from "@/utils/contexts/threadReplyMap";
 import { useContext } from "react";
 import { PostPointer } from "../PostPointer/PostPointer";
+import { UnmodFlag } from "@umechan/shared";
 
 type Props = {
   id: number;
-  is_unmod: string;
-}
+  isUnmod: UnmodFlag;
+};
 
 export const PostReplies = (props: Props) => {
-  const { reply_map } = useContext(threadReplyMapContext);
-  const replies_list = reply_map[props.id];
+  const { replyMap } = useContext(threadReplyMapContext);
+  const repliesList = replyMap[props.id];
 
-  if (!(replies_list || []).length) {
+  if (!(repliesList || []).length) {
     return null;
   }
 
   return (
     <Box gap={8} style={{ flexWrap: "wrap" }}>
       <span><i>Ответы: </i></span>
-      {replies_list.map((reply_id) => (
-        <PostPointer key={reply_id} postId={reply_id} is_unmod={"true"}>
-          <span style={{ fontSize: 12, fontWeight: 600 }}><i><b>{`>>${reply_id}`}</b></i></span>
+      {repliesList.map((replyId) => (
+        <PostPointer key={replyId} postId={replyId} isUnmod={props.isUnmod}>
+          <span style={{ fontSize: 12, fontWeight: 600 }}><i><b>{`>>${replyId}`}</b></i></span>
         </PostPointer>
       ))}
     </Box>
