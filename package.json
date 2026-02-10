@@ -3,7 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "pnpm": {
-    "onlyBuiltDependencies": ["better-sqlite3"]
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "sharp",
+      "sqlite3",
+      "unrs-resolver"
+    ]
   },
   "scripts": {
     "dev": "pnpm --filter @umechan/shared run build && concurrently \"pnpm --filter @umechan/shared run dev\" \"pnpm --filter epds run dev\" \"pnpm --filter umechan-opti run dev\"",
