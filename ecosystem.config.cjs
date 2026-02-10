@@ -23,7 +23,7 @@ module.exports = {
       script: 'sh',
       args: [
         '-c',
-        'pnpm --filter @umechan/shared run build && pnpm --filter epds run build && pnpm --filter epds run migrate && cd packages/backend && node --env-file=.env dist/index.js',
+        'pnpm --filter @umechan/shared run build && pnpm --filter epds run build && pnpm --filter epds run migrate && cd packages/backend && node --env-file=.env dist/index.js --no-tick-sync',
       ],
       autorestart: true,
       watch: false,
