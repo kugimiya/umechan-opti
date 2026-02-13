@@ -40,6 +40,15 @@ export type PostId = string; // format ^[0-9]{12}$
 export type PostPayload = {
   id: PostId;
   legacyId?: number;
+  poster?: string;
+  posterVerified?: boolean;
+  subject?: string;
+  message?: string;
+  messageTruncated?: string;
+  timestamp?: number;
+  updatedAt?: number;
+  boardId?: number | null;
+  parentId?: number | null;
 };
 
 export type CreateReplyOnThread = {
