@@ -40,7 +40,7 @@ export async function handleBoardsMessage(
   db: DbConnection
 ): Promise<void> {
   const event = payload as ChanBoardsEvent;
-  const value = event?.value;
+  const value = event?.eventName;
   if (!value) return;
   try {
     switch (value) {
@@ -87,7 +87,7 @@ export async function handlePostsMessage(
   db: DbConnection
 ): Promise<void> {
   const event = payload as ChanPostsEvent;
-  const value = event?.value;
+  const value = event?.eventName;
   if (!value) return;
   try {
     switch (value) {
@@ -146,7 +146,7 @@ export async function handleFilesMessage(
   db: DbConnection
 ): Promise<void> {
   const event = payload as ChanFilesEvent;
-  const value = event?.value;
+  const value = event?.eventName;
   if (!value) return;
   try {
     switch (value) {
@@ -186,7 +186,7 @@ export async function handlePassportsMessage(
   db: DbConnection
 ): Promise<void> {
   const event = payload as ChanPassportsEvent;
-  const value = event?.value;
+  const value = event?.eventName;
   if (!value) return;
   try {
     switch (value) {
