@@ -13,6 +13,9 @@ export class Board {
   @Column({ type: "text" })
   name!: string;
 
+  @Column({ type: "integer", nullable: true })
+  legal!: boolean | null;
+
   @OneToMany(() => Post, (post: Post) => post.board)
   posts!: Post[];
 }

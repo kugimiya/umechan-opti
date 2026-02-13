@@ -31,10 +31,13 @@ export class Post {
 
   @ManyToOne(() => Board, (board: Board) => board.posts)
   @JoinColumn({ name: "boardId" })
-  board!: Board;
+  board!: Board | null;
 
-  @Column({ type: "bigint", transformer: bigintTransformer })
-  boardId!: number;
+  @Column({ nullable: true, type: "bigint", transformer: bigintTransformer })
+  boardId!: number | null;
+
+  @Column({ type: "integer", nullable: true })
+  legacyId!: number | null;
 
   @OneToMany(() => Media, (media: Media) => media.post)
   media!: Media[];

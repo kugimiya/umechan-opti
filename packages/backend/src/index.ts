@@ -1,11 +1,14 @@
 import "reflect-metadata";
 import { createApiServer } from "./api";
+import { createKafkaConsumer } from "./kafka";
 import { createUpdateTick } from "./sync";
+import { createDbConnection } from "./db/connection";
 import {
   apiDefaultListenHost,
   apiDefaultListenPort,
   delayAfterUpdateTick,
   fullSyncIntervalSeconds,
+  kafkaBootstrapServers,
   pissykakaApi
 } from "./utils/config";
 import { logger } from "./utils/logger";
@@ -26,6 +29,7 @@ if (process.argv.includes('--help')) {
     'pnpm run start -- --no-tick-sync      disable event sync tick only (periodic full sync still runs if enabled)',
     'pnpm run start -- --no-full-sync      disable full sync only (initial + periodic; event tick still runs)',
     'pnpm run start -- --no-api-server     disable api server',
+    'pnpm run start -- --no-kafka-consumer disable Kafka consumer (raspredach topics)',
     '',
     'For configuration look at .env.example file',
   ];
@@ -36,9 +40,25 @@ if (process.argv.includes('--help')) {
 const noFullSync = process.argv.includes('--no-full-sync');
 const noTickSync = process.argv.includes('--no-tick-sync');
 const noApiServer = process.argv.includes('--no-api-server');
+const noKafkaConsumer = process.argv.includes('--no-kafka-consumer');
 
 const main = async () => {
   logger.info("Starting app...");
+
+  if (!noKafkaConsumer && kafkaBootstrapServers) {
+    try {
+      const db = await createDbConnection();
+      const kafkaConsumer = await createKafkaConsumer(db);
+      kafkaConsumer.run().catch((e) => {
+        logger.error(`[Kafka] Consumer error: ${e}`);
+      });
+      logger.info("[Kafka] Consumer started in background");
+    } catch (e) {
+      logger.error(`[Kafka] Failed to start consumer: ${e}`);
+    }
+  } else if (!noKafkaConsumer && !kafkaBootstrapServers) {
+    logger.info("[Kafka] KAFKA_BOOTSTRAP_SERVERS not set, skipping consumer");
+  }
 
   let currentTick = 0;
   const tickService = await createUpdateTick(pissykakaApi);
