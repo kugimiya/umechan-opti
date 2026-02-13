@@ -1,5 +1,5 @@
 const toString = (v: unknown): string =>
-  v instanceof Error ? v.message : String(v);
+  v instanceof Error ? [v.name, v.message, v.stack, v.cause].join('\n') : String(v);
 
 export const logger = {
   info: (text: string) => console.log(`INFO: ${text}`),

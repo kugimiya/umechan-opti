@@ -9,8 +9,13 @@ export const bindUtilRoutes = (fastify: FastifyInstance, tickService: CreateUpda
   };
 
   fastify.post('/api/v2/util/force_sync', async (_request, reply) => {
-    await tickService.tick();
-    reply.send({ ok: true });
+    try {
+      await tickService.tick();
+    } catch (err) {
+      logger.error(err);
+    } finally {
+      reply.send({ ok: true });
+    }
   });
 
   fastify.get('/api/v2/util/la', async (_req, reply) => {
