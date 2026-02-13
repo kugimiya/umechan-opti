@@ -42,9 +42,9 @@ export type PostPayload = {
   legacyId?: number;
 };
 
-export type EventPostCreate = {
+export type CreateReplyOnThread = {
   eventName: string;
-  value: "EventPostCreate";
+  value: "CreateReplyOnThread";
   nodeSign: string;
   postData: PostPayload;
 };
@@ -73,7 +73,7 @@ export type EventPostBoardMigration = {
 };
 
 export type ChanPostsEvent =
-  | EventPostCreate
+  | CreateReplyOnThread
   | EventPostDelete
   | EventPostModify
   | EventPostBoardMigration;

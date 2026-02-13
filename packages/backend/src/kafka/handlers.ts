@@ -8,7 +8,7 @@ import type {
   EventBoardCreate,
   EventBoardDelete,
   EventBoardModify,
-  EventPostCreate,
+  CreateReplyOnThread,
   EventPostDelete,
   EventPostModify,
   EventPostBoardMigration,
@@ -91,8 +91,8 @@ export async function handlePostsMessage(
   if (!value) return;
   try {
     switch (value) {
-      case "EventPostCreate": {
-        const { postData } = event as EventPostCreate;
+      case "CreateReplyOnThread": {
+        const { postData } = event as CreateReplyOnThread;
         if (postData?.id != null) {
           const id = postIdToNumber(postData.id);
           await db.posts.upsertFromKafka(id, {
