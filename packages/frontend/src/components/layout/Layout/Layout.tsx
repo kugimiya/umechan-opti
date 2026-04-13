@@ -8,14 +8,14 @@ import { Navbar } from "@/components/common/Navbar/Navbar";
 import { ModalPostForm } from "@/components/common/ModalPostForm/ModalPostForm";
 import styles from './Layout.module.css';
 
-export const Layout = async (props: Readonly<{ children: React.ReactNode; unmod: UnmodFlag }>) => {
-  const { children, unmod } = props;
+export const Layout = async (props: Readonly<{ children: React.ReactNode; unmod: UnmodFlag; hideNavbar?: boolean }>) => {
+  const { children, unmod, hideNavbar = false } = props;
   const boards = await epdsApi.boardsList(unmod);
   const navbarItems = enrichNavbar(boards.items, unmod);
 
   return (
     <>
-      <Navbar className={styles.navbar} items={navbarItems} />
+      {!hideNavbar ? <Navbar className={styles.navbar} items={navbarItems} /> : null}
 
       <Box className={styles.main} as='main'>
         {children}

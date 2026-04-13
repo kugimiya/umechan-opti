@@ -11,6 +11,7 @@ export const enrichNavbar = (boards: EpdsBoard[], unmod: UnmodFlag) => {
 
   const navItems: LinkItem[] = [
     { title: 'Главная', url: unmod === 'true' ? '/feed?unmod=true' : '/feed' },
+    { title: 'Chat UI', url: unmod === 'true' ? '/chat?unmod=true' : '/chat' },
   ];
 
   if (IS_MODERKA_ENABLED) {

@@ -1,0 +1,9 @@
+.git
+.cursor
+**/node_modules
+**/.next
+**/dist
+**/.turbo
+**/.DS_Store
+infra/monorepo-docker/.env
+infra/kafka-ui/.env

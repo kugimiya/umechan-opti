@@ -13,7 +13,10 @@ export const createApiServer = async (
 ) => {
   const db = await createDbConnection();
   const fastify = createFastify();
-  fastify.register(fastifyCors);
+  fastify.register(fastifyCors, {
+    origin: true,
+    credentials: true,
+  });
 
   fastify.setErrorHandler((error: unknown, request, reply) => {
     logger.error(error);
