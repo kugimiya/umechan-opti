@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { ApiTemplate } from "../types/apiTemplate";
 import type { ResponseBoardsList } from "../types/responseBoardsList";
-import type { ResponseThreadsList } from "../types/responseThreadsList";
+import type { ResponsePost, ResponseThreadsList } from "../types/responseThreadsList";
 import type { ResponseThreadPostsList } from "../types/responseThreadPostsList";
 import type { ResponseEventsList } from "../types/responseEventsList";
 import { fetchEntitiesFromApiBaseLimit } from "../utils/config";
@@ -25,10 +25,27 @@ export const createRestSource = (params: CreateRestSourceParams): SyncSource => 
     },
 
     getThreadsList: async ({ tag }) => {
-      const response = await request.get<ApiTemplate<ResponseThreadsList>>(`/v2/board/${tag}`, {
-        params: { limit: fetchEntitiesFromApiBaseLimit },
-      });
-      return response.data.payload.posts;
+      let list: ResponsePost[] = [];
+      let isListComplete = false;
+      let iter = 0;
+
+      while (!isListComplete) {
+        const response = await request.get<ApiTemplate<ResponseThreadsList>>(`/v2/board/${tag}`, {
+          params: {
+            offset: iter * fetchEntitiesFromApiBaseLimit,
+            limit: fetchEntitiesFromApiBaseLimit,
+            no_board_list: "true",
+          },
+        });
+
+        const posts = response.data.payload?.posts || [];
+        list = [...list, ...posts];
+
+        iter++;
+        isListComplete = posts.length === 0 || iter > 1000;
+      }
+
+      return list;
     },
 
     getThreadPostsList: async ({ threadId }) => {

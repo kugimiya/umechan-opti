@@ -41,3 +41,36 @@ export const parallelExecutor = async <K, T>(
 
   return promise;
 };
+
+/**
+ * Runs `fn` for each item with at most `parallelTasks` concurrent executions.
+ * Does not collect results — suitable for streaming / immediate side effects.
+ */
+export const parallelForEach = async <T>(
+  dataArray: T[],
+  parallelTasks: number,
+  fn: (item: T) => Promise<void>,
+): Promise<void> => {
+  if (dataArray.length === 0) {
+    return;
+  }
+
+  const workers = Math.min(parallelTasks, dataArray.length);
+  let nextIndex = 0;
+
+  const worker = async () => {
+    while (true) {
+      const i = nextIndex++;
+      if (i >= dataArray.length) {
+        return;
+      }
+      try {
+        await fn(dataArray[i]);
+      } catch (e) {
+        logger.error((e as Error).message);
+      }
+    }
+  };
+
+  await Promise.all(Array.from({ length: workers }, () => worker()));
+};

@@ -1,4 +1,4 @@
-import { FastifyInstance } from "fastify";
+import { FastifyInstance, FastifyRequest } from "fastify";
 import type { CreateUpdateTickReturn } from "../../sync";
 import { logger } from "../../utils/logger";
 import os from "node:os";
@@ -8,9 +8,22 @@ export const bindUtilRoutes = (fastify: FastifyInstance, tickService: CreateUpda
     requests: 0,
   };
 
-  fastify.post('/api/v2/util/force_sync', async (_request, reply) => {
+  type ForceSyncBody = { thread_id?: number | string };
+
+  fastify.post('/api/v2/util/force_sync', async (request: FastifyRequest<{ Body: ForceSyncBody }>, reply) => {
+    const raw = request.body?.thread_id;
+    const threadId =
+      raw === undefined || raw === null || raw === ""
+        ? NaN
+        : typeof raw === "string"
+          ? Number(raw.trim())
+          : Number(raw);
     try {
-      await tickService.tick();
+      if (Number.isFinite(threadId) && threadId > 0) {
+        await tickService.updatePartial(threadId);
+      } else {
+        // await tickService.tick();
+      }
     } catch (err) {
       logger.error(err);
     } finally {

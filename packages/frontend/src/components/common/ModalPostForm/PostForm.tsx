@@ -99,10 +99,12 @@ export const PostForm = () => {
       pushToLog(`error while sending post: ${(error as Error).message}`);
     } finally {
       pushToLog('posting done... awaiting changes!');
-      try {
-        await epdsApi.forceSync(Number(modalState.targetId));
-      } catch (error) {
-        pushToLog(`error while fetching changes: ${(error as Error).message}`);
+      if (modalState.target === "thread" && modalState.targetId != null) {
+        try {
+          await epdsApi.forceSync(modalState.targetId);
+        } catch (error) {
+          pushToLog(`error while fetching changes: ${(error as Error).message}`);
+        }
       }
 
       pushToLog('triggering page reload...');

@@ -1,7 +1,7 @@
 import { createDbConnection } from "../db/connection";
 import { createRestSource } from "../sources";
 import { logger } from "../utils/logger";
-import { getFullThreads } from "./getFullThreads";
+import { getFullThreadsV2 } from "./getFullThreads";
 import { processBoards } from "./processors/processBoards";
 import { processEvents } from "./processors/processEvents";
 import { processPosts } from "./processors/processPosts";
@@ -19,14 +19,27 @@ export const createUpdateTick = async (baseUrl: string) => {
   }
 
   const updateAll = async () => {
-    logger.info("Get all data...");
-    const { fullThreads, boards } = await getFullThreads(source);
+    logger.info("Full sync (streaming via getFullThreadsV2)...");
+    await getFullThreadsV2(source, {
+      onBoards: async (boards) => {
+        logger.info("Update database (boards)...");
+        await processBoards(boards, db);
+      },
+      onFullThread: async (thread) => {
+        logger.debug(`Update database (posts), thread id=${thread.id}`);
+        await processPosts([thread], db);
+      },
+    });
+  };
 
-    logger.info("Update database (boards)...");
-    await processBoards(boards, db);
-
-    logger.info("Update database (posts)...");
-    await processPosts(fullThreads, db);
+  const updatePartial = async (threadId: number) => {
+    if (!Number.isFinite(threadId) || threadId <= 0) {
+      throw new Error(`invalid threadId: ${threadId}`);
+    }
+    logger.info(`Partial sync: fetch thread ${threadId}...`);
+    const thread = await source.getThreadPostsList({ threadId });
+    logger.info("Update database (posts, single thread)...");
+    await processPosts([thread], db);
   };
 
   const tick = async () => {
@@ -41,5 +54,5 @@ export const createUpdateTick = async (baseUrl: string) => {
     }
   };
 
-  return { updateAll, tick };
+  return { updateAll, updatePartial, tick };
 };
