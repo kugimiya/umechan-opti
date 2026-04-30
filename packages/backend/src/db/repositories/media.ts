@@ -20,4 +20,38 @@ export const dbModelMedia = (dataSource: DataSource) => ({
       postId,
     });
   },
+  replaceForPosts: async (
+    mediaItems: Array<{
+      postId: number;
+      mediaType: MediaType;
+      link: string | null;
+      preview: string | null;
+    }>,
+    postIds: number[]
+  ) => {
+    if (postIds.length) {
+      await dataSource
+        .getRepository(Media)
+        .createQueryBuilder()
+        .delete()
+        .where("postId IN (:...postIds)", { postIds })
+        .execute();
+    }
+
+    if (!mediaItems.length) return;
+
+    await dataSource
+      .createQueryBuilder()
+      .insert()
+      .into(Media)
+      .values(
+        mediaItems.map((item) => ({
+          mediaType: item.mediaType,
+          urlOrigin: item.link,
+          urlPreview: item.preview,
+          postId: item.postId,
+        }))
+      )
+      .execute();
+  },
 });

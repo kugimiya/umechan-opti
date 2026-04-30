@@ -11,60 +11,74 @@ export const processPosts = async (posts: ResponsePost[], db: DbConnection) => {
   let checked = 0;
 
   let mediaChecked = 0;
-
-  const process = async (post: ResponsePost) => {
-    checked += 1;
-
-    if (await db.posts.isExist(post)) {
-      await db.posts.update(post);
-      updated += 1;
-    } else {
-      await db.posts.insert(post);
-      created += 1;
-    }
-
-    await db.media.dropByPostId(post.id);
-
-    if (post.media?.images?.length) {
-      for (let item of post.media.images) {
-        mediaChecked += 1;
-        await db.media.insert(item, post.id, MediaType.Image);
-      }
-    }
-
-    if (post.media?.youtubes?.length) {
-      for (let item of post.media.youtubes) {
-        mediaChecked += 1;
-        await db.media.insert(item, post.id, MediaType.YouTube);
-      }
-    }
-
-    if (post.media?.videos?.length) {
-      for (let item of post.media.videos) {
-        mediaChecked += 1;
-        await db.media.insert(item, post.id, MediaType.Video);
-      }
-    }
-  };
+  const allPosts: ResponsePost[] = [];
 
   for (let post of posts) {
-    try {
-      logger.debug(`Processing post ${post.id}...`);
-      await process(post);
-    } catch (error) {
-      logger.error(`Error processing post ${post.id}: ${error}`);
-    }
+    logger.debug(`Queued post ${post.id}...`);
+    allPosts.push(post);
 
     if (post.replies.length) {
       for (let reply of post.replies) {
-        try {
-          logger.debug(`Processing reply ${reply.id}...`);
-          await process(reply);
-        } catch (error) {
-          logger.error(`Error processing reply ${reply.id}: ${error}`);
+        logger.debug(`Queued reply ${reply.id}...`);
+        allPosts.push(reply);
+      }
+    }
+  }
+
+  const uniquePosts = Array.from(new Map(allPosts.map((post) => [post.id, post])).values());
+  checked = uniquePosts.length;
+
+  if (uniquePosts.length) {
+    const existingIds = await db.posts.getExistingIds(uniquePosts.map((post) => post.id));
+    updated = uniquePosts.filter((post) => existingIds.has(post.id)).length;
+    created = uniquePosts.length - updated;
+
+    const mediaItems: Array<{
+      postId: number;
+      mediaType: MediaType;
+      link: string | null;
+      preview: string | null;
+    }> = [];
+
+    for (let post of uniquePosts) {
+      if (post.media?.images?.length) {
+        for (let item of post.media.images) {
+          mediaChecked += 1;
+          mediaItems.push({
+            postId: post.id,
+            mediaType: MediaType.Image,
+            link: item.link,
+            preview: item.preview,
+          });
+        }
+      }
+
+      if (post.media?.youtubes?.length) {
+        for (let item of post.media.youtubes) {
+          mediaChecked += 1;
+          mediaItems.push({
+            postId: post.id,
+            mediaType: MediaType.YouTube,
+            link: item.link,
+            preview: item.preview,
+          });
+        }
+      }
+
+      if (post.media?.videos?.length) {
+        for (let item of post.media.videos) {
+          mediaChecked += 1;
+          mediaItems.push({
+            postId: post.id,
+            mediaType: MediaType.Video,
+            link: item.link,
+            preview: item.preview,
+          });
         }
       }
     }
+
+    await db.posts.syncPostsAndMedia(uniquePosts, mediaItems);
   }
 
   const postCheckTimeTaken = measureTime("db check posts", "end");

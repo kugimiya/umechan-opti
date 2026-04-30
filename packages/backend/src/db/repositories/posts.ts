@@ -1,8 +1,20 @@
 import type { ResponsePost } from "../../types/responseThreadsList";
+import { MediaType } from "@umechan/shared";
 import { DataSource } from "typeorm";
+import { Media } from "../entities/Media";
 import { Post } from "../entities/Post";
 
 export const dbModelPosts = (dataSource: DataSource) => ({
+  getExistingIds: async (ids: number[]) => {
+    if (!ids.length) return new Set<number>();
+    const rows = await dataSource
+      .getRepository(Post)
+      .createQueryBuilder("post")
+      .select("post.id", "id")
+      .where("post.id IN (:...ids)", { ids })
+      .getRawMany<{ id: number }>();
+    return new Set(rows.map((row) => Number(row.id)));
+  },
   insert: async (post: ResponsePost) => {
     const postRepository = dataSource.getRepository(Post);
     const newPost = postRepository.create({
@@ -106,5 +118,112 @@ export const dbModelPosts = (dataSource: DataSource) => ({
         updatedAt: payload.updatedAt ?? defaults.updatedAt,
       })
     );
+  },
+  upsertMany: async (posts: ResponsePost[]) => {
+    if (!posts.length) return;
+    await dataSource
+      .createQueryBuilder()
+      .insert()
+      .into(Post)
+      .values(
+        posts.map((post) => ({
+          id: post.id,
+          boardId: post.board_id,
+          poster: post.poster,
+          posterVerified: post.is_verify,
+          message: post.message,
+          messageTruncated: post.truncated_message,
+          subject: post.subject,
+          timestamp: Number(post.timestamp),
+          parentId: post.parent_id || null,
+          updatedAt: post.updated_at,
+        }))
+      )
+      .orUpdate(
+        [
+          "boardId",
+          "poster",
+          "posterVerified",
+          "message",
+          "messageTruncated",
+          "subject",
+          "timestamp",
+          "parentId",
+          "updatedAt",
+        ],
+        ["id"]
+      )
+      .execute();
+  },
+  syncPostsAndMedia: async (
+    posts: ResponsePost[],
+    mediaItems: Array<{
+      postId: number;
+      mediaType: MediaType;
+      link: string | null;
+      preview: string | null;
+    }>
+  ) => {
+    if (!posts.length) return;
+
+    await dataSource.transaction(async (manager) => {
+      await manager
+        .createQueryBuilder()
+        .insert()
+        .into(Post)
+        .values(
+          posts.map((post) => ({
+            id: post.id,
+            boardId: post.board_id,
+            poster: post.poster,
+            posterVerified: post.is_verify,
+            message: post.message,
+            messageTruncated: post.truncated_message,
+            subject: post.subject,
+            timestamp: Number(post.timestamp),
+            parentId: post.parent_id || null,
+            updatedAt: post.updated_at,
+          }))
+        )
+        .orUpdate(
+          [
+            "boardId",
+            "poster",
+            "posterVerified",
+            "message",
+            "messageTruncated",
+            "subject",
+            "timestamp",
+            "parentId",
+            "updatedAt",
+          ],
+          ["id"]
+        )
+        .execute();
+
+      const postIds = posts.map((post) => post.id);
+      await manager
+        .createQueryBuilder()
+        .delete()
+        .from(Media)
+        .where("postId IN (:...postIds)", { postIds })
+        .execute();
+
+      if (!mediaItems.length) return;
+
+      await manager
+        .createQueryBuilder()
+        .insert()
+        .into(Media)
+        .values(
+          mediaItems.map((item) => ({
+            mediaType: item.mediaType,
+            urlOrigin: item.link,
+            urlPreview: item.preview,
+            postId: item.postId,
+          }))
+        )
+        .execute();
+    });
   },
 });
