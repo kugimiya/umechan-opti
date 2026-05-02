@@ -1,15 +1,22 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { EpdsBoard, EpdsChatFolder, EpdsChatThread, EpdsPost } from "@umechan/shared";
+import { FC, useEffect, useMemo, useState } from "react";
+import { EpdsBoard, EpdsChatFolder, EpdsChatThread, EpdsPost, UnmodFlag } from "@umechan/shared";
 import { epdsApi } from "@/api/epds";
 import { pissykakaApi } from "@/api/pissykaka";
-import { formatDateTime } from "@/types/formatDateTime";
+import { formatChatDateTime, formatDateTime } from "@/types/formatDateTime";
 import { groupThreadsByFolder, toChatMessages } from "@/utils/chatViewModel";
 import { PostMedia } from "@/components/common/PostMedia/PostMedia";
 import { Box } from "@/components/layout/Box/Box";
 
-export const ChatApp = () => {
+import "./styles.css";
+import { ChatPane } from "./components/ChatPane/ChatPane";
+
+type Props = {
+  unmod: UnmodFlag;
+}
+
+export const ChatApp: FC<Props> = ({ unmod }) => {
   const [passphrase, setPassphrase] = useState("");
   const [profileToken, setProfileToken] = useState<string | null>(null);
   const [boards, setBoards] = useState<EpdsBoard[]>([]);
@@ -181,9 +188,11 @@ export const ChatApp = () => {
 
   const messages = selectedThread ? toChatMessages(selectedThread) : [];
 
+  console.log(groupedThreads);
+
   return (
     <Box gap="12px" style={{ width: "100%", minHeight: "70vh" }}>
-      <Box flexDirection="column" gap="8px" style={{ width: 340, minWidth: 340 }}>
+      <Box flexDirection="column" gap="8px" style={{ width: 340, minWidth: 340, borderRight: "1px solid white", maxHeight: '100vh', overflow: 'hidden', overflowY: 'auto', paddingBottom: '32px' }}>
         <div>
           <label>Раздел: </label>
           <select value={boardTag} onChange={(e) => setBoardTag(e.target.value)}>
@@ -191,6 +200,7 @@ export const ChatApp = () => {
           </select>
           <button onClick={markAllRead}>Прочитать всё</button>
         </div>
+
         <div>
           <input
             placeholder="Новая папка"
@@ -199,6 +209,7 @@ export const ChatApp = () => {
           />
           <button onClick={createFolder}>Создать папку</button>
         </div>
+
         {folders.map((folder) => (
           <Box key={folder.id} gap="6px" alignItems="center">
             <input
@@ -208,36 +219,68 @@ export const ChatApp = () => {
             <button onClick={() => deleteFolder(folder.id)}>Удалить папку</button>
           </Box>
         ))}
+
         {isLoading ? <span>Загрузка...</span> : null}
+
         {groupedThreads.map((group) => (
+          <Box key={group.id} flexDirection="column" gap="0px">
+            {group.items.map((thread) => (
+              <ChatPane key={thread.id}
+                chatPictureUrl="unknown"
+                chatTitle={thread.displayTitle}
+                isOpened={selectedThreadId === thread.id}
+                onClick={() => loadThread(thread.id)}
+                unreadCount={thread.unreadCounter}
+                lastMessage={{
+                  dateTime: formatChatDateTime(thread.timestamp),
+                  author: thread.replies?.at(-1)?.poster ?? thread.poster ?? '...',
+                  text: thread.replies?.at(-1)?.messageTruncated ?? thread.messageTruncated ?? '...'
+                }}
+              />
+            ))}
+          </Box>
+        ))}
+        
+        {/* {groupedThreads.map((group) => (
           <Box key={group.id} flexDirection="column" gap="6px">
             <b>{group.title}</b>
+
             {group.items.map((thread) => (
               <Box key={thread.id} gap="6px" alignItems="center" style={{ border: "1px solid var(--clr-border-dark)", padding: 6 }}>
-                <button onClick={() => loadThread(thread.id)} style={{ textAlign: "left", flex: 1 }}>
-                  {thread.displayTitle} {thread.isNewThread ? "NEW" : ""} {thread.unreadCounter > 0 ? `(${thread.unreadCounter})` : ""}
-                </button>
-                <button onClick={() => setHidden(thread.id, true)}>Скрыть</button>
+
+                <span onClick={() => loadThread(thread.id)} style={{ cursor: "click" }}>
+                  <b><i>{thread.isNewThread ? "NEW!" : ""}</i></b>
+                  {" "}
+                  <b>{thread.unreadCounter > 0 ? `(${thread.unreadCounter})` : ""}</b>
+                  {" "}
+                  {thread.displayTitle} 
+                </span>
+
+                <button onClick={() => setHidden(thread.id, true)}>🙈</button>
+
                 <button
                   onClick={() => {
                     setAliasThreadId(aliasThreadId === thread.id ? null : thread.id);
                     setAliasValue(thread.alias ?? "");
                   }}
                 >
-                  Имя
+                  🎛️
                 </button>
+
                 <select
                   value={thread.folderId ?? ""}
                   onChange={(e) => epdsApi.chatAssignFolder(thread.id, profileToken!, e.target.value ? Number(e.target.value) : null).then(() => refreshChatData(true))}
                 >
-                  <option value="">Без папки</option>
+                  <option value="">📂</option>
                   {folders.map((folder) => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
                 </select>
               </Box>
             ))}
           </Box>
-        ))}
+        ))} */}
+
         <button onClick={() => setShowHidden((prev) => !prev)}>{showHidden ? "Скрыть блок скрытых" : "Показать скрытые"}</button>
+        
         {showHidden ? (
           <Box flexDirection="column" gap="6px">
             <b>Скрытые</b>
@@ -249,6 +292,7 @@ export const ChatApp = () => {
             ))}
           </Box>
         ) : null}
+
         {aliasThreadId != null ? (
           <Box gap="6px">
             <input value={aliasValue} onChange={(e) => setAliasValue(e.target.value)} placeholder="Новое имя чата" />
@@ -260,7 +304,8 @@ export const ChatApp = () => {
 
       <Box flexDirection="column" gap="12px" style={{ flex: 1 }}>
         <h3>{selectedThread ? (threads.find((item) => item.id === selectedThread.id)?.displayTitle ?? `Чат #${selectedThread.id}`) : `Новый чат в /${selectedBoard?.tag ?? ""}`}</h3>
-        <Box flexDirection="column" gap="8px" style={{ maxHeight: "55vh", overflow: "auto", border: "1px solid var(--clr-border-dark)", padding: 12 }}>
+        
+        <Box flexDirection="column" gap="8px" style={{ height: '100vh', maxHeight: "calc(100vh - 280px)", overflow: "auto", border: "1px solid var(--clr-border-dark)", padding: 12 }}>
           {messages.map((msg) => (
             <Box key={msg.id} flexDirection="column" gap="6px" style={{ borderBottom: "1px solid var(--clr-border-dark)", paddingBottom: 8 }}>
               <span><b>{msg.poster || "anon"}</b> {msg.subject ? `• ${msg.subject}` : ""} • {formatDateTime(msg.timestamp)}</span>

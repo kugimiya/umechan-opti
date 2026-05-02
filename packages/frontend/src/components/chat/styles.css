@@ -1,0 +1,8 @@
+:root {
+  --chat-bg: #000000;
+  --chat-active: #508f7d;
+}
+
+body {
+  overflow: hidden;
+}

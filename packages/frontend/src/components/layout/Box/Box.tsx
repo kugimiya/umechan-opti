@@ -1,6 +1,6 @@
-import React, { CSSProperties } from "react";
+import React, { CSSProperties, DOMAttributes } from "react";
 
-export type BoxProps = React.PropsWithChildren & {
+export type BoxProps = React.PropsWithChildren & DOMAttributes<'div'> & {
   as?: keyof React.JSX.IntrinsicElements;
   className?: string;
 
@@ -15,22 +15,37 @@ export type BoxProps = React.PropsWithChildren & {
 }
 
 export const Box = (props: BoxProps) => {
+  const {
+    as,
+    className,
+    flexDirection,
+    justifyContent,
+    alignItems,
+    gap,
+    flexGrow,
+    flexWrap,
+    style,
+    children,
+    ...otherProps
+  } = props;
+
   return React.createElement(
-    props.as || "div",
+    as || "div",
     {
-      className: props.className,
+      className: className,
       style: {
         // TODO: move into css
         display: "flex",
-        flexDirection: props.flexDirection,
-        justifyContent: props.justifyContent,
-        alignItems: props.alignItems,
-        gap: props.gap,
-        flexGrow: props.flexGrow,
-        flexWrap: props.flexWrap,
-        ...props.style,
-      }
+        flexDirection: flexDirection,
+        justifyContent: justifyContent,
+        alignItems: alignItems,
+        gap: gap,
+        flexGrow: flexGrow,
+        flexWrap: flexWrap,
+        ...style,
+      },
+      ...otherProps
     },
-    props.children
+    children
   );
 };

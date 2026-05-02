@@ -64,7 +64,7 @@ export const epdsApi = {
     const { data } = await epdsRequest.get<{ ok: boolean }>(`/v2/chat/session`);
     return data;
   },
-  chatThreads: async (boardTag: string, offset = 0, limit = Number(process.env.NEXT_PUBLIC_DEFAULT_LIMIT)) => {
+  chatThreads: async (boardTag: string, offset = 0, limit = 1000) => {
     const { data } = await epdsRequest.get<EpdsResponseChatThreads>(`/v2/chat/board/${boardTag}/threads`, {
       params: { offset, limit },
     });
