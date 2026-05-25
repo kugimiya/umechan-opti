@@ -74,6 +74,8 @@ const main = async () => {
   }
 
   let lastFullSyncTime = 0;
+  let lastSleepLogTime = 0;
+  const sleepLogIntervalMs = 10 * 60 * 1000;
   if (!noFullSync) {
     logger.info('Before first tick we should fetch all!');
     measureTime("fetch_all", "start");
@@ -107,7 +109,11 @@ const main = async () => {
         logger.info(`Periodic full sync ended with ${measureTime("full_sync", "end")}ms`);
       }
 
-      logger.info(`Sleeping ${delayAfterUpdateTick}ms before next cycle`);
+      const now = Date.now();
+      if (now - lastSleepLogTime >= sleepLogIntervalMs) {
+        logger.info(`Sleeping ${delayAfterUpdateTick}ms before next cycle`);
+        lastSleepLogTime = now;
+      }
     } catch (e) {
       logger.error(`Error in sync cycle: ${e}`);
     } finally {

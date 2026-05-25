@@ -3,7 +3,7 @@
 import {
   type CSSProperties,
   type DependencyList,
-  type FC,
+  forwardRef,
   type PropsWithChildren,
   useCallback,
   useEffect,
@@ -28,14 +28,26 @@ type Props = PropsWithChildren & {
 const isNearBottom = (el: HTMLElement) =>
   el.scrollHeight - el.scrollTop - el.clientHeight <= BOTTOM_PIN_THRESHOLD_PX;
 
-export const PrettyScrollbarContainer: FC<Props> = ({
+export const PrettyScrollbarContainer = forwardRef<HTMLDivElement, Props>(function PrettyScrollbarContainer({
   children,
   styles,
   maxHeight = "100vh",
   className,
   scrollToBottomOn,
-}) => {
+}, forwardedRef) {
   const rootRef = useRef<HTMLDivElement>(null);
+
+  const setRootRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      rootRef.current = node;
+      if (typeof forwardedRef === "function") {
+        forwardedRef(node);
+      } else if (forwardedRef) {
+        forwardedRef.current = node;
+      }
+    },
+    [forwardedRef],
+  );
   const contentRef = useRef<HTMLDivElement>(null);
   const pinnedToBottomRef = useRef(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -129,7 +141,7 @@ export const PrettyScrollbarContainer: FC<Props> = ({
 
   return (
     <div
-      ref={rootRef}
+      ref={setRootRef}
       className={["chat-thread-sidebar-scroll", className].filter(Boolean).join(" ")}
       onScroll={onScroll}
       style={{
@@ -140,4 +152,4 @@ export const PrettyScrollbarContainer: FC<Props> = ({
       {body}
     </div>
   );
-};
+});

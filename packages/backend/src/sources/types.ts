@@ -8,7 +8,7 @@ import type { ResponsePost } from "../types/responseThreadsList";
  */
 export type SyncSource = {
   getBoardsList: () => Promise<ResponseBoard[]>;
-  getThreadsList: (params: { tag: string }) => Promise<ResponsePost[]>;
+  getThreadsList: (params: { tag: string; offset: number; limit: number }) => Promise<ResponsePost[]>;
   getThreadPostsList: (params: { threadId: number }) => Promise<ResponsePost>;
   getEvents: (params: { fromTimestamp: number }) => Promise<ResponseEvent[]>;
 };

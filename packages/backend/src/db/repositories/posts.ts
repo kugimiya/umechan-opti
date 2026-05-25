@@ -15,6 +15,16 @@ export const dbModelPosts = (dataSource: DataSource) => ({
       .getRawMany<{ id: number }>();
     return new Set(rows.map((row) => Number(row.id)));
   },
+  getUpdatedAtByIds: async (ids: number[]) => {
+    if (!ids.length) return new Map<number, number>();
+    const rows = await dataSource
+      .getRepository(Post)
+      .createQueryBuilder("post")
+      .select(["post.id", "post.updatedAt"])
+      .where("post.id IN (:...ids)", { ids })
+      .getMany();
+    return new Map(rows.map((row) => [Number(row.id), row.updatedAt]));
+  },
   insert: async (post: ResponsePost) => {
     const postRepository = dataSource.getRepository(Post);
     const newPost = postRepository.create({

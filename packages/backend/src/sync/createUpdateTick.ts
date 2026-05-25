@@ -29,7 +29,7 @@ export const createUpdateTick = async (baseUrl: string) => {
         logger.debug(`Update database (posts), thread id=${thread.id}`);
         await processPosts([thread], db);
       },
-    });
+    }, db);
   };
 
   const updatePartial = async (threadId: number) => {

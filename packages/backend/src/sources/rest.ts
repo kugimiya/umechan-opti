@@ -24,28 +24,15 @@ export const createRestSource = (params: CreateRestSourceParams): SyncSource => 
       return response.data.payload.boards;
     },
 
-    getThreadsList: async ({ tag }) => {
-      let list: ResponsePost[] = [];
-      let isListComplete = false;
-      let iter = 0;
-
-      while (!isListComplete) {
-        const response = await request.get<ApiTemplate<ResponseThreadsList>>(`/v2/board/${tag}`, {
-          params: {
-            offset: iter * fetchEntitiesFromApiBaseLimit,
-            limit: fetchEntitiesFromApiBaseLimit,
-            no_board_list: "true",
-          },
-        });
-
-        const posts = response.data.payload?.posts || [];
-        list = [...list, ...posts];
-
-        iter++;
-        isListComplete = posts.length === 0 || iter > 1000;
-      }
-
-      return list;
+    getThreadsList: async ({ tag, offset, limit }) => {
+      const response = await request.get<ApiTemplate<ResponseThreadsList>>(`/v2/board/${tag}`, {
+        params: {
+          offset,
+          limit,
+          no_board_list: "true",
+        },
+      });
+      return response.data.payload?.posts || [];
     },
 
     getThreadPostsList: async ({ threadId }) => {
