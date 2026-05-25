@@ -1,6 +1,13 @@
 :root {
   --chat-bg: #000000;
   --chat-active: #508f7d;
+  --chat-border: rgb(59, 59, 59);
+
+  --chat-message-bg: rgb(59, 59, 59);
+
+  --chat-progress-a: var(--chat-active);
+  --chat-progress-b: var(--chat-bg);
+  --chat-progress-track: var(--chat-bg);
 }
 
 body {

@@ -1,0 +1,39 @@
+.root {
+  justify-content: space-evenly;
+}
+
+.item {
+  justify-content: center;
+  font-weight: bold;
+}
+
+.item span {
+  font-size: 14px;
+  padding: 2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+}
+
+.item span.unreadBadge {
+  font-size: 8px;
+  color: var(--chat-active);
+  padding: 0;
+}
+
+.item span:hover .unreadBadge {
+  filter: brightness(1.1);
+}
+
+.item span:hover {
+  color: var(--chat-active);
+}
+
+.active .unreadBadge {
+  color: var(--chat-active);
+}
+
+.active {
+  color: var(--chat-active);
+}

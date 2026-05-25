@@ -24,7 +24,7 @@ export const toChatMessages = (thread: EpdsPost): ChatMessage[] => {
       id: item.id,
       poster: item.poster,
       subject: item.subject,
-      message: item.message,
+      message: item.messageTruncated.replaceAll('&gt;', '>'),
       timestamp: item.timestamp,
       media: item.media,
     }));

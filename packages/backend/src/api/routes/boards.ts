@@ -1,7 +1,18 @@
+import { EpdsPostMediaType } from "@umechan/shared";
+import type { EpdsPostMedia } from "@umechan/shared";
 import { FastifyInstance, FastifyRequest } from "fastify";
 import type { DbConnection } from "../../db/connection";
+import type { Media } from "../../db/entities/Media";
 
 const CHAT_COOKIE_NAME = "umechan_chat_profile";
+
+const chatImageMediaToEpds = (m: Media): EpdsPostMedia => ({
+  id: m.id,
+  urlOrigin: m.urlOrigin ?? "",
+  urlPreview: m.urlPreview ?? "",
+  mediaType: EpdsPostMediaType.PISSYKAKA_IMAGE,
+  postId: Number(m.postId),
+});
 const identifyRateLimit = new Map<string, number[]>();
 
 const readCookie = (cookieHeader: string | undefined, cookieName: string): string | null => {
@@ -23,10 +34,22 @@ const getProfileToken = (request: FastifyRequest, fallbackToken?: string): strin
 };
 
 export const bindBoardsRoutes = (fastify: FastifyInstance, db: DbConnection) => {
-  type ReqBoardsList = FastifyRequest<{ Querystring: { unmod?: string } }>;
+  type ReqBoardsList = FastifyRequest<{ Querystring: { unmod?: string; profileToken?: string } }>;
   fastify.get('/api/v2/boards', async (request: ReqBoardsList, reply) => {
     const boards = await db.apis.boards.getAll(request.query.unmod !== 'true');
-    reply.send({ items: boards });
+    const profileToken = getProfileToken(request, request.query.profileToken);
+    const profile = await db.chat.profileByToken(profileToken);
+    const boardNumericIds = boards.map((b) => Number(b.id));
+    let unreadThreadsByBoardId = new Map<number, number>();
+    if (profile && boardNumericIds.length > 0) {
+      unreadThreadsByBoardId = await db.chat.countThreadsWithUnreadByBoardIds(profile.id, boardNumericIds);
+    }
+    reply.send({
+      items: boards.map((b) => ({
+        ...b,
+        chatUnreadThreadsCount: unreadThreadsByBoardId.get(Number(b.id)) ?? 0,
+      })),
+    });
   });
 
   type ReqBoard = FastifyRequest<{ Querystring: { unmod?: string }, Params: { boardTag: string } }>;
@@ -130,8 +153,12 @@ export const bindBoardsRoutes = (fastify: FastifyInstance, db: DbConnection) => 
     const threads = await db.chat.listThreadsByBoard(request.params.boardTag, offset, limit);
     const count = await db.chat.countThreadsByBoard(request.params.boardTag);
     const threadIds = threads.map((item) => Number(item.id));
-    const states = await db.chat.listStatesByProfileAndThreads(profile.id, threadIds);
-    const folders = await db.chat.listFolders(profile.id, board.id);
+    const [states, folders, lastReplyPreviewByThread, firstImageMediaByThread] = await Promise.all([
+      db.chat.listStatesByProfileAndThreads(profile.id, threadIds),
+      db.chat.listFolders(profile.id, board.id),
+      db.chat.lastReplyPreviewByThreadIds(threadIds),
+      db.chat.firstPissykakaImageMediaByThreadIds(threadIds),
+    ]);
     const statesMap = new Map(states.map((item) => [item.threadId, item]));
 
     const responseItems = await Promise.all(threads.map(async (thread) => {
@@ -139,6 +166,8 @@ export const bindBoardsRoutes = (fastify: FastifyInstance, db: DbConnection) => 
       const lastSeenPostId = Number(state?.lastSeenPostId ?? 0);
       const unreadCounter = await db.chat.unreadCountForThread(profile.id, thread.id, lastSeenPostId);
       const displayTitle = state?.alias?.trim() || thread.subject?.trim() || `Thread #${thread.id}`;
+      const thumb = firstImageMediaByThread.get(thread.id);
+      const lastPreview = lastReplyPreviewByThread.get(thread.id);
       return {
         ...thread,
         unreadCounter,
@@ -147,6 +176,9 @@ export const bindBoardsRoutes = (fastify: FastifyInstance, db: DbConnection) => 
         alias: state?.alias ?? null,
         folderId: state?.folderId ?? null,
         displayTitle,
+        firstPicture: thumb ? chatImageMediaToEpds(thumb) : null,
+        lastReplyTruncatedText: lastPreview?.truncatedText ?? "",
+        lastReplyAuthor: lastPreview?.author ?? "",
       };
     }));
 
@@ -317,7 +349,7 @@ export const bindBoardsRoutes = (fastify: FastifyInstance, db: DbConnection) => 
     }
     const threadId = Number(request.body?.threadId);
     const postId = Number(request.body?.postId);
-    if (!threadId || !postId) {
+    if (!Number.isFinite(threadId) || threadId <= 0 || !Number.isFinite(postId) || postId <= 0) {
       reply.status(400).send({ error: "threadId and postId are required" });
       return;
     }

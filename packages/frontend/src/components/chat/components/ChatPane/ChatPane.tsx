@@ -28,7 +28,11 @@ export const ChatPane: FC<Props> = (props) => {
 
   return (
     <Box className={clsx(styles.root, isOpened && styles.rootOpened)} flexDirection="row" gap="8px" style={{ maxWidth: '100%' }} onClick={onClick}>
-      <div className={styles.picture} />
+      <div className={styles.picture}>
+        {Boolean(chatPictureUrl) && (
+          <img src={chatPictureUrl} alt="chat picture" className={styles.pictureImg} />
+        )}
+      </div>
 
       <span className={styles.datetime}>
         {lastMessage.dateTime}

@@ -1,16 +1,21 @@
 'use client';
 
-import { FC, useEffect, useMemo, useState } from "react";
+import "./styles.css";
+
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { EpdsBoard, EpdsChatFolder, EpdsChatThread, EpdsPost, UnmodFlag } from "@umechan/shared";
 import { epdsApi } from "@/api/epds";
-import { pissykakaApi } from "@/api/pissykaka";
-import { formatChatDateTime, formatDateTime } from "@/types/formatDateTime";
+import { parsePissykakaCreatedPostId, pissykakaApi } from "@/api/pissykaka";
+import { formatChatDateTime } from "@/types/formatDateTime";
 import { groupThreadsByFolder, toChatMessages } from "@/utils/chatViewModel";
-import { PostMedia } from "@/components/common/PostMedia/PostMedia";
 import { Box } from "@/components/layout/Box/Box";
 
-import "./styles.css";
 import { ChatPane } from "./components/ChatPane/ChatPane";
+import { IndeterminateLinearProgress } from "./components/IndeterminateLinearProgress/IndeterminateLinearProgress";
+import { ChatBoardSelector } from "./components/ChatBoardSelector/ChatBoardSelector";
+import { PrettyScrollbarContainer } from "./components/PrettyScrollbarContainer/PrettyScrollbarContainer";
+import { Posting } from "./components/Posting/Posting";
+import { Message } from "./components/Message/Message";
 
 type Props = {
   unmod: UnmodFlag;
@@ -20,7 +25,7 @@ export const ChatApp: FC<Props> = ({ unmod }) => {
   const [passphrase, setPassphrase] = useState("");
   const [profileToken, setProfileToken] = useState<string | null>(null);
   const [boards, setBoards] = useState<EpdsBoard[]>([]);
-  const [boardTag, setBoardTag] = useState<string>("");
+  const [boardTag, setBoardTag] = useState<string>("rnd");
   const [threads, setThreads] = useState<EpdsChatThread[]>([]);
   const [hiddenThreads, setHiddenThreads] = useState<EpdsChatThread[]>([]);
   const [folders, setFolders] = useState<EpdsChatFolder[]>([]);
@@ -42,6 +47,17 @@ export const ChatApp: FC<Props> = ({ unmod }) => {
 
   const selectedBoard = useMemo(() => boards.find((b) => b.tag === boardTag) ?? null, [boards, boardTag]);
   const groupedThreads = useMemo(() => groupThreadsByFolder(threads, folders), [threads, folders]);
+
+  const refreshBoardsList = useCallback(() => {
+    return epdsApi.boardsList(unmod).then((data) => {
+      setBoards(data.items);
+      setBoardTag((prev) => {
+        if (data.items.length === 0) return "";
+        if (prev !== "" && data.items.some((b) => b.tag === prev)) return prev;
+        return data.items[0].tag;
+      });
+    });
+  }, [unmod]);
 
   const refreshChatData = async (keepThread = true) => {
     if (!profileToken || !boardTag) return;
@@ -78,13 +94,11 @@ export const ChatApp: FC<Props> = ({ unmod }) => {
         }
       })
       .catch(() => void 0);
-    epdsApi.boardsList().then((data) => {
-      setBoards(data.items);
-      if (data.items.length > 0) {
-        setBoardTag(data.items[0].tag);
-      }
-    });
   }, []);
+
+  useEffect(() => {
+    void refreshBoardsList();
+  }, [refreshBoardsList]);
 
   useEffect(() => {
     refreshChatData(false);
@@ -95,10 +109,21 @@ export const ChatApp: FC<Props> = ({ unmod }) => {
     epdsApi.chatThread(selectedThreadId).then((data) => setSelectedThread(data.item));
   }, [selectedThreadId, profileToken]);
 
+  const messages = useMemo(
+    () => (selectedThread ? toChatMessages(selectedThread) : []),
+    [selectedThread],
+  );
+  const lastMessageId = messages.at(-1)?.id;
+  const messagesScrollToBottomOn = useMemo(
+    () => [selectedThreadId, messages.length, lastMessageId],
+    [selectedThreadId, messages.length, lastMessageId],
+  );
+
   const identify = async () => {
     const data = await epdsApi.chatIdentify(passphrase);
     if (data.ok) {
       setProfileToken(data.profileToken || "cookie");
+      await refreshBoardsList();
     }
   };
 
@@ -106,6 +131,7 @@ export const ChatApp: FC<Props> = ({ unmod }) => {
     if (!profileToken || !boardTag) return;
     await epdsApi.chatMarkAllRead(boardTag, profileToken);
     await refreshChatData(true);
+    await refreshBoardsList();
   };
 
   const setHidden = async (threadId: number, hidden: boolean) => {
@@ -155,11 +181,28 @@ export const ChatApp: FC<Props> = ({ unmod }) => {
         parentId: selectedThreadId ?? undefined,
         tag: selectedThreadId == null ? boardTag : undefined,
       });
-      const createdPostId = Number(sent.payload.post_id);
-      const currentThreadId = selectedThreadId ?? createdPostId;
-      await epdsApi.chatOwnPost(currentThreadId, createdPostId, profileToken || undefined);
-      if (selectedThreadId != null) {
+
+      const isReply = selectedThreadId != null;
+      if (isReply) {
         await epdsApi.forceSync(selectedThreadId);
+      }
+
+      let createdPostId = parsePissykakaCreatedPostId(sent);
+      if (isReply && createdPostId == null) {
+        const threadData = await epdsApi.chatThread(selectedThreadId);
+        const replies = threadData.item.replies ?? [];
+        if (replies.length > 0) {
+          createdPostId = replies[replies.length - 1].id;
+        }
+      }
+
+      if (createdPostId != null) {
+        const threadId = isReply ? selectedThreadId : createdPostId;
+        await epdsApi.chatOwnPost(threadId, createdPostId, profileToken || undefined);
+      }
+
+      if (!isReply && createdPostId != null) {
+        await epdsApi.forceSync(createdPostId);
       }
       setMessage("");
       setFiles(null);
@@ -186,20 +229,42 @@ export const ChatApp: FC<Props> = ({ unmod }) => {
     );
   }
 
-  const messages = selectedThread ? toChatMessages(selectedThread) : [];
-
-  console.log(groupedThreads);
-
   return (
-    <Box gap="12px" style={{ width: "100%", minHeight: "70vh" }}>
-      <Box flexDirection="column" gap="8px" style={{ width: 340, minWidth: 340, borderRight: "1px solid white", maxHeight: '100vh', overflow: 'hidden', overflowY: 'auto', paddingBottom: '32px' }}>
-        <div>
-          <label>Раздел: </label>
-          <select value={boardTag} onChange={(e) => setBoardTag(e.target.value)}>
-            {boards.map((board) => <option key={board.id} value={board.tag}>{board.name}</option>)}
-          </select>
-          <button onClick={markAllRead}>Прочитать всё</button>
-        </div>
+    <Box style={{ width: "100%", minHeight: "70vh" }}>
+      <PrettyScrollbarContainer
+        styles={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          width: 340,
+          minWidth: 340,
+          borderRight: "1px solid var(--chat-border)",
+          paddingBottom: 32,
+        }}
+      >
+        <ChatBoardSelector boards={boards} onSelect={board => setBoardTag(board.tag)} selected={boardTag} />
+
+        {isLoading ? <IndeterminateLinearProgress /> : null}
+
+        {groupedThreads.map((group) => (
+          <Box key={group.id} flexDirection="column" gap="0px">
+            {group.items.map((thread) => (
+              <ChatPane
+                key={thread.id}
+                chatPictureUrl={thread.firstPicture?.urlPreview || ''}
+                chatTitle={thread.displayTitle}
+                isOpened={selectedThreadId === thread.id}
+                onClick={() => loadThread(thread.id)}
+                unreadCount={thread.unreadCounter}
+                lastMessage={{
+                  dateTime: formatChatDateTime(thread.timestamp),
+                  author: thread.lastReplyAuthor || thread.poster || "...",
+                  text: thread.lastReplyTruncatedText || "...",
+                }}
+              />
+            ))}
+          </Box>
+        ))}
 
         <div>
           <input
@@ -220,64 +285,7 @@ export const ChatApp: FC<Props> = ({ unmod }) => {
           </Box>
         ))}
 
-        {isLoading ? <span>Загрузка...</span> : null}
-
-        {groupedThreads.map((group) => (
-          <Box key={group.id} flexDirection="column" gap="0px">
-            {group.items.map((thread) => (
-              <ChatPane key={thread.id}
-                chatPictureUrl="unknown"
-                chatTitle={thread.displayTitle}
-                isOpened={selectedThreadId === thread.id}
-                onClick={() => loadThread(thread.id)}
-                unreadCount={thread.unreadCounter}
-                lastMessage={{
-                  dateTime: formatChatDateTime(thread.timestamp),
-                  author: thread.replies?.at(-1)?.poster ?? thread.poster ?? '...',
-                  text: thread.replies?.at(-1)?.messageTruncated ?? thread.messageTruncated ?? '...'
-                }}
-              />
-            ))}
-          </Box>
-        ))}
-        
-        {/* {groupedThreads.map((group) => (
-          <Box key={group.id} flexDirection="column" gap="6px">
-            <b>{group.title}</b>
-
-            {group.items.map((thread) => (
-              <Box key={thread.id} gap="6px" alignItems="center" style={{ border: "1px solid var(--clr-border-dark)", padding: 6 }}>
-
-                <span onClick={() => loadThread(thread.id)} style={{ cursor: "click" }}>
-                  <b><i>{thread.isNewThread ? "NEW!" : ""}</i></b>
-                  {" "}
-                  <b>{thread.unreadCounter > 0 ? `(${thread.unreadCounter})` : ""}</b>
-                  {" "}
-                  {thread.displayTitle} 
-                </span>
-
-                <button onClick={() => setHidden(thread.id, true)}>🙈</button>
-
-                <button
-                  onClick={() => {
-                    setAliasThreadId(aliasThreadId === thread.id ? null : thread.id);
-                    setAliasValue(thread.alias ?? "");
-                  }}
-                >
-                  🎛️
-                </button>
-
-                <select
-                  value={thread.folderId ?? ""}
-                  onChange={(e) => epdsApi.chatAssignFolder(thread.id, profileToken!, e.target.value ? Number(e.target.value) : null).then(() => refreshChatData(true))}
-                >
-                  <option value="">📂</option>
-                  {folders.map((folder) => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
-                </select>
-              </Box>
-            ))}
-          </Box>
-        ))} */}
+        <button onClick={markAllRead}>Прочитать всё</button>
 
         <button onClick={() => setShowHidden((prev) => !prev)}>{showHidden ? "Скрыть блок скрытых" : "Показать скрытые"}</button>
         
@@ -300,34 +308,23 @@ export const ChatApp: FC<Props> = ({ unmod }) => {
             <button onClick={() => renameThread(aliasThreadId, null)}>Сброс</button>
           </Box>
         ) : null}
-      </Box>
+      </PrettyScrollbarContainer>
 
-      <Box flexDirection="column" gap="12px" style={{ flex: 1 }}>
-        <h3>{selectedThread ? (threads.find((item) => item.id === selectedThread.id)?.displayTitle ?? `Чат #${selectedThread.id}`) : `Новый чат в /${selectedBoard?.tag ?? ""}`}</h3>
-        
-        <Box flexDirection="column" gap="8px" style={{ height: '100vh', maxHeight: "calc(100vh - 280px)", overflow: "auto", border: "1px solid var(--clr-border-dark)", padding: 12 }}>
+      <Box flexDirection="column" style={{ flex: 1 }}>
+        <PrettyScrollbarContainer
+          styles={{ height: "100vh", display: "flex", flexDirection: "column", gap: "12px", padding: "12px" }}
+          maxHeight="calc(100vh - 77px)"
+          scrollToBottomOn={messagesScrollToBottomOn}
+        >
           {messages.map((msg) => (
-            <Box key={msg.id} flexDirection="column" gap="6px" style={{ borderBottom: "1px solid var(--clr-border-dark)", paddingBottom: 8 }}>
-              <span><b>{msg.poster || "anon"}</b> {msg.subject ? `• ${msg.subject}` : ""} • {formatDateTime(msg.timestamp)}</span>
-              <span>{msg.message}</span>
-              <Box gap="8px" flexWrap="wrap">
-                {msg.media?.map((item) => <PostMedia key={item.id} mediaItem={item} />)}
-              </Box>
-            </Box>
+            <Message key={msg.id} message={msg} />
           ))}
-        </Box>
+        </PrettyScrollbarContainer>
 
-        <Box flexDirection="column" gap="8px" style={{ border: "1px solid var(--clr-border-dark)", padding: 12 }}>
-          <b>Отправка сообщения</b>
-          <input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Тема поста" />
-          <input value={poster} onChange={(e) => setPoster(e.target.value)} placeholder="Автор поста" />
-          <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Сообщение" />
-          <input type="file" multiple onChange={(e) => setFiles(e.target.files)} />
-          <button disabled={isSending || !message.trim()} onClick={sendMessage}>
-            {isSending ? "Отправка..." : selectedThreadId == null ? "Создать чат" : "Отправить сообщение"}
-          </button>
-          {logs.map((line) => <span key={line}>{line}</span>)}
-        </Box>
+        <Posting isSending={isSending} sendMessage={(message) => {
+          setMessage(message);
+          sendMessage();
+        }} />
       </Box>
     </Box>
   );

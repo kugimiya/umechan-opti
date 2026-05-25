@@ -66,5 +66,22 @@ services:
       DYNAMIC_CONFIG_ENABLED: "true"
     restart: unless-stopped
 
+  database:
+    image: mysql:8.3.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_DATABASE=${MYSQL_CHAN_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./:/app
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 2s
+      retries: 10
+
 volumes:
   backend_data:

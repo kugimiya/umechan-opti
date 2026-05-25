@@ -1,5 +1,5 @@
 import { randomUUID, scryptSync } from "crypto";
-import { DataSource, In } from "typeorm";
+import { Brackets, DataSource, In } from "typeorm";
 import { ChatProfile } from "../entities/ChatProfile";
 import { ProfileThreadState } from "../entities/ProfileThreadState";
 import { Post } from "../entities/Post";
@@ -7,6 +7,7 @@ import { Board } from "../entities/Board";
 import { ChatFolder } from "../entities/ChatFolder";
 import { defaultLimit } from "../../utils/config";
 import { ProfileOwnPost } from "../entities/ProfileOwnPost";
+import { Media } from "../entities/Media";
 
 const hashPassphrase = (passphrase: string) => {
   const salt = process.env.CHAT_PASSPHRASE_SALT ?? "umechan-chat";
@@ -14,6 +15,11 @@ const hashPassphrase = (passphrase: string) => {
 };
 
 const now = () => Date.now();
+
+/** Тип медиа в БД совпадает с {@link EpdsPostMediaType.PISSYKAKA_IMAGE} */
+const PISSYKAKA_IMAGE_DB = "image";
+
+type LastReplyPreview = { truncatedText: string; author: string };
 
 export const dbModelChat = (dataSource: DataSource) => ({
   identify: async (passphrase: string) => {
@@ -70,6 +76,160 @@ export const dbModelChat = (dataSource: DataSource) => ({
       .where("thread.parentId IS NULL")
       .andWhere("board.tag = :boardTag", { boardTag })
       .getCount();
+  },
+  /**
+   * Для каждой доски: сколько корневых тредов имеют хотя бы один непрочитанный ответ
+   * (та же модель, что и метод unreadCountForThread); скрытые треды не считаем.
+   */
+  countThreadsWithUnreadByBoardIds: async (profileId: number, boardIds: number[]) => {
+    const map = new Map<number, number>(boardIds.map((id) => [Number(id), 0]));
+    if (boardIds.length === 0) {
+      return map;
+    }
+    const postRepository = dataSource.getRepository(Post);
+    const threadRows = await postRepository
+      .createQueryBuilder("t")
+      .select("t.id", "threadId")
+      .addSelect("t.boardId", "boardId")
+      .where("t.parentId IS NULL")
+      .andWhere("t.boardId IN (:...boardIds)", { boardIds })
+      .getRawMany<{ threadId: unknown; boardId: unknown }>();
+    if (threadRows.length === 0) {
+      return map;
+    }
+    const threadIds = threadRows.map((r) => Number(r.threadId));
+    const replies = await postRepository.find({
+      where: { parentId: In(threadIds) },
+      select: ["id", "parentId"],
+    });
+    const replyIdsByThread = new Map<number, number[]>();
+    for (const r of replies) {
+      const tid = Number(r.parentId);
+      const idList = replyIdsByThread.get(tid) ?? [];
+      idList.push(Number(r.id));
+      replyIdsByThread.set(tid, idList);
+    }
+    const states = await dataSource.getRepository(ProfileThreadState).find({
+      where: { profileId, threadId: In(threadIds) },
+    });
+    const stateByThread = new Map<number, ProfileThreadState>(states.map((s) => [Number(s.threadId), s]));
+
+    const ownRows = await dataSource.getRepository(ProfileOwnPost).find({
+      where: { profileId, threadId: In(threadIds) },
+      select: ["postId", "threadId"],
+    });
+    const ownIdsByThread = new Map<number, Set<number>>();
+    for (const o of ownRows) {
+      const tid = Number(o.threadId);
+      if (!ownIdsByThread.has(tid)) {
+        ownIdsByThread.set(tid, new Set());
+      }
+      ownIdsByThread.get(tid)!.add(Number(o.postId));
+    }
+
+    for (const row of threadRows) {
+      const threadId = Number(row.threadId);
+      const boardId = Number(row.boardId);
+      if (!map.has(boardId)) {
+        continue;
+      }
+      if (stateByThread.get(threadId)?.hidden) {
+        continue;
+      }
+      const lastSeenRaw = stateByThread.get(threadId)?.lastSeenPostId;
+      const lastSeen = lastSeenRaw == null ? 0 : Number(lastSeenRaw);
+      const replyIds = replyIdsByThread.get(threadId);
+      if (replyIds == null || replyIds.length === 0) {
+        continue;
+      }
+      const own = ownIdsByThread.get(threadId) ?? new Set();
+      let hasUnread = false;
+      for (const replyId of replyIds) {
+        if (replyId > lastSeen && !own.has(replyId)) {
+          hasUnread = true;
+          break;
+        }
+      }
+      if (hasUnread) {
+        map.set(boardId, (map.get(boardId) ?? 0) + 1);
+      }
+    }
+    return map;
+  },
+  /** Последний по id пост в треде (корень или ответ): обрезка текста и poster */
+  lastReplyPreviewByThreadIds: async (threadIds: number[]) => {
+    if (threadIds.length === 0) {
+      return new Map<number, LastReplyPreview>();
+    }
+    const postRepository = dataSource.getRepository(Post);
+    const rawRows = await postRepository
+      .createQueryBuilder("p")
+      .select("COALESCE(p.parentId, p.id)", "threadId")
+      .addSelect("MAX(p.id)", "lastPostId")
+      .where(
+        new Brackets((qb) => {
+          qb.where("p.id IN (:...threadIds) AND p.parentId IS NULL", { threadIds }).orWhere(
+            "p.parentId IN (:...threadIds)",
+            { threadIds },
+          );
+        }),
+      )
+      .groupBy("COALESCE(p.parentId, p.id)")
+      .getRawMany();
+    const lastPostIds = rawRows.map((r) => Number(r.lastPostId)).filter((id) => !Number.isNaN(id));
+    if (lastPostIds.length === 0) {
+      return new Map<number, LastReplyPreview>();
+    }
+    const lastPosts = await postRepository.find({
+      where: { id: In(lastPostIds) },
+      select: ["id", "messageTruncated", "poster"],
+    });
+    const previewByPostId = new Map<number, LastReplyPreview>(
+      lastPosts.map((p) => [
+        Number(p.id),
+        { truncatedText: p.messageTruncated, author: p.poster },
+      ]),
+    );
+    const emptyPreview: LastReplyPreview = { truncatedText: "", author: "" };
+    return new Map(
+      rawRows.map((r) => {
+        const tid = Number(r.threadId);
+        const pid = Number(r.lastPostId);
+        return [tid, previewByPostId.get(pid) ?? emptyPreview];
+      }),
+    );
+  },
+  /** Первая картинка PISSYKAKA_IMAGE в треде по порядку: OP, затем ответы по возрастанию id */
+  firstPissykakaImageMediaByThreadIds: async (threadIds: number[]) => {
+    if (threadIds.length === 0) {
+      return new Map<number, Media | null>();
+    }
+    const postRepository = dataSource.getRepository(Post);
+    const posts = await postRepository
+      .createQueryBuilder("p")
+      .leftJoinAndSelect("p.media", "media")
+      .where(
+        new Brackets((qb) => {
+          qb.where("p.id IN (:...threadIds) AND p.parentId IS NULL", { threadIds }).orWhere(
+            "p.parentId IN (:...threadIds)",
+            { threadIds },
+          );
+        }),
+      )
+      .orderBy("COALESCE(p.parentId, p.id)", "ASC")
+      .addOrderBy("CASE WHEN p.parentId IS NULL THEN 0 ELSE 1 END", "ASC")
+      .addOrderBy("p.id", "ASC")
+      .getMany();
+    const byThread = new Map<number, Media | null>();
+    for (const post of posts) {
+      const threadId = Number(post.parentId ?? post.id);
+      if (byThread.has(threadId)) continue;
+      const picture = post.media?.find((m) => m.mediaType === PISSYKAKA_IMAGE_DB);
+      if (picture) {
+        byThread.set(threadId, picture);
+      }
+    }
+    return byThread;
   },
   listStatesByProfileAndThreads: async (profileId: number, threadIds: number[]) => {
     if (threadIds.length === 0) {

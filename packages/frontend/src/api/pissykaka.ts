@@ -19,9 +19,28 @@ export type PissykakaCreatePostPayload = {
 
 export type PissykakaCreatePostResponse = {
   payload: {
-    post_id: number;
-    password: string;
+    post_id?: number;
+    password?: string;
+    [key: string]: unknown;
   };
+};
+
+/** id созданного поста из ответа pisscord (поля различаются для POST треда и PUT ответа) */
+export const parsePissykakaCreatedPostId = (response: PissykakaCreatePostResponse): number | null => {
+  const payload = response?.payload;
+  if (!payload || typeof payload !== "object") return null;
+  const candidates = [
+    payload.post_id,
+    payload.postId,
+    payload.id,
+    payload.reply_id,
+    payload.replyId,
+  ];
+  for (const raw of candidates) {
+    const id = Number(raw);
+    if (Number.isFinite(id) && id > 0) return id;
+  }
+  return null;
 };
 
 export const pissykakaApi = {

@@ -13,6 +13,8 @@ export type EpdsBoard = {
   id: number;
   tag: string;
   name: string;
+  /** Сколько тредов доски содержат непрочитанные ответы (сессия чата через cookie/query). */
+  chatUnreadThreadsCount?: number;
 };
 
 export type EpdsPost = {
@@ -39,6 +41,12 @@ export type EpdsChatThread = EpdsPost & {
   alias: string | null;
   folderId: number | null;
   displayTitle: string;
+  /** Первая картинка pisscord в треде (OP или ответы), по порядку постов */
+  firstPicture: EpdsPostMedia | null;
+  /** Обрезанный текст последнего сообщения в треде (OP или последний ответ) */
+  lastReplyTruncatedText: string;
+  /** Автор (poster) последнего сообщения в треде */
+  lastReplyAuthor: string;
 };
 
 export type EpdsChatFolder = {
