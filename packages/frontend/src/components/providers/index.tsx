@@ -8,13 +8,16 @@ import {
 import { ImagesMap, imagesOnPageContext } from "@/utils/contexts/imagesOnPage";
 import { ReplyMap, threadReplyMapContext } from "@/utils/contexts/threadReplyMap";
 import { PropsWithChildren, useState } from "react";
+import { MediaModalHostProvider } from "@/components/common/MediaModal/MediaModalHost";
 
 export const AppProviders = (props: PropsWithChildren<{}>) => {
   const [formContextValue, setFormContextValue] = useState<Omit<ModalPostFormContextType, 'set'>>(modalPostFormContextDefaultValue);
 
   return (
     <modalPostFormContext.Provider value={{ ...formContextValue, set: setFormContextValue }}>
-      {props.children}
+      <MediaModalHostProvider>
+        {props.children}
+      </MediaModalHostProvider>
     </modalPostFormContext.Provider>
   );
 };

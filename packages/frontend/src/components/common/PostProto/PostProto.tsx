@@ -33,7 +33,7 @@ export const PostProto = memo(function PostProtoInner(props: Props) {
 
       <Box gap={8} flexWrap="wrap">
         {post.media?.map((item) => (
-          <PostMedia key={item.urlPreview} mediaItem={item} disableModal={props.disableModal} />
+          <PostMedia key={item.urlPreview} mediaItem={item} disableGlobalModal={props.disableModal} />
         ))}
       </Box>
 

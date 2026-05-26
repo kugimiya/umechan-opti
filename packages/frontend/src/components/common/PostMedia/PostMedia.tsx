@@ -1,74 +1,61 @@
 'use client';
 
 import { EpdsPostMedia, EpdsPostMediaType } from "@umechan/shared";
-import { useContext, useState } from "react";
-import { imagesOnPageContext } from "@/utils/contexts/imagesOnPage";
-import { MediaModal } from "@/components/common/MediaModal/MediaModal";
+import { useContext, useMemo } from "react";
+import { imagesOnPageContext, type ImagesMapItem } from "@/utils/contexts/imagesOnPage";
+import { mediaModalHostContext } from "@/utils/contexts/mediaModalHost";
 
 type Props = {
   mediaItem: EpdsPostMedia;
-  disableModal?: boolean;
-}
+  disableGlobalModal?: boolean;
+};
+
+const toModalItem = (mediaItem: EpdsPostMedia): ImagesMapItem => [
+  mediaItem.urlOrigin,
+  mediaItem.postId,
+  mediaItem.mediaType,
+];
 
 export const PostMedia = (props: Props) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const isLocalModal = Boolean(props.disableGlobalModal);
   const { imagesMap } = useContext(imagesOnPageContext);
-  const [index, setIndex] = useState(imagesMap.findIndex((item) => item[0] === props.mediaItem.urlOrigin));
+  const { open: openMediaModal } = useContext(mediaModalHostContext);
+
+  const localModalItem = useMemo(() => toModalItem(props.mediaItem), [props.mediaItem]);
 
   if (!props.mediaItem.urlPreview || !props.mediaItem.urlOrigin) {
     return null;
   }
 
   const isYoutubeVideo = props.mediaItem.mediaType === EpdsPostMediaType.YOUTUBE;
+  const globalIndex = isLocalModal
+    ? -1
+    : imagesMap.findIndex((item) => item[0] === props.mediaItem.urlOrigin);
 
   return (
-    <>
-      <MediaModal
-        item={imagesMap[index]}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        onBack={() => {
-          setIndex(_ => {
-            const next = _ > 0 ? _ - 1 : 0;
-            const targetPostElm = document
-              ?.querySelector(`[data-image-index="${next}"]`) as HTMLImageElement;
-            targetPostElm?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return next;
-          });
-        }}
-        onForward={() => {
-          setIndex(_ => {
-            const next = _ < imagesMap.length - 1 ? _ + 1 : imagesMap.length - 1;
-            const targetPostElm = document
-              ?.querySelector(`[data-image-index="${next}"]`) as HTMLImageElement;
-            targetPostElm?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return next;
-          });
-        }}
+    <div
+      {...(!isLocalModal && globalIndex >= 0 ? { "data-image-index": globalIndex } : {})}
+      style={{
+        width: isYoutubeVideo ? 168 * 1.5 : "auto",
+        height: isYoutubeVideo ? 94 * 1.5 : "auto",
+        cursor: "pointer",
+      }}
+      onClick={() => {
+        if (isLocalModal) {
+          openMediaModal({ items: [localModalItem], index: 0, navigation: false });
+          return;
+        }
+
+        if (globalIndex < 0) return;
+
+        openMediaModal({ items: imagesMap, index: globalIndex, navigation: true });
+      }}
+    >
+      <img
+        src={isYoutubeVideo ? "https://rkn.gov.ru" : props.mediaItem.urlPreview}
+        style={{ objectFit: "contain", maxWidth: "100%", maxHeight: "100%" }}
+        alt={isYoutubeVideo ? "yt video" : "post media"}
       />
-
-      <div
-        data-image-index={index}
-        style={{
-          width: isYoutubeVideo ? 168 * 1.5 : "auto",
-          height: isYoutubeVideo ? 94 * 1.5  : "auto",
-          cursor: 'pointer'
-        }}
-        onClick={() => {
-          if (props.disableModal !== undefined) {
-            return;
-          }
-
-          setIndex(imagesMap.findIndex((item) => item[0] === props.mediaItem.urlOrigin));
-          setIsOpen(true);
-        }}
-      >
-        <img
-          src={isYoutubeVideo ? "https://rkn.gov.ru" : props.mediaItem.urlPreview}
-          style={{ objectFit: 'contain', maxWidth: '100%', maxHeight: '100%' }}
-          alt={isYoutubeVideo ? "yt video" : "post media"}
-        />
-      </div>
-    </>
+    </div>
   );
-}
+};

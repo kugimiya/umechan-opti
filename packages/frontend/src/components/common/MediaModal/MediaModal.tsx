@@ -9,8 +9,10 @@ type Props = {
   item: ImagesMapItem;
   isOpen: boolean;
   onClose: () => void;
-  onBack: () => void;
-  onForward: () => void;
+  onBack?: () => void;
+  onForward?: () => void;
+  /** Галерея: стрелки и кнопки prev/next. false — только Escape и закрытие по клику. */
+  navigation?: boolean;
 };
 
 const makeYouTubeEmbedLink = (link: string) => {
@@ -29,6 +31,7 @@ const getStoredVideoVolume = (): number => {
 };
 
 export const MediaModal = (props: Props) => {
+  const navigation = props.navigation ?? true;
   const ref = useRef<HTMLDivElement>(null);
   const [videoVolume, setVideoVolume] = useState(getStoredVideoVolume);
 
@@ -38,16 +41,16 @@ export const MediaModal = (props: Props) => {
 
   useEffect(() => {
     if (ref.current && props.isOpen) {
-      (ref.current.firstChild as HTMLDivElement).focus();
+      (ref.current.firstChild as HTMLDivElement)?.focus();
     }
-  }, [ref.current, props.isOpen]);
+  }, [props.isOpen, props.item[0]]);
 
   if (!props.isOpen) {
     return null;
   }
 
   return (
-    <div ref={ref} style={{ zIndex: 1 }}>
+    <div ref={ref}>
       <div
         onClick={props.onClose}
         className={styles.root}
@@ -57,12 +60,12 @@ export const MediaModal = (props: Props) => {
             props.onClose();
           }
 
-          if (ev.key === 'ArrowLeft') {
-            props.onBack();
+          if (navigation && ev.key === 'ArrowLeft') {
+            props.onBack?.();
           }
 
-          if (ev.key === 'ArrowRight') {
-            props.onForward();
+          if (navigation && ev.key === 'ArrowRight') {
+            props.onForward?.();
           }
         }}
       >
@@ -70,7 +73,9 @@ export const MediaModal = (props: Props) => {
           onClick={(ev) => ev.stopPropagation()}
           className={styles.inner}
         >
-          <button onClick={props.onBack} style={{ padding: '4px' }}>{"<"}</button>
+          {navigation ? (
+            <button type="button" onClick={props.onBack} style={{ padding: '4px' }}>{"<"}</button>
+          ) : null}
 
           {props.item[2] === EpdsPostMediaType.PISSYKAKA_IMAGE && (
             <img
@@ -122,7 +127,9 @@ export const MediaModal = (props: Props) => {
             />
           )}
 
-          <button onClick={props.onForward} style={{ padding: '4px' }}>{">"}</button>
+          {navigation ? (
+            <button type="button" onClick={props.onForward} style={{ padding: '4px' }}>{">"}</button>
+          ) : null}
         </div>
 
         {props.item[0]}

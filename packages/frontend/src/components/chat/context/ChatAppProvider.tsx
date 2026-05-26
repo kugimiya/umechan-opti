@@ -195,6 +195,24 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     setSelectedThreadId(threadId);
   }, []);
 
+  const zeroThreadUnreadLocally = useCallback((threadId: number) => {
+    const patch = (list: EpdsChatThread[]) =>
+      list.map((thread) => (thread.id === threadId ? { ...thread, unreadCounter: 0 } : thread));
+
+    setThreads((prev) => patch(prev));
+    setHiddenThreads((prev) => patch(prev));
+
+    const tag = activeBoardTagRef.current;
+    const cached = boardCacheRef.current[tag];
+    if (cached) {
+      boardCacheRef.current[tag] = {
+        ...cached,
+        threads: patch(cached.threads),
+        hiddenThreads: patch(cached.hiddenThreads),
+      };
+    }
+  }, []);
+
   const refreshBoardsList = useCallback(() => {
     return epdsApi.boardsList(unmod).then((data) => {
       setBoards(data.items);
@@ -229,8 +247,30 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
 
   useEffect(() => {
     if (!selectedThreadId || !profileToken) return;
-    epdsApi.chatThread(selectedThreadId).then((data) => setSelectedThread(data.item));
-  }, [selectedThreadId, profileToken]);
+
+    let cancelled = false;
+    const threadId = selectedThreadId;
+
+    void (async () => {
+      try {
+        const data = await epdsApi.chatThread(threadId);
+        if (cancelled) return;
+
+        setSelectedThread(data.item);
+        zeroThreadUnreadLocally(threadId);
+        await syncCurrentBoardRoster();
+        if (!cancelled) {
+          await refreshBoardsList();
+        }
+      } catch {
+        // keep roster state on load failure
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedThreadId, profileToken, zeroThreadUnreadLocally, syncCurrentBoardRoster, refreshBoardsList]);
 
   const messages = useMemo(
     () => (selectedThread ? toChatMessages(selectedThread) : []),
