@@ -21,6 +21,8 @@ type Props = PropsWithChildren & {
   unmod: UnmodFlag;
 };
 
+const BOARDS_UNREAD_POLL_MS = 5000;
+
 const threadsListEqual = (a: EpdsChatThread[], b: EpdsChatThread[]) => {
   const empty: BoardRosterCache = { ...emptyBoardRosterCache(), threads: a, hiddenThreads: [] };
   const full: BoardRosterCache = { ...emptyBoardRosterCache(), threads: b, hiddenThreads: [] };
@@ -55,7 +57,9 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   const activeBoardTagRef = useRef(boardTag);
   const rosterScrollRef = useRef<HTMLElement | null>(null);
   const profileTokenRef = useRef(profileToken);
+  const selectedThreadIdRef = useRef(selectedThreadId);
   const selectBoardInFlightRef = useRef<string | null>(null);
+  const prevUnreadThreadsByBoardTagRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
     activeBoardTagRef.current = boardTag;
@@ -64,6 +68,10 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   useEffect(() => {
     profileTokenRef.current = profileToken;
   }, [profileToken]);
+
+  useEffect(() => {
+    selectedThreadIdRef.current = selectedThreadId;
+  }, [selectedThreadId]);
 
   const groupedThreads = useMemo(() => groupThreadsByFolder(threads, folders), [threads, folders]);
 
@@ -213,6 +221,25 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     }
   }, []);
 
+  const invalidateBoardRosterCache = useCallback((tag: string) => {
+    delete boardCacheRef.current[tag];
+  }, []);
+
+  const reloadBoardRosterFromScratch = useCallback(async (tag: string) => {
+    const snapshot = await fetchRosterPage(tag, 0, ROSTER_INITIAL_LIMIT, false);
+    applySnapshotToState(tag, snapshot);
+    return snapshot;
+  }, [applySnapshotToState, fetchRosterPage]);
+
+  const refreshOpenThreadContent = useCallback(async () => {
+    const threadId = selectedThreadIdRef.current;
+    if (!threadId || !profileTokenRef.current) return;
+
+    const data = await epdsApi.chatThread(threadId);
+    setSelectedThread(data.item);
+    zeroThreadUnreadLocally(threadId);
+  }, [zeroThreadUnreadLocally]);
+
   const refreshBoardsList = useCallback(() => {
     return epdsApi.boardsList(unmod).then((data) => {
       setBoards(data.items);
@@ -223,8 +250,43 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
         activeBoardTagRef.current = next;
         return next;
       });
+      return data.items;
     });
   }, [unmod]);
+
+  const pollBoardsUnread = useCallback(async () => {
+    if (!profileTokenRef.current || selectBoardInFlightRef.current) return;
+
+    const items = await refreshBoardsList();
+    const activeTag = activeBoardTagRef.current;
+
+    for (const board of items) {
+      const count = board.chatUnreadThreadsCount ?? 0;
+      const prevCount = prevUnreadThreadsByBoardTagRef.current[board.tag] ?? 0;
+      prevUnreadThreadsByBoardTagRef.current[board.tag] = count;
+
+      if (count <= 0) continue;
+
+      const isActiveBoard = board.tag === activeTag;
+      if (!isActiveBoard && count === prevCount) continue;
+
+      invalidateBoardRosterCache(board.tag);
+
+      if (!isActiveBoard) continue;
+
+      try {
+        await reloadBoardRosterFromScratch(board.tag);
+        await refreshOpenThreadContent();
+      } catch {
+        // keep current UI on poll failure
+      }
+    }
+  }, [
+    refreshBoardsList,
+    invalidateBoardRosterCache,
+    reloadBoardRosterFromScratch,
+    refreshOpenThreadContent,
+  ]);
 
   useEffect(() => {
     epdsApi.chatSession()
@@ -244,6 +306,18 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     if (!profileToken || !boardTag) return;
     void selectBoard(boardTag);
   }, [profileToken, boardTag, selectBoard]);
+
+  useEffect(() => {
+    if (!profileToken) return;
+
+    const tick = () => {
+      void pollBoardsUnread();
+    };
+
+    tick();
+    const intervalId = window.setInterval(tick, BOARDS_UNREAD_POLL_MS);
+    return () => window.clearInterval(intervalId);
+  }, [profileToken, pollBoardsUnread]);
 
   useEffect(() => {
     if (!selectedThreadId || !profileToken) return;
