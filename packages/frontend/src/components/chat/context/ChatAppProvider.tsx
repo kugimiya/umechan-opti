@@ -49,6 +49,7 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   const [isSending, setIsSending] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [isMarkingAllRead, setIsMarkingAllRead] = useState(false);
 
   const boardCacheRef = useRef<Record<string, BoardRosterCache>>({});
   const activeBoardTagRef = useRef(boardTag);
@@ -250,11 +251,16 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   }, [passphrase, refreshBoardsList]);
 
   const markAllRead = useCallback(async () => {
-    if (!profileToken || !boardTag) return;
-    await epdsApi.chatMarkAllRead(boardTag, profileToken);
-    await syncCurrentBoardRoster();
-    await refreshBoardsList();
-  }, [profileToken, boardTag, syncCurrentBoardRoster, refreshBoardsList]);
+    if (!profileToken || !boardTag || isMarkingAllRead) return;
+    setIsMarkingAllRead(true);
+    try {
+      await epdsApi.chatMarkAllRead(boardTag, profileToken);
+      await syncCurrentBoardRoster();
+      await refreshBoardsList();
+    } finally {
+      setIsMarkingAllRead(false);
+    }
+  }, [profileToken, boardTag, isMarkingAllRead, syncCurrentBoardRoster, refreshBoardsList]);
 
   const setHidden = useCallback(async (threadId: number, hidden: boolean) => {
     if (!profileToken) return;
@@ -393,6 +399,7 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     deleteFolder,
     renameFolderOnChange,
     markAllRead,
+    isMarkingAllRead,
 
     aliasThreadId,
     setAliasThreadId,
@@ -433,6 +440,7 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     deleteFolder,
     renameFolderOnChange,
     markAllRead,
+    isMarkingAllRead,
     aliasThreadId,
     aliasValue,
     renameThread,

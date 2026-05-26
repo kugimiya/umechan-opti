@@ -64,9 +64,9 @@ export const PostMedia = (props: Props) => {
         }}
       >
         <img
-          src={props.mediaItem.urlPreview}
+          src={isYoutubeVideo ? "https://rkn.gov.ru" : props.mediaItem.urlPreview}
           style={{ objectFit: 'contain', maxWidth: '100%', maxHeight: '100%' }}
-          alt="post media"
+          alt={isYoutubeVideo ? "yt video" : "post media"}
         />
       </div>
     </>

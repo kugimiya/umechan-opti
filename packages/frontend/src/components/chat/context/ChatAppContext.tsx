@@ -32,6 +32,7 @@ export type ChatAppContextValue = {
   deleteFolder: (folderId: number) => Promise<void>;
   renameFolderOnChange: (folderId: number, name: string) => Promise<void>;
   markAllRead: () => Promise<void>;
+  isMarkingAllRead: boolean;
 
   aliasThreadId: number | null;
   setAliasThreadId: (id: number | null) => void;
@@ -82,6 +83,7 @@ export const chatAppContextDefaultValue: ChatAppContextValue = {
   deleteFolder: async () => {},
   renameFolderOnChange: async () => {},
   markAllRead: async () => {},
+  isMarkingAllRead: false,
 
   aliasThreadId: null,
   setAliasThreadId: noop,

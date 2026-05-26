@@ -1,13 +1,27 @@
 :root {
-  --chat-bg: #000000;
-  --chat-active: #508f7d;
-  --chat-border: rgb(59, 59, 59);
+  --chat-bg: #262625;
+  --chat-active: #375A61;
+  --chat-border: #F0E7D8;
 
-  --chat-message-bg: rgb(59, 59, 59);
+  --chat-message-bg: #454545;
+  --chat-messages-bg: #262625;
 
   --chat-progress-a: var(--chat-active);
   --chat-progress-b: var(--chat-bg);
   --chat-progress-track: var(--chat-bg);
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --chat-bg: #F2E6D8;
+    --chat-active: #BF9B7A;
+    --chat-border: #555934;
+    --chat-message-bg: #8C5B3E;
+    --chat-messages-bg: #F2E6D8;
+    --chat-progress-a: var(--chat-active);
+    --chat-progress-b: var(--chat-bg);
+    --chat-progress-track: var(--chat-bg);
+  }
 }
 
 body {

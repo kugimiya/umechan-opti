@@ -28,6 +28,7 @@ export const ChatRoster: FC = () => {
     renameFolderOnChange,
     deleteFolder,
     markAllRead,
+    isMarkingAllRead,
     showHidden,
     setShowHidden,
     hiddenThreads,
@@ -75,6 +76,23 @@ export const ChatRoster: FC = () => {
         onSelect={(board) => selectBoard(board.tag)}
         selected={boardTag}
       />
+
+      <Box style={{ paddingLeft: '8px' }}>
+        <button
+          type="button"
+          disabled={isMarkingAllRead}
+          onClick={() => void markAllRead()}
+          style={{
+            border: 0,
+            cursor: isMarkingAllRead ? "not-allowed" : "pointer",
+            padding: "4px 8px",
+            fontSize: "10px",
+            opacity: isMarkingAllRead ? 0.6 : 1,
+          }}
+        >
+          Прочитать всё
+        </button>
+      </Box>
 
       {isLoading ? <IndeterminateLinearProgress /> : null}
 
@@ -129,10 +147,6 @@ export const ChatRoster: FC = () => {
           </button>
         </Box>
       ))}
-
-      <button type="button" onClick={markAllRead}>
-        Прочитать всё
-      </button>
 
       <button type="button" onClick={() => setShowHidden((prev) => !prev)}>
         {showHidden ? "Скрыть блок скрытых" : "Показать скрытые"}

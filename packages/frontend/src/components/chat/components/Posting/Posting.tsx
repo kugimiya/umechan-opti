@@ -1,14 +1,15 @@
 import { Box } from "@/components/layout/Box/Box";
-import { FC, useCallback, useState } from "react";
+import { FC, RefObject, useCallback } from "react";
 
 type Props = {
   isSending: boolean;
+  message: string;
+  setMessage: (value: string) => void;
   sendMessage: (message: string) => Promise<boolean>;
+  textareaRef?: RefObject<HTMLTextAreaElement | null>;
 };
 
-export const Posting: FC<Props> = ({ isSending, sendMessage }) => {
-  const [message, setMessage] = useState("");
-
+export const Posting: FC<Props> = ({ isSending, message, setMessage, sendMessage, textareaRef }) => {
   const submit = useCallback(async () => {
     const draft = message.trim();
     if (!draft || isSending) return;
@@ -17,7 +18,7 @@ export const Posting: FC<Props> = ({ isSending, sendMessage }) => {
     if (ok) {
       setMessage("");
     }
-  }, [isSending, message, sendMessage]);
+  }, [isSending, message, sendMessage, setMessage]);
 
   return (
     <Box
@@ -26,6 +27,7 @@ export const Posting: FC<Props> = ({ isSending, sendMessage }) => {
       style={{ borderTop: "1px solid var(--chat-border)", paddingTop: 0, position: "relative" }}
     >
       <textarea
+        ref={textareaRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         disabled={isSending}
