@@ -1,15 +1,15 @@
 import createFastify from "fastify";
 import fastifyCors from '@fastify/cors';
 import { createDbConnection } from "../db/connection";
-import type { CreateUpdateTickReturn } from "../sync";
 import { logger } from "../utils/logger";
 import { bindBoardsRoutes } from "./routes/boards";
 import { bindUtilRoutes } from "./routes/util";
+import type { ApiServerSyncOptions } from "./syncOptions";
 
 export const createApiServer = async (
   listenPort: number,
   listenHost: string,
-  tickService: CreateUpdateTickReturn
+  sync: ApiServerSyncOptions = {},
 ) => {
   const db = await createDbConnection();
   const fastify = createFastify();
@@ -26,7 +26,7 @@ export const createApiServer = async (
   bindBoardsRoutes(fastify, db);
   logger.info("Board routes binded");
 
-  bindUtilRoutes(fastify, tickService);
+  bindUtilRoutes(fastify, sync);
   logger.info("Util routes binded");
 
   const startListen = async () => {

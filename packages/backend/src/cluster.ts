@@ -3,6 +3,10 @@ import cluster from "node:cluster";
 import os from "node:os";
 import { createDbConnection } from "./db/connection";
 import { runApi, runKafka, runSyncLoop } from "./app/roles";
+import { handleForceSyncMessage, requestForceSyncFromPrimary } from "./cluster/ipc";
+import { createSyncLock } from "./cluster/syncLock";
+import { createUpdateTick } from "./sync";
+import { pissykakaApi } from "./utils/config";
 import { logger } from "./utils/logger";
 
 if (!process.env.DATABASE_URL) {
@@ -80,13 +84,20 @@ const runPrimary = async () => {
   process.on("SIGTERM", shutdown);
   process.on("SIGINT", shutdown);
 
+  const withSyncLock = createSyncLock();
+  const tickService = await createUpdateTick(pissykakaApi);
+
+  cluster.on("message", (worker, msg) => {
+    handleForceSyncMessage(worker, msg, tickService, withSyncLock);
+  });
+
   await runKafka({ noKafkaConsumer });
-  await runSyncLoop({ noFullSync, noTickSync });
+  await runSyncLoop({ noFullSync, noTickSync }, tickService, withSyncLock);
 };
 
 const runWorker = async () => {
-  logger.info(`[Cluster] Worker ${process.pid} starting API`);
-  await runApi();
+  logger.info(`[Cluster] Worker ${process.pid} starting API (api-only)`);
+  await runApi({ apiOnly: true, requestForceSync: requestForceSyncFromPrimary });
 };
 
 if (cluster.isPrimary) {

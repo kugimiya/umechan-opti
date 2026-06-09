@@ -29,7 +29,11 @@ export const AppDataSource = new DataSource({
   enableWAL: true,
   timeout: 5000,
   prepareDatabase: (db) => {
-    db.pragma("cache_size = 25000");
+    db.pragma("journal_mode = WAL");
+    db.pragma("synchronous = NORMAL");
+    db.pragma("cache_size = -64000");
     db.pragma("temp_store = MEMORY");
+    db.pragma("mmap_size = 268435456");
+    db.pragma("wal_autocheckpoint = 1000");
   },
 });

@@ -2,6 +2,7 @@ import { createApiServer } from "../api";
 import { createKafkaConsumer } from "../kafka";
 import { createUpdateTick } from "../sync";
 import type { CreateUpdateTickReturn } from "../sync";
+import type { SyncLock } from "../cluster/syncLock";
 import { createDbConnection } from "../db/connection";
 import {
   apiDefaultListenHost,
@@ -48,14 +49,20 @@ export const runKafka = async (flags: Pick<AppFlags, "noKafkaConsumer">) => {
 
 export const runApi = async (opts?: {
   tickService?: CreateUpdateTickReturn;
+  /** Cluster workers: API only, no sync service (tick/full sync live in primary). */
+  apiOnly?: boolean;
+  /** Cluster workers: delegate force_sync to primary via IPC. */
+  requestForceSync?: (threadId: number) => Promise<void>;
   listenPort?: number;
   listenHost?: string;
 }) => {
-  const tickService = opts?.tickService ?? await createUpdateTick(pissykakaApi);
+  const tickService =
+    opts?.tickService ??
+    (opts?.apiOnly ? undefined : await createUpdateTick(pissykakaApi));
   const { startListen } = await createApiServer(
     opts?.listenPort ?? apiDefaultListenPort,
     opts?.listenHost ?? apiDefaultListenHost,
-    tickService,
+    { tickService, requestForceSync: opts?.requestForceSync },
   );
   await startListen();
 };
@@ -63,8 +70,10 @@ export const runApi = async (opts?: {
 export const runSyncLoop = async (
   flags: Pick<AppFlags, "noFullSync" | "noTickSync">,
   tickService?: CreateUpdateTickReturn,
+  withSyncLock?: SyncLock,
 ) => {
   const { tick, updateAll } = tickService ?? await createUpdateTick(pissykakaApi);
+  const run = withSyncLock ?? (<T>(fn: () => Promise<T>) => fn());
 
   let currentTick = 0;
   let lastFullSyncTime = 0;
@@ -74,7 +83,7 @@ export const runSyncLoop = async (
   if (!flags.noFullSync) {
     logger.info("Before first tick we should fetch all!");
     measureTime("fetch_all", "start");
-    await updateAll();
+    await run(() => updateAll());
     lastFullSyncTime = Date.now();
     logger.info(`Fetch ended with ${measureTime("fetch_all", "end")}ms`);
   } else {
@@ -91,7 +100,7 @@ export const runSyncLoop = async (
       if (!flags.noTickSync) {
         logger.info(`Start tick #${currentTick}`);
         measureTime("upd_tick", "start");
-        await tick();
+        await run(() => tick());
         const timeTaken = measureTime("upd_tick", "end");
         logger.info(`Update tick #${currentTick} completed with ${timeTaken}ms`);
         currentTick += 1;
@@ -100,7 +109,7 @@ export const runSyncLoop = async (
       if (!flags.noFullSync && fullSyncIntervalMs > 0 && Date.now() - lastFullSyncTime >= fullSyncIntervalMs) {
         logger.info("Running periodic full sync...");
         measureTime("full_sync", "start");
-        await updateAll();
+        await run(() => updateAll());
         lastFullSyncTime = Date.now();
         logger.info(`Periodic full sync ended with ${measureTime("full_sync", "end")}ms`);
       }
@@ -129,7 +138,7 @@ export const runMonolith = async (flags: AppFlags) => {
     const { startListen } = await createApiServer(
       apiDefaultListenPort,
       apiDefaultListenHost,
-      tickService,
+      { tickService },
     );
     await startListen();
   }

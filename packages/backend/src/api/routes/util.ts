@@ -1,9 +1,10 @@
 import { FastifyInstance, FastifyRequest } from "fastify";
-import type { CreateUpdateTickReturn } from "../../sync";
+import type { ApiServerSyncOptions } from "../syncOptions";
 import { logger } from "../../utils/logger";
 import os from "node:os";
 
-export const bindUtilRoutes = (fastify: FastifyInstance, tickService: CreateUpdateTickReturn) => {
+export const bindUtilRoutes = (fastify: FastifyInstance, sync: ApiServerSyncOptions = {}) => {
+  const { tickService, requestForceSync } = sync;
   const metrics = {
     requests: 0,
   };
@@ -20,14 +21,24 @@ export const bindUtilRoutes = (fastify: FastifyInstance, tickService: CreateUpda
           : Number(raw);
     try {
       if (Number.isFinite(threadId) && threadId > 0) {
-        await tickService.updatePartial(threadId);
+        if (tickService) {
+          await tickService.updatePartial(threadId);
+        } else if (requestForceSync) {
+          await requestForceSync(threadId);
+        } else {
+          reply.code(503).send({ ok: false, error: "sync is not available" });
+          return;
+        }
       } else {
-        // await tickService.tick();
+        // await tickService?.tick();
       }
+      reply.send({ ok: true });
     } catch (err) {
       logger.error(err);
-    } finally {
-      reply.send({ ok: true });
+      reply.code(500).send({
+        ok: false,
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   });
 

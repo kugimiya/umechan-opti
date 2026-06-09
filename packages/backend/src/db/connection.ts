@@ -15,6 +15,7 @@ export const createDbConnection = async () => {
     if (process.env.SKIP_MIGRATIONS !== "1") {
       await runMigrations();
     }
+    await AppDataSource.query("PRAGMA optimize");
   }
 
   return {
