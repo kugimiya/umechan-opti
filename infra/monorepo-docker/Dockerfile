@@ -51,7 +51,7 @@ WORKDIR /app/packages/backend
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "node dist/db/cli.js migrate && npm run start:no-tick-sync"]
+CMD ["sh", "-c", "node dist/db/cli.js migrate && npm run start:cluster"]
 
 FROM node:22-alpine AS frontend-runtime
 

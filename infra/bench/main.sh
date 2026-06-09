@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HOST="${HOST:-jopka-rpi3.lan}"
-PORT="${PORT:-3000}"
+HOST="${HOST:-melchior.lan}"
+PORT="${PORT:-9000}"
 PASSPHRASE="${PASSPHRASE:-$(openssl rand -hex 4)}"
 BOARD_TAG="${BOARD_TAG:-rnd}"
 THREADS_HEAVY_OFFSET="${THREADS_HEAVY_OFFSET:-50}"
