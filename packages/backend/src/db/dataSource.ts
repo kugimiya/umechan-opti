@@ -24,6 +24,12 @@ export const AppDataSource = new DataSource({
   database: getDatabasePath(),
   entities: [Board, Post, Media, Settings, File, Passport, ChatProfile, ProfileThreadState, ChatFolder, ProfileOwnPost],
   migrations: [path.join(__dirname, "migrations", "*.{ts,js}")],
-  synchronize: false, // Используем миграции вместо synchronize
+  synchronize: false,
   logging: process.env.NODE_ENV === "development",
+  enableWAL: true,
+  timeout: 5000,
+  prepareDatabase: (db) => {
+    db.pragma("cache_size = 25000");
+    db.pragma("temp_store = MEMORY");
+  },
 });
