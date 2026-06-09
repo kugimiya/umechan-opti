@@ -39,6 +39,12 @@ export class Post {
   @Column({ type: "integer", nullable: true })
   legacyId!: number | null;
 
+  @Column({ type: "boolean", default: false })
+  isSticky!: boolean;
+
+  @Column({ type: "boolean", default: false })
+  isBlocked!: boolean;
+
   @OneToMany(() => Media, (media: Media) => media.post)
   media!: Media[];
 

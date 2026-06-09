@@ -25,6 +25,9 @@ export type ChatAppContextValue = {
 
   selectedThreadId: number | null;
   loadThread: (threadId: number) => void;
+  closeThread: () => void;
+
+  isThreadBlocked: boolean;
 
   folderDraft: string;
   setFolderDraft: (value: string) => void;
@@ -76,6 +79,9 @@ export const chatAppContextDefaultValue: ChatAppContextValue = {
 
   selectedThreadId: null,
   loadThread: noop,
+  closeThread: noop,
+
+  isThreadBlocked: false,
 
   folderDraft: "",
   setFolderDraft: noop,

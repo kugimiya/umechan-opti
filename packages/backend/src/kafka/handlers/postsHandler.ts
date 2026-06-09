@@ -38,6 +38,8 @@ export async function handlePostsMessage(
             messageTruncated: postData.messageTruncated,
             timestamp: postData.timestamp,
             updatedAt: postData.updatedAt,
+            isSticky: postData.isSticky,
+            isBlocked: postData.isBlocked,
           });
           logger.info(`[Kafka] Post create: id=${postData.id}`);
         }
@@ -67,6 +69,8 @@ export async function handlePostsMessage(
             messageTruncated: p.messageTruncated,
             timestamp: p.timestamp,
             updatedAt: p.updatedAt,
+            isSticky: p.isSticky,
+            isBlocked: p.isBlocked,
           });
           logger.info(`[Kafka] Post modify: id=${ev.postId}`);
         }

@@ -4,26 +4,70 @@ import { DataSource } from "typeorm";
 import { Media } from "../entities/Media";
 import { Post } from "../entities/Post";
 
+const stickyBlockedFromResponse = (post: ResponsePost) => ({
+  isSticky: Boolean(post.is_sticky),
+  isBlocked: Boolean(post.is_blocked),
+});
+
+/** SQLite default SQLITE_MAX_VARIABLE_NUMBER is 999. */
+const SQL_IN_CHUNK_SIZE = 500;
+const SQL_UPSERT_CHUNK_SIZE = 50;
+
+const chunkArray = <T>(items: T[], chunkSize: number): T[][] => {
+  if (chunkSize <= 0) return [items];
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += chunkSize) {
+    chunks.push(items.slice(i, i + chunkSize));
+  }
+  return chunks;
+};
+
+const postRowFromResponse = (post: ResponsePost) => ({
+  id: post.id,
+  boardId: post.board_id,
+  poster: post.poster,
+  posterVerified: post.is_verify,
+  message: post.message,
+  messageTruncated: post.truncated_message,
+  subject: post.subject,
+  timestamp: Number(post.timestamp),
+  parentId: post.parent_id || null,
+  updatedAt: post.updated_at,
+  ...stickyBlockedFromResponse(post),
+});
+
 export const dbModelPosts = (dataSource: DataSource) => ({
   getExistingIds: async (ids: number[]) => {
     if (!ids.length) return new Set<number>();
-    const rows = await dataSource
-      .getRepository(Post)
-      .createQueryBuilder("post")
-      .select("post.id", "id")
-      .where("post.id IN (:...ids)", { ids })
-      .getRawMany<{ id: number }>();
-    return new Set(rows.map((row) => Number(row.id)));
+    const result = new Set<number>();
+    for (const chunk of chunkArray(ids, SQL_IN_CHUNK_SIZE)) {
+      const rows = await dataSource
+        .getRepository(Post)
+        .createQueryBuilder("post")
+        .select("post.id", "id")
+        .where("post.id IN (:...ids)", { ids: chunk })
+        .getRawMany<{ id: number }>();
+      for (const row of rows) {
+        result.add(Number(row.id));
+      }
+    }
+    return result;
   },
   getUpdatedAtByIds: async (ids: number[]) => {
     if (!ids.length) return new Map<number, number>();
-    const rows = await dataSource
-      .getRepository(Post)
-      .createQueryBuilder("post")
-      .select(["post.id", "post.updatedAt"])
-      .where("post.id IN (:...ids)", { ids })
-      .getMany();
-    return new Map(rows.map((row) => [Number(row.id), row.updatedAt]));
+    const result = new Map<number, number>();
+    for (const chunk of chunkArray(ids, SQL_IN_CHUNK_SIZE)) {
+      const rows = await dataSource
+        .getRepository(Post)
+        .createQueryBuilder("post")
+        .select(["post.id", "post.updatedAt"])
+        .where("post.id IN (:...ids)", { ids: chunk })
+        .getMany();
+      for (const row of rows) {
+        result.set(Number(row.id), row.updatedAt);
+      }
+    }
+    return result;
   },
   insert: async (post: ResponsePost) => {
     const postRepository = dataSource.getRepository(Post);
@@ -38,6 +82,7 @@ export const dbModelPosts = (dataSource: DataSource) => ({
       timestamp: Number(post.timestamp),
       parentId: post.parent_id || null,
       updatedAt: post.updated_at,
+      ...stickyBlockedFromResponse(post),
     });
     return postRepository.save(newPost);
   },
@@ -53,6 +98,7 @@ export const dbModelPosts = (dataSource: DataSource) => ({
         subject: post.subject,
         timestamp: Number(post.timestamp),
         updatedAt: post.updated_at,
+        ...stickyBlockedFromResponse(post),
       }
     );
     return postRepository.findOne({ where: { id: post.id } });
@@ -88,6 +134,8 @@ export const dbModelPosts = (dataSource: DataSource) => ({
       messageTruncated?: string;
       timestamp?: number;
       updatedAt?: number;
+      isSticky?: boolean;
+      isBlocked?: boolean;
     }
   ) => {
     const repo = dataSource.getRepository(Post);
@@ -111,6 +159,8 @@ export const dbModelPosts = (dataSource: DataSource) => ({
       if (payload.messageTruncated !== undefined) post.messageTruncated = payload.messageTruncated;
       if (payload.timestamp !== undefined) post.timestamp = payload.timestamp;
       if (payload.updatedAt !== undefined) post.updatedAt = payload.updatedAt;
+      if (payload.isSticky !== undefined) post.isSticky = payload.isSticky;
+      if (payload.isBlocked !== undefined) post.isBlocked = payload.isBlocked;
       return repo.save(post);
     }
     return repo.save(
@@ -126,44 +176,37 @@ export const dbModelPosts = (dataSource: DataSource) => ({
         messageTruncated: payload.messageTruncated ?? defaults.messageTruncated,
         timestamp: payload.timestamp ?? defaults.timestamp,
         updatedAt: payload.updatedAt ?? defaults.updatedAt,
+        isSticky: payload.isSticky ?? false,
+        isBlocked: payload.isBlocked ?? false,
       })
     );
   },
   upsertMany: async (posts: ResponsePost[]) => {
     if (!posts.length) return;
-    await dataSource
-      .createQueryBuilder()
-      .insert()
-      .into(Post)
-      .values(
-        posts.map((post) => ({
-          id: post.id,
-          boardId: post.board_id,
-          poster: post.poster,
-          posterVerified: post.is_verify,
-          message: post.message,
-          messageTruncated: post.truncated_message,
-          subject: post.subject,
-          timestamp: Number(post.timestamp),
-          parentId: post.parent_id || null,
-          updatedAt: post.updated_at,
-        }))
-      )
-      .orUpdate(
-        [
-          "boardId",
-          "poster",
-          "posterVerified",
-          "message",
-          "messageTruncated",
-          "subject",
-          "timestamp",
-          "parentId",
-          "updatedAt",
-        ],
-        ["id"]
-      )
-      .execute();
+    for (const chunk of chunkArray(posts, SQL_UPSERT_CHUNK_SIZE)) {
+      await dataSource
+        .createQueryBuilder()
+        .insert()
+        .into(Post)
+        .values(chunk.map((post) => postRowFromResponse(post)))
+        .orUpdate(
+          [
+            "boardId",
+            "poster",
+            "posterVerified",
+            "message",
+            "messageTruncated",
+            "subject",
+            "timestamp",
+            "parentId",
+            "updatedAt",
+            "isSticky",
+            "isBlocked",
+          ],
+          ["id"]
+        )
+        .execute();
+    }
   },
   syncPostsAndMedia: async (
     posts: ResponsePost[],
@@ -176,64 +219,66 @@ export const dbModelPosts = (dataSource: DataSource) => ({
   ) => {
     if (!posts.length) return;
 
+    const mediaByPostId = new Map<number, typeof mediaItems>();
+    for (const item of mediaItems) {
+      const bucket = mediaByPostId.get(item.postId) ?? [];
+      bucket.push(item);
+      mediaByPostId.set(item.postId, bucket);
+    }
+
     await dataSource.transaction(async (manager) => {
-      await manager
-        .createQueryBuilder()
-        .insert()
-        .into(Post)
-        .values(
-          posts.map((post) => ({
-            id: post.id,
-            boardId: post.board_id,
-            poster: post.poster,
-            posterVerified: post.is_verify,
-            message: post.message,
-            messageTruncated: post.truncated_message,
-            subject: post.subject,
-            timestamp: Number(post.timestamp),
-            parentId: post.parent_id || null,
-            updatedAt: post.updated_at,
-          }))
-        )
-        .orUpdate(
-          [
-            "boardId",
-            "poster",
-            "posterVerified",
-            "message",
-            "messageTruncated",
-            "subject",
-            "timestamp",
-            "parentId",
-            "updatedAt",
-          ],
-          ["id"]
-        )
-        .execute();
+      for (const postChunk of chunkArray(posts, SQL_UPSERT_CHUNK_SIZE)) {
+        await manager
+          .createQueryBuilder()
+          .insert()
+          .into(Post)
+          .values(postChunk.map((post) => postRowFromResponse(post)))
+          .orUpdate(
+            [
+              "boardId",
+              "poster",
+              "posterVerified",
+              "message",
+              "messageTruncated",
+              "subject",
+              "timestamp",
+              "parentId",
+              "updatedAt",
+              "isSticky",
+              "isBlocked",
+            ],
+            ["id"]
+          )
+          .execute();
 
-      const postIds = posts.map((post) => post.id);
-      await manager
-        .createQueryBuilder()
-        .delete()
-        .from(Media)
-        .where("postId IN (:...postIds)", { postIds })
-        .execute();
+        const postIds = postChunk.map((post) => post.id);
+        for (const idChunk of chunkArray(postIds, SQL_IN_CHUNK_SIZE)) {
+          await manager
+            .createQueryBuilder()
+            .delete()
+            .from(Media)
+            .where("postId IN (:...postIds)", { postIds: idChunk })
+            .execute();
+        }
 
-      if (!mediaItems.length) return;
-
-      await manager
-        .createQueryBuilder()
-        .insert()
-        .into(Media)
-        .values(
-          mediaItems.map((item) => ({
-            mediaType: item.mediaType,
-            urlOrigin: item.link,
-            urlPreview: item.preview,
-            postId: item.postId,
-          }))
-        )
-        .execute();
+        const chunkMedia = postChunk.flatMap((post) => mediaByPostId.get(post.id) ?? []);
+        for (const mediaChunk of chunkArray(chunkMedia, SQL_UPSERT_CHUNK_SIZE)) {
+          if (!mediaChunk.length) continue;
+          await manager
+            .createQueryBuilder()
+            .insert()
+            .into(Media)
+            .values(
+              mediaChunk.map((item) => ({
+                mediaType: item.mediaType,
+                urlOrigin: item.link,
+                urlPreview: item.preview,
+                postId: item.postId,
+              }))
+            )
+            .execute();
+        }
+      }
     });
   },
 });

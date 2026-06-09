@@ -3,22 +3,32 @@ import { FC, RefObject, useCallback } from "react";
 
 type Props = {
   isSending: boolean;
+  isBlocked?: boolean;
   message: string;
   setMessage: (value: string) => void;
   sendMessage: (message: string) => Promise<boolean>;
   textareaRef?: RefObject<HTMLTextAreaElement | null>;
 };
 
-export const Posting: FC<Props> = ({ isSending, message, setMessage, sendMessage, textareaRef }) => {
+export const Posting: FC<Props> = ({
+  isSending,
+  isBlocked = false,
+  message,
+  setMessage,
+  sendMessage,
+  textareaRef,
+}) => {
   const submit = useCallback(async () => {
     const draft = message.trim();
-    if (!draft || isSending) return;
+    if (!draft || isSending || isBlocked) return;
 
     const ok = await sendMessage(draft);
     if (ok) {
       setMessage("");
     }
-  }, [isSending, message, sendMessage, setMessage]);
+  }, [isBlocked, isSending, message, sendMessage, setMessage]);
+
+  const disabled = isSending || isBlocked;
 
   return (
     <Box
@@ -30,20 +40,20 @@ export const Posting: FC<Props> = ({ isSending, message, setMessage, sendMessage
         ref={textareaRef}
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        disabled={isSending}
-        placeholder="Сообщение"
+        disabled={disabled}
+        placeholder={isBlocked ? "Тред закрыт для ответов" : "Сообщение"}
         style={{
           border: 0,
           padding: 4,
           paddingRight: 80,
           height: 72,
           backgroundColor: "var(--chat-bg)",
-          opacity: isSending ? 0.6 : 1,
+          opacity: disabled ? 0.6 : 1,
         }}
       />
       <button
         type="button"
-        disabled={isSending || !message.trim()}
+        disabled={disabled || !message.trim()}
         onClick={() => void submit()}
         style={{
           position: "absolute",
@@ -51,7 +61,7 @@ export const Posting: FC<Props> = ({ isSending, message, setMessage, sendMessage
           bottom: 0,
           right: 0,
           width: 72,
-          cursor: isSending ? "not-allowed" : "pointer",
+          cursor: disabled ? "not-allowed" : "pointer",
         }}
       >
         ↗

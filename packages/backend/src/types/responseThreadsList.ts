@@ -14,6 +14,8 @@ export type ResponsePost = {
   timestamp: number;
   parent_id: number | null;
   updated_at: number;
+  is_sticky?: boolean;
+  is_blocked?: boolean;
   replies: ResponsePost[];
   media?: {
     images?: ResponseMedia[];

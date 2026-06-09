@@ -21,29 +21,15 @@ export const ChatRoster: FC = () => {
     groupedThreads,
     selectedThreadId,
     loadThread,
-    folderDraft,
-    setFolderDraft,
-    createFolder,
-    folders,
-    renameFolderOnChange,
-    deleteFolder,
     markAllRead,
     isMarkingAllRead,
-    showHidden,
-    setShowHidden,
-    hiddenThreads,
-    setHidden,
-    aliasThreadId,
-    setAliasThreadId,
-    aliasValue,
-    setAliasValue,
-    renameThread,
     registerRosterScrollElement,
     ensureRosterFillsViewport,
     loadMoreRoster,
   } = useChatApp();
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const fillViewportScheduledRef = useRef(false);
 
   const onScrollContainerRef = useCallback(
     (el: HTMLDivElement | null) => {
@@ -55,7 +41,16 @@ export const ChatRoster: FC = () => {
 
   useLayoutEffect(() => {
     if (isLoading) return;
-    void ensureRosterFillsViewport();
+
+    if (fillViewportScheduledRef.current) return;
+    fillViewportScheduledRef.current = true;
+
+    const frameId = requestAnimationFrame(() => {
+      fillViewportScheduledRef.current = false;
+      void ensureRosterFillsViewport();
+    });
+
+    return () => cancelAnimationFrame(frameId);
   }, [boardTag, groupedThreads.length, isLoading, ensureRosterFillsViewport]);
 
   return (
@@ -124,68 +119,6 @@ export const ChatRoster: FC = () => {
       </InfiniteScroll>
 
       {isLoadingMore ? <IndeterminateLinearProgress /> : null}
-
-      <div>
-        <input
-          placeholder="Новая папка"
-          value={folderDraft}
-          onChange={(e) => setFolderDraft(e.target.value)}
-        />
-        <button type="button" onClick={createFolder}>
-          Создать папку
-        </button>
-      </div>
-
-      {folders.map((folder) => (
-        <Box key={folder.id} gap="6px" alignItems="center">
-          <input
-            value={folder.name}
-            onChange={(e) => renameFolderOnChange(folder.id, e.target.value)}
-          />
-          <button type="button" onClick={() => deleteFolder(folder.id)}>
-            Удалить папку
-          </button>
-        </Box>
-      ))}
-
-      <button type="button" onClick={() => setShowHidden((prev) => !prev)}>
-        {showHidden ? "Скрыть блок скрытых" : "Показать скрытые"}
-      </button>
-
-      {showHidden ? (
-        <Box flexDirection="column" gap="6px">
-          <b>Скрытые</b>
-          {hiddenThreads.map((thread) => (
-            <Box
-              key={thread.id}
-              gap="6px"
-              alignItems="center"
-              style={{ border: "1px solid var(--clr-border-dark)", padding: 6 }}
-            >
-              <span style={{ flex: 1 }}>{thread.displayTitle}</span>
-              <button type="button" onClick={() => setHidden(thread.id, false)}>
-                Показать обратно
-              </button>
-            </Box>
-          ))}
-        </Box>
-      ) : null}
-
-      {aliasThreadId != null ? (
-        <Box gap="6px">
-          <input
-            value={aliasValue}
-            onChange={(e) => setAliasValue(e.target.value)}
-            placeholder="Новое имя чата"
-          />
-          <button type="button" onClick={() => renameThread(aliasThreadId, aliasValue || null)}>
-            Сохранить имя
-          </button>
-          <button type="button" onClick={() => renameThread(aliasThreadId, null)}>
-            Сброс
-          </button>
-        </Box>
-      ) : null}
     </PrettyScrollbarContainer>
   );
 };

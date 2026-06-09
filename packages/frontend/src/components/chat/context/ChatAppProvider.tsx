@@ -22,6 +22,15 @@ type Props = PropsWithChildren & {
 };
 
 const BOARDS_UNREAD_POLL_MS = 5000;
+const UNREAD_SOUND_PATH = "/sounds/chat-unread.mp3";
+
+const playUnreadSound = () => {
+  if (typeof window === "undefined") return;
+  new Audio(UNREAD_SOUND_PATH).play().catch(() => void 0);
+};
+
+const isOverlayOpen = () =>
+  typeof document !== "undefined" && Boolean(document.querySelector("[data-overlay-modal]"));
 
 const threadsListEqual = (a: EpdsChatThread[], b: EpdsChatThread[]) => {
   const empty: BoardRosterCache = { ...emptyBoardRosterCache(), threads: a, hiddenThreads: [] };
@@ -60,6 +69,9 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   const selectedThreadIdRef = useRef(selectedThreadId);
   const selectBoardInFlightRef = useRef<string | null>(null);
   const prevUnreadThreadsByBoardTagRef = useRef<Record<string, number>>({});
+  const prevTotalUnreadRef = useRef<number | null>(null);
+  const rosterClosedRef = useRef(false);
+  const rosterPageFetchRef = useRef(false);
 
   useEffect(() => {
     activeBoardTagRef.current = boardTag;
@@ -99,9 +111,17 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     limit: number,
     append: boolean,
   ): Promise<BoardRosterCache> => {
-    const response = await epdsApi.chatThreads(tag, offset, limit);
-    const prev = append ? boardCacheRef.current[tag] : undefined;
-    return buildCacheFromResponse(prev, response, offset, limit, append);
+    if (rosterPageFetchRef.current) {
+      throw new Error("roster fetch in flight");
+    }
+    rosterPageFetchRef.current = true;
+    try {
+      const response = await epdsApi.chatThreads(tag, offset, limit);
+      const prev = append ? boardCacheRef.current[tag] : undefined;
+      return buildCacheFromResponse(prev, response, offset, limit, append);
+    } finally {
+      rosterPageFetchRef.current = false;
+    }
   }, []);
 
   const syncBoardInBackground = useCallback(async (tag: string) => {
@@ -125,6 +145,9 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   }, [syncBoardInBackground]);
 
   const pickInitialThreadId = useCallback((snapshot: BoardRosterCache, currentId: number | null) => {
+    if (rosterClosedRef.current) {
+      return null;
+    }
     if (currentId != null && snapshot.threads.some((t) => t.id === currentId)) {
       return currentId;
     }
@@ -165,12 +188,14 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     const tag = activeBoardTagRef.current;
     if (!profileTokenRef.current) return;
     const cached = boardCacheRef.current[tag];
-    if (!cached?.hasMore || isLoadingMore) return;
+    if (!cached?.hasMore || isLoadingMore || rosterPageFetchRef.current) return;
 
     setIsLoadingMore(true);
     try {
       const snapshot = await fetchRosterPage(tag, cached.nextOffset, ROSTER_SCROLL_LIMIT, true);
       applySnapshotToState(tag, snapshot);
+    } catch {
+      // skip when another roster fetch is in flight
     } finally {
       setIsLoadingMore(false);
     }
@@ -185,9 +210,14 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
       const cached = boardCacheRef.current[tag];
       if (!cached?.hasMore) break;
       if (el && isScrollable(el)) break;
+      if (rosterPageFetchRef.current) break;
 
-      const snapshot = await fetchRosterPage(tag, cached.nextOffset, ROSTER_FILL_LIMIT, true);
-      applySnapshotToState(tag, snapshot);
+      try {
+        const snapshot = await fetchRosterPage(tag, cached.nextOffset, ROSTER_FILL_LIMIT, true);
+        applySnapshotToState(tag, snapshot);
+      } catch {
+        break;
+      }
 
       await new Promise<void>((resolve) => {
         requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
@@ -200,7 +230,14 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   }, []);
 
   const loadThread = useCallback((threadId: number) => {
+    rosterClosedRef.current = false;
     setSelectedThreadId(threadId);
+  }, []);
+
+  const closeThread = useCallback(() => {
+    rosterClosedRef.current = true;
+    setSelectedThreadId(null);
+    setSelectedThread(null);
   }, []);
 
   const zeroThreadUnreadLocally = useCallback((threadId: number) => {
@@ -259,6 +296,14 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
 
     const items = await refreshBoardsList();
     const activeTag = activeBoardTagRef.current;
+    const totalUnread = items.reduce((sum, board) => sum + (board.chatUnreadThreadsCount ?? 0), 0);
+
+    if (prevTotalUnreadRef.current != null
+      && totalUnread > prevTotalUnreadRef.current
+      && document.visibilityState === "hidden") {
+      playUnreadSound();
+    }
+    prevTotalUnreadRef.current = totalUnread;
 
     for (const board of items) {
       const count = board.chatUnreadThreadsCount ?? 0;
@@ -320,6 +365,18 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   }, [profileToken, pollBoardsUnread]);
 
   useEffect(() => {
+    if (!profileToken) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || isOverlayOpen()) return;
+      closeThread();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [profileToken, closeThread]);
+
+  useEffect(() => {
     if (!selectedThreadId || !profileToken) return;
 
     let cancelled = false;
@@ -350,6 +407,7 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     () => (selectedThread ? toChatMessages(selectedThread) : []),
     [selectedThread],
   );
+  const isThreadBlocked = Boolean(selectedThread?.isBlocked);
   const lastMessageId = messages.at(-1)?.id;
   const messagesScrollToBottomOn = useMemo(
     () => [selectedThreadId, messages.length, lastMessageId] as const,
@@ -411,6 +469,7 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   const sendMessage = useCallback(async (messageOverride?: string): Promise<boolean> => {
     const text = (messageOverride ?? message).trim();
     if (!boardTag || !text) return false;
+    if (selectedThreadId != null && selectedThread?.isBlocked) return false;
     setIsSending(true);
     try {
       const markdownImages: string[] = [];
@@ -478,6 +537,7 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     selectedThreadId,
     profileToken,
     syncCurrentBoardRoster,
+    selectedThread,
   ]);
 
   const submitPosting = useCallback(async (draft: string) => {
@@ -506,6 +566,9 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
 
     selectedThreadId,
     loadThread,
+    closeThread,
+
+    isThreadBlocked,
 
     folderDraft,
     setFolderDraft,
@@ -549,6 +612,8 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
     groupedThreads,
     selectedThreadId,
     loadThread,
+    closeThread,
+    isThreadBlocked,
     folderDraft,
     createFolder,
     deleteFolder,

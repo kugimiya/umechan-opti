@@ -74,7 +74,9 @@ export const buildCacheFromResponse = (
   limit: number,
   append: boolean,
 ): BoardRosterCache => {
-  const nextOffset = offset + limit;
+  const nextOffset = append && prev
+    ? Math.max(prev.nextOffset, offset + limit)
+    : offset + limit;
   const totalCount = response.count;
   return {
     threads: append && prev

@@ -61,7 +61,8 @@ export const dbModelApis = (dataSource: DataSource) => ({
         .leftJoinAndSelect("thread.media", "media")
         .where("thread.parentId IS NULL")
         .andWhere("board.tag = :boardTag", { boardTag })
-        .orderBy("thread.updatedAt", "DESC")
+        .orderBy("thread.isSticky", "DESC")
+        .addOrderBy("thread.updatedAt", "DESC")
         .skip(offset)
         .take(limit)
         .getMany();
@@ -132,7 +133,8 @@ export const dbModelApis = (dataSource: DataSource) => ({
       }
 
       const threads = await queryBuilder
-        .orderBy("thread.updatedAt", "DESC")
+        .orderBy("thread.isSticky", "DESC")
+        .addOrderBy("thread.updatedAt", "DESC")
         .skip(offset)
         .take(limit)
         .getMany();

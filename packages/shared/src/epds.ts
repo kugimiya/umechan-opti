@@ -32,6 +32,8 @@ export type EpdsPost = {
   media?: EpdsPostMedia[];
   board: EpdsBoard;
   _count?: EpdsPostCount;
+  isSticky?: boolean;
+  isBlocked?: boolean;
 };
 
 export type EpdsChatThread = EpdsPost & {

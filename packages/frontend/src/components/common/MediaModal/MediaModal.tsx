@@ -54,6 +54,7 @@ export const MediaModal = (props: Props) => {
       <div
         onClick={props.onClose}
         className={styles.root}
+        data-overlay-modal
         tabIndex={-1}
         onKeyDown={(ev) => {
           if (ev.key === 'Escape') {

@@ -18,7 +18,7 @@
 
 .item span.unreadBadge {
   font-size: 8px;
-  color: var(--chat-active);
+  color: var(--chat-unread-fg);
   padding: 0;
 }
 
@@ -31,7 +31,7 @@
 }
 
 .active .unreadBadge {
-  color: var(--chat-active);
+  color: var(--chat-unread-fg);
 }
 
 .active {

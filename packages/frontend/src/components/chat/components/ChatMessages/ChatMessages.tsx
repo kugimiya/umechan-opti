@@ -9,7 +9,14 @@ import { Posting } from "../Posting/Posting";
 import { PrettyScrollbarContainer } from "../PrettyScrollbarContainer/PrettyScrollbarContainer";
 
 export const ChatMessages: FC = () => {
-  const { messages, messagesScrollToBottomOn, isSending, submitPosting } = useChatApp();
+  const {
+    messages,
+    messagesScrollToBottomOn,
+    isSending,
+    submitPosting,
+    selectedThreadId,
+    isThreadBlocked,
+  } = useChatApp();
   const [draftMessage, setDraftMessage] = useState("");
   const postingInputRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -21,6 +28,23 @@ export const ChatMessages: FC = () => {
   }, []);
 
   const messageGroups = useMemo(() => groupChatMessagesByDate(messages), [messages]);
+
+  if (selectedThreadId == null) {
+    return (
+      <Box
+        flexDirection="column"
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          color: "var(--chat-border)",
+          fontSize: "14px",
+        }}
+      >
+        Выберите тред
+      </Box>
+    );
+  }
 
   return (
     <Box flexDirection="column" style={{ flex: 1 }}>
@@ -59,6 +83,7 @@ export const ChatMessages: FC = () => {
 
       <Posting
         isSending={isSending}
+        isBlocked={isThreadBlocked}
         message={draftMessage}
         setMessage={setDraftMessage}
         sendMessage={submitPosting}

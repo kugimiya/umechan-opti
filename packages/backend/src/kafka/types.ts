@@ -49,6 +49,8 @@ export type PostPayload = {
   updatedAt?: number;
   boardId?: number | null;
   parentId?: number | null;
+  isSticky?: boolean;
+  isBlocked?: boolean;
 };
 
 export type CreateReplyOnThread = {

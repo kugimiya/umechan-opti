@@ -1,11 +1,18 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { Box } from "@/components/layout/Box/Box";
 import { useChatApp } from "../../context/useChatApp";
 
 export const ChatLogin: FC = () => {
   const { passphrase, setPassphrase, identify } = useChatApp();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const isSubmitDisabled = !isMounted || passphrase.trim().length < 3;
 
   return (
     <Box flexDirection="column" gap="12px">
@@ -15,8 +22,9 @@ export const ChatLogin: FC = () => {
         value={passphrase}
         onChange={(e) => setPassphrase(e.target.value)}
         placeholder="Кодовая фраза"
+        suppressHydrationWarning
       />
-      <button onClick={identify} disabled={passphrase.trim().length < 3}>
+      <button type="button" onClick={identify} disabled={isSubmitDisabled}>
         Войти
       </button>
     </Box>

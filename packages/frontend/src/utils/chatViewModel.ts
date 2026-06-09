@@ -112,6 +112,13 @@ export const groupChatMessagesByDate = (messages: ChatMessage[]): ChatMessageDat
   return groups;
 };
 
+const sortThreadsInGroup = (items: EpdsChatThread[]) =>
+  items.slice().sort((a, b) => {
+    const stickyDiff = Number(Boolean(b.isSticky)) - Number(Boolean(a.isSticky));
+    if (stickyDiff !== 0) return stickyDiff;
+    return b.updatedAt - a.updatedAt;
+  });
+
 export const groupThreadsByFolder = (items: EpdsChatThread[], folders: EpdsChatFolder[]): ChatThreadGroup[] => {
   const byFolder = new Map<number | null, EpdsChatThread[]>();
   for (const item of items) {
@@ -122,13 +129,13 @@ export const groupThreadsByFolder = (items: EpdsChatThread[], folders: EpdsChatF
   groups.push({
     id: "no-folder",
     title: "Без папки",
-    items: (byFolder.get(null) ?? []).sort((a, b) => b.updatedAt - a.updatedAt),
+    items: sortThreadsInGroup(byFolder.get(null) ?? []),
   });
   for (const folder of folders) {
     groups.push({
       id: `folder-${folder.id}`,
       title: folder.name,
-      items: (byFolder.get(folder.id) ?? []).sort((a, b) => b.updatedAt - a.updatedAt),
+      items: sortThreadsInGroup(byFolder.get(folder.id) ?? []),
     });
   }
   return groups.filter((group) => group.items.length > 0 || group.id === "no-folder");

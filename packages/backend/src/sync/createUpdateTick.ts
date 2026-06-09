@@ -1,7 +1,7 @@
 import { createDbConnection } from "../db/connection";
 import { createRestSource } from "../sources";
 import { logger } from "../utils/logger";
-import { getFullThreadsV2 } from "./getFullThreads";
+import { getFullThreads, getFullThreadsV2 } from "./getFullThreads";
 import { processBoards } from "./processors/processBoards";
 import { processEvents } from "./processors/processEvents";
 import { processPosts } from "./processors/processPosts";
@@ -18,7 +18,20 @@ export const createUpdateTick = async (baseUrl: string) => {
     await db.settings.create('current_timestamp', 'number', '0');
   }
 
+  let isFirstFullSync = true;
+
   const updateAll = async () => {
+    if (isFirstFullSync) {
+      isFirstFullSync = false;
+      logger.info("Full sync (initial via getFullThreads, no heuristics)...");
+      const { boards, fullThreads } = await getFullThreads(source);
+      logger.info("Update database (boards)...");
+      await processBoards(boards, db);
+      logger.info(`Update database (posts), threads=${fullThreads.length}...`);
+      await processPosts(fullThreads, db);
+      return;
+    }
+
     logger.info("Full sync (streaming via getFullThreadsV2)...");
     await getFullThreadsV2(source, {
       onBoards: async (boards) => {
