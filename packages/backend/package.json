@@ -6,6 +6,7 @@
     "build": "tsc",
     "start": "tsc && node --env-file=.env dist/index.js",
     "start-ci": "npm run migrate; node --env-file=.env dist/index.js",
+    "start:cluster": "tsc && node --env-file=.env dist/cluster.js",
     "start:no-tick-sync": "tsc && node --env-file=.env dist/index.js --no-tick-sync",
     "start:no-full-sync": "tsc && node --env-file=.env dist/index.js --no-full-sync",
     "test": "tsc && node --env-file=.env --test dist",

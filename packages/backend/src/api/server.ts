@@ -29,13 +29,15 @@ export const createApiServer = async (
   bindUtilRoutes(fastify, tickService);
   logger.info("Util routes binded");
 
-  const startListen = () => fastify.listen({ port: listenPort, host: listenHost }, (err: Error | null) => {
-    if (err) {
-      logger.error(err);
-    } else {
+  const startListen = async () => {
+    try {
+      await fastify.listen({ port: listenPort, host: listenHost });
       logger.info(`Start API server at ${JSON.stringify(fastify.server.address())}`);
+    } catch (err) {
+      logger.error(err);
+      throw err;
     }
-  });
+  };
 
-  return { startListen };
+  return { fastify, startListen };
 };

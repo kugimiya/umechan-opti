@@ -12,7 +12,9 @@ import { dbModelChat } from "./repositories/chat";
 export const createDbConnection = async () => {
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();
-    await runMigrations();
+    if (process.env.SKIP_MIGRATIONS !== "1") {
+      await runMigrations();
+    }
   }
 
   return {
