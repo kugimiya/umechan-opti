@@ -30,13 +30,22 @@ export const createApiServer = async (
   logger.info("Util routes binded");
 
   const startListen = async () => {
-    try {
-      await fastify.listen({ port: listenPort, host: listenHost });
-      logger.info(`Start API server at ${JSON.stringify(fastify.server.address())}`);
-    } catch (err) {
-      logger.error(err);
-      throw err;
-    }
+    await fastify.ready();
+    await new Promise<void>((resolve, reject) => {
+      const onError = (err: Error) => {
+        fastify.server.removeListener("listening", onListening);
+        logger.error(err);
+        reject(err);
+      };
+      const onListening = () => {
+        fastify.server.removeListener("error", onError);
+        logger.info(`Start API server at ${JSON.stringify(fastify.server.address())}`);
+        resolve();
+      };
+      fastify.server.once("error", onError);
+      fastify.server.once("listening", onListening);
+      fastify.server.listen(listenPort, listenHost);
+    });
   };
 
   return { fastify, startListen };

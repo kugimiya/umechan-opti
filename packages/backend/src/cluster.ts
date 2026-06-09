@@ -38,10 +38,7 @@ const noTickSync = process.argv.includes("--no-tick-sync");
 const noKafkaConsumer = process.argv.includes("--no-kafka-consumer");
 
 const forkWorker = () => {
-  cluster.fork({
-    ...process.env,
-    SKIP_MIGRATIONS: "1",
-  });
+  cluster.fork({ SKIP_MIGRATIONS: "1" });
 };
 
 const runPrimary = async () => {
@@ -53,7 +50,22 @@ const runPrimary = async () => {
     forkWorker();
   }
 
+  const listeningWorkers = new Set<number>();
+
+  cluster.on("listening", (worker, address) => {
+    listeningWorkers.add(worker.id);
+    logger.info(`[Cluster] Worker ${worker.process.pid} listening on ${JSON.stringify(address)}`);
+  });
+
   cluster.on("exit", (worker, code, signal) => {
+    const wasListening = listeningWorkers.delete(worker.id);
+    if (signal === "SIGTERM") {
+      return;
+    }
+    if (!wasListening && code === 1) {
+      logger.error(`[Cluster] Worker ${worker.process.pid} failed to start, not restarting`);
+      return;
+    }
     logger.warn(`[Cluster] Worker ${worker.process.pid} exited (code=${code}, signal=${signal}), restarting`);
     forkWorker();
   });
