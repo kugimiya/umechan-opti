@@ -126,15 +126,15 @@ export const dbModelApis = (dataSource: DataSource) => ({
         .createQueryBuilder("thread")
         .leftJoinAndSelect("thread.board", "board")
         .leftJoinAndSelect("thread.media", "media")
-        .where("thread.parentId IS NULL");
+        .where("thread.parentId IS NULL")
+        .andWhere("thread.isSticky = :isSticky", { isSticky: false });
 
       if (moderated) {
         queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: bannedBoardTags });
       }
 
       const threads = await queryBuilder
-        .orderBy("thread.isSticky", "DESC")
-        .addOrderBy("thread.updatedAt", "DESC")
+        .orderBy("thread.updatedAt", "DESC")
         .skip(offset)
         .take(limit)
         .getMany();
@@ -159,7 +159,8 @@ export const dbModelApis = (dataSource: DataSource) => ({
       const queryBuilder = postRepository
         .createQueryBuilder("thread")
         .leftJoin("thread.board", "board")
-        .where("thread.parentId IS NULL");
+        .where("thread.parentId IS NULL")
+        .andWhere("thread.isSticky = :isSticky", { isSticky: false });
 
       if (moderated) {
         queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: bannedBoardTags });
