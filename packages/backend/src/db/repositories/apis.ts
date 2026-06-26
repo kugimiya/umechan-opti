@@ -3,7 +3,7 @@ import { DataSource } from "typeorm";
 import { Board } from "../entities/Board";
 import { Post } from "../entities/Post";
 
-const bannedBoardTags = ['fff', 'uwu', 'hry', 'uly', '//', '///', '/'];
+const bannedBoardTags = ['fff', 'uwu', 'hry', 'uly', '//', '///', '/', 'hdn'];
 
 export const dbModelApis = (dataSource: DataSource) => ({
   boards: {
