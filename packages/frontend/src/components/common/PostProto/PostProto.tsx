@@ -22,7 +22,7 @@ export const PostProto = memo(function PostProtoInner(props: Props) {
   const { post, isOpPost = false, isAtThreadList = false, isAtFeed = false } = props;
 
   const inThread = isAtThreadList
-    ? <Link href={props.isUnmod ? `/board/${post.board.tag}/${post.id}?unmod=true` : `/board/${post.board.tag}/${post.id}`}>В тред</Link>
+    ? <Link href={props.isUnmod === "true" ? `/board/${post.board.tag}/${post.id}?unmod=true` : `/board/${post.board.tag}/${post.id}`}>В тред</Link>
     : null;
 
   const postIdLink = <QuickReplyLink post={post} isAtThread />;
