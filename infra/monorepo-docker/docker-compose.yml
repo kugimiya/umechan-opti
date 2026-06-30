@@ -25,7 +25,7 @@ services:
       - "${BACKEND_PORT:-3000}:3000"
     volumes:
       - backend_data:/app/packages/backend/data
-    restart: unless-stopped
+    restart: always
 
   frontend:
     build:
@@ -50,7 +50,7 @@ services:
       - "${FRONTEND_PORT:-3040}:3040"
     depends_on:
       - backend
-    restart: unless-stopped
+    restart: always
 
   database:
     image: mysql:8.3.0
