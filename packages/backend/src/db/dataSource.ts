@@ -7,6 +7,7 @@ import { ChatProfile } from "./entities/ChatProfile";
 import { ProfileThreadState } from "./entities/ProfileThreadState";
 import { ChatFolder } from "./entities/ChatFolder";
 import { ProfileOwnPost } from "./entities/ProfileOwnPost";
+import { SyncChangeLog } from "./entities/SyncChangeLog";
 import path from "path";
 
 const getDatabasePath = (): string => {
@@ -20,7 +21,17 @@ const getDatabasePath = (): string => {
 export const AppDataSource = new DataSource({
   type: "better-sqlite3",
   database: getDatabasePath(),
-  entities: [Board, Post, Media, Settings, ChatProfile, ProfileThreadState, ChatFolder, ProfileOwnPost],
+  entities: [
+    Board,
+    Post,
+    Media,
+    Settings,
+    ChatProfile,
+    ProfileThreadState,
+    ChatFolder,
+    ProfileOwnPost,
+    SyncChangeLog,
+  ],
   migrations: [path.join(__dirname, "migrations", "*.{ts,js}")],
   synchronize: false,
   logging: process.env.NODE_ENV === "development",

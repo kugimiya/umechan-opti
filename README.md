@@ -91,6 +91,7 @@ cp packages/backend/.env.example packages/backend/.env
 - **API_DEFAULT_LISTEN_PORT**, **API_DEFAULT_LISTEN_HOST** — порт/хост HTTP API.
 - **MODERATION_SECRET_PASS** — секрет для модерации.
 - **METRICS_PASSWORD** — пароль для `/metrics`.
+- **P2P_*** — опциональная p2p-репликация между инстансами `epds` (см. `packages/backend/README.md`).
 
 ### Frontend (`packages/frontend/.env.local`)
 

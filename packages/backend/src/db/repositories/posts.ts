@@ -1,9 +1,12 @@
 import type { ResponsePost } from "../../types/responseThreadsList";
 import { MediaType } from "@umechan/shared";
-import { DataSource } from "typeorm";
+import { DataSource, In } from "typeorm";
 import { Media } from "../entities/Media";
 import { Post } from "../entities/Post";
 import { deleteFilesForMedia } from "../../media/storage";
+import { mediaSyncIdFromNaturalKey } from "../../p2p/ids";
+import { logChanges, type LogChangeInput } from "../../p2p/journal";
+import { p2pNodeId } from "../../p2p/config";
 
 const stickyBlockedFromResponse = (post: ResponsePost) => ({
   isSticky: Boolean(post.is_sticky),
@@ -23,7 +26,7 @@ const chunkArray = <T>(items: T[], chunkSize: number): T[][] => {
   return chunks;
 };
 
-const postRowFromResponse = (post: ResponsePost) => ({
+const postRowFromResponse = (post: ResponsePost, originNodeId: string) => ({
   id: post.id,
   boardId: post.board_id,
   poster: post.poster,
@@ -34,8 +37,21 @@ const postRowFromResponse = (post: ResponsePost) => ({
   timestamp: Number(post.timestamp),
   parentId: post.parent_id || null,
   updatedAt: post.updated_at,
+  originNodeId,
   ...stickyBlockedFromResponse(post),
 });
+
+export type SyncedMediaInput = {
+  postId: number;
+  mediaType: MediaType;
+  link: string | null;
+  preview: string | null;
+  localPath?: string | null;
+  localPreviewPath?: string | null;
+  contentSha256?: string | null;
+  previewSha256?: string | null;
+  existingSyncId?: string;
+};
 
 export const dbModelPosts = (dataSource: DataSource) => ({
   getExistingIds: async (ids: number[]) => {
@@ -83,6 +99,7 @@ export const dbModelPosts = (dataSource: DataSource) => ({
       timestamp: Number(post.timestamp),
       parentId: post.parent_id || null,
       updatedAt: post.updated_at,
+      originNodeId: p2pNodeId() || null,
       ...stickyBlockedFromResponse(post),
     });
     return postRepository.save(newPost);
@@ -99,8 +116,9 @@ export const dbModelPosts = (dataSource: DataSource) => ({
         subject: post.subject,
         timestamp: Number(post.timestamp),
         updatedAt: post.updated_at,
+        originNodeId: p2pNodeId() || null,
         ...stickyBlockedFromResponse(post),
-      }
+      },
     );
     return postRepository.findOne({ where: { id: post.id } });
   },
@@ -131,12 +149,13 @@ export const dbModelPosts = (dataSource: DataSource) => ({
   },
   upsertMany: async (posts: ResponsePost[]) => {
     if (!posts.length) return;
+    const origin = p2pNodeId() || "root";
     for (const chunk of chunkArray(posts, SQL_UPSERT_CHUNK_SIZE)) {
       await dataSource
         .createQueryBuilder()
         .insert()
         .into(Post)
-        .values(chunk.map((post) => postRowFromResponse(post)))
+        .values(chunk.map((post) => postRowFromResponse(post, origin)))
         .orUpdate(
           [
             "boardId",
@@ -150,31 +169,27 @@ export const dbModelPosts = (dataSource: DataSource) => ({
             "updatedAt",
             "isSticky",
             "isBlocked",
+            "originNodeId",
           ],
-          ["id"]
+          ["id"],
         )
         .execute();
     }
   },
-  syncPostsAndMedia: async (
-    posts: ResponsePost[],
-    mediaItems: Array<{
-      postId: number;
-      mediaType: MediaType;
-      link: string | null;
-      preview: string | null;
-      localPath?: string | null;
-      localPreviewPath?: string | null;
-    }>
-  ) => {
+  syncPostsAndMedia: async (posts: ResponsePost[], mediaItems: SyncedMediaInput[]) => {
     if (!posts.length) return;
 
-    const mediaByPostId = new Map<number, typeof mediaItems>();
+    const origin = p2pNodeId() || "root";
+    const now = Date.now();
+    const mediaByPostId = new Map<number, SyncedMediaInput[]>();
     for (const item of mediaItems) {
       const bucket = mediaByPostId.get(item.postId) ?? [];
       bucket.push(item);
       mediaByPostId.set(item.postId, bucket);
     }
+
+    const journalInputs: LogChangeInput[] = [];
+    let pointers: Awaited<ReturnType<typeof logChanges>> = [];
 
     await dataSource.transaction(async (manager) => {
       for (const postChunk of chunkArray(posts, SQL_UPSERT_CHUNK_SIZE)) {
@@ -182,7 +197,7 @@ export const dbModelPosts = (dataSource: DataSource) => ({
           .createQueryBuilder()
           .insert()
           .into(Post)
-          .values(postChunk.map((post) => postRowFromResponse(post)))
+          .values(postChunk.map((post) => postRowFromResponse(post, origin)))
           .orUpdate(
             [
               "boardId",
@@ -196,41 +211,107 @@ export const dbModelPosts = (dataSource: DataSource) => ({
               "updatedAt",
               "isSticky",
               "isBlocked",
+              "originNodeId",
             ],
-            ["id"]
+            ["id"],
           )
           .execute();
 
-        const postIds = postChunk.map((post) => post.id);
-        for (const idChunk of chunkArray(postIds, SQL_IN_CHUNK_SIZE)) {
-          await manager
-            .createQueryBuilder()
-            .delete()
-            .from(Media)
-            .where("postId IN (:...postIds)", { postIds: idChunk })
-            .execute();
+        for (const post of postChunk) {
+          journalInputs.push({
+            table: "Post",
+            recordKey: String(post.id),
+            op: "upsert",
+            originNodeId: origin,
+            updatedAt: post.updated_at,
+          });
         }
 
+        const postIds = postChunk.map((post) => post.id);
+        const existingMedia = await manager.getRepository(Media).find({
+          where: { postId: In(postIds) },
+        });
+        const existingByNatural = new Map(
+          existingMedia.map((m) => [
+            `${Number(m.postId)}:${m.mediaType}:${m.urlOrigin ?? ""}`,
+            m,
+          ]),
+        );
+
+        const keepSyncIds = new Set<string>();
         const chunkMedia = postChunk.flatMap((post) => mediaByPostId.get(post.id) ?? []);
-        for (const mediaChunk of chunkArray(chunkMedia, SQL_UPSERT_CHUNK_SIZE)) {
-          if (!mediaChunk.length) continue;
-          await manager
-            .createQueryBuilder()
-            .insert()
-            .into(Media)
-            .values(
-              mediaChunk.map((item) => ({
+
+        for (const item of chunkMedia) {
+          const natural = `${item.postId}:${item.mediaType}:${item.link ?? ""}`;
+          const existing = existingByNatural.get(natural);
+          const syncId =
+            item.existingSyncId ||
+            existing?.syncId ||
+            mediaSyncIdFromNaturalKey(item.postId, item.mediaType, item.link);
+          keepSyncIds.add(syncId);
+          const updatedAt = now;
+          if (existing) {
+            await manager.getRepository(Media).update(
+              { id: existing.id },
+              {
+                syncId,
                 mediaType: item.mediaType,
                 urlOrigin: item.link,
                 urlPreview: item.preview,
                 localPath: item.localPath ?? null,
                 localPreviewPath: item.localPreviewPath ?? null,
+                contentSha256: item.contentSha256 ?? null,
+                previewSha256: item.previewSha256 ?? null,
                 postId: item.postId,
-              }))
-            )
-            .execute();
+                updatedAt,
+                originNodeId: origin,
+              },
+            );
+          } else {
+            await manager.getRepository(Media).save(
+              manager.getRepository(Media).create({
+                syncId,
+                mediaType: item.mediaType,
+                urlOrigin: item.link,
+                urlPreview: item.preview,
+                localPath: item.localPath ?? null,
+                localPreviewPath: item.localPreviewPath ?? null,
+                contentSha256: item.contentSha256 ?? null,
+                previewSha256: item.previewSha256 ?? null,
+                postId: item.postId,
+                updatedAt,
+                revision: 0,
+                originNodeId: origin,
+              }),
+            );
+          }
+          journalInputs.push({
+            table: "Media",
+            recordKey: syncId,
+            op: "upsert",
+            originNodeId: origin,
+            updatedAt,
+          });
+        }
+
+        for (const existing of existingMedia) {
+          if (keepSyncIds.has(existing.syncId)) continue;
+          await deleteFilesForMedia(existing);
+          await manager.getRepository(Media).delete({ id: existing.id });
+          journalInputs.push({
+            table: "Media",
+            recordKey: existing.syncId,
+            op: "delete",
+            originNodeId: origin,
+            updatedAt: now,
+          });
         }
       }
+
+      pointers = await logChanges(dataSource, journalInputs, { manager, notify: false });
     });
+
+    const { getP2pHub } = await import("../../p2p/hub");
+    getP2pHub()?.broadcast(pointers);
   },
 });

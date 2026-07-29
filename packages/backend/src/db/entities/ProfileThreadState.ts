@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { ChatProfile } from "./ChatProfile";
 import { Post } from "./Post";
 import { ChatFolder } from "./ChatFolder";
@@ -6,9 +6,13 @@ import { bigintTransformer } from "../transformers";
 
 @Entity("ProfileThreadState")
 @Unique("UQ_ProfileThreadState_profile_thread", ["profileId", "threadId"])
+@Index("UQ_ProfileThreadState_syncId", ["syncId"], { unique: true })
 export class ProfileThreadState {
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @Column({ type: "text" })
+  syncId!: string;
 
   @Column()
   profileId!: number;
@@ -48,5 +52,10 @@ export class ProfileThreadState {
 
   @Column({ type: "integer" })
   updatedAt!: number;
-}
 
+  @Column({ type: "integer", default: 0 })
+  revision!: number;
+
+  @Column({ type: "text", nullable: true })
+  originNodeId!: string | null;
+}

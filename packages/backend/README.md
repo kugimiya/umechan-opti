@@ -82,6 +82,35 @@ cp .env.example .env
 - **API_DEFAULT_LISTEN_PORT**, **API_DEFAULT_LISTEN_HOST** — порт/хост HTTP API.
 - **MODERATION_SECRET_PASS** — секрет для модераторского функционала.
 - **METRICS_PASSWORD** — пароль для эндпоинта `/metrics`.
+- **P2P_NODE_ID**, **P2P_SYNC_TOKEN** — включают p2p server/client (обязательны вместе).
+- **P2P_UPSTREAM_URL** — если задан, узел = replica (без pissykaka sync); иначе root.
+- **P2P_CONTROL_LISTEN_***, **P2P_ADVERTISE_WS_URL**, **P2P_ADVERTISE_PUSH_URL** — control plane (WS+push на primary).
+- **P2P_CALLBACK_BASE_URL** — URL этого узла для raw GET при push-up.
+
+---
+
+## P2P репликация
+
+Дерево узлов (один upstream на child). Root тянет pissykaka и раздаёт state; replica подключается к upstream.
+
+**Workers (REST):** `GET /p2p/meta`, `/p2p/snapshot`, `/p2p/changes`, `/p2p/raw/...`, `/p2p/files/...`  
+**Primary:** `WS /p2p/ws`, `POST /p2p/push` (порт `P2P_CONTROL_LISTEN_PORT`)
+
+Auth: `Authorization: Bearer $P2P_SYNC_TOKEN`.  
+Реплицируются Board/Post/Media/Chat*; не Settings, не SyncChangeLog, не миграции.  
+Конфликты: LWW `(updatedAt, originNodeId)`. Live-события — указатели; данные — raw MessagePack.
+
+Пример replica `.env`:
+
+```bash
+P2P_NODE_ID=leaf-1
+P2P_SYNC_TOKEN=shared-secret
+P2P_UPSTREAM_URL=http://root:3000
+P2P_CALLBACK_BASE_URL=http://leaf:3000
+P2P_CONTROL_LISTEN_PORT=3002
+```
+
+Код: `src/p2p/` (journal, routes, controlServer, client, apply).
 
 ---
 
@@ -105,6 +134,7 @@ cp .env.example .env
 - **`sources/`** — адаптер внешнего API: `createRestSource`, контракт `SyncSource`.
 - **`db/`** — TypeORM: entities, repositories, migrations, `cli.ts`.
 - **`api/`** — Fastify: `routes/boards.ts`, `routes/util.ts`.
+- **`p2p/`** — peer sync: journal, REST/WS, replica client.
 - **`types/`** — типы внешнего API (responseBoardsList, responseThreadsList и т.д.).
 
 ---

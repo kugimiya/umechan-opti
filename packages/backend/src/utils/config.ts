@@ -34,3 +34,18 @@ export const bannedBoardTags = process.env.BANNED_BOARD_TAGS ? process.env.BANNE
 
 /** Игнорируемые при full sync тэги досок */
 export const ignoredBoardTags = process.env.IGNORED_BOARD_TAGS ? process.env.IGNORED_BOARD_TAGS.split(',').map((t) => t.trim()).filter(Boolean) : [];
+
+export {
+  p2pNodeId,
+  p2pSyncToken,
+  p2pUpstreamUrl,
+  isP2pReplica,
+  p2pControlListenHost,
+  p2pControlListenPort,
+  p2pAdvertiseWsUrl,
+  p2pAdvertisePushUrl,
+  p2pChangelogMaxAgeDays,
+  p2pChangelogMaxRows,
+  p2pCallbackBaseUrl,
+  assertP2pIdentity,
+} from "../p2p/config";

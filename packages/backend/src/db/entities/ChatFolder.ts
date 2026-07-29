@@ -1,11 +1,15 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { ChatProfile } from "./ChatProfile";
 import { Board } from "./Board";
 
 @Entity("ChatFolder")
+@Index("UQ_ChatFolder_syncId", ["syncId"], { unique: true })
 export class ChatFolder {
   @PrimaryGeneratedColumn()
   id!: number;
+
+  @Column({ type: "text" })
+  syncId!: string;
 
   @Column()
   profileId!: number;
@@ -29,5 +33,10 @@ export class ChatFolder {
 
   @Column({ type: "integer" })
   updatedAt!: number;
-}
 
+  @Column({ type: "integer", default: 0 })
+  revision!: number;
+
+  @Column({ type: "text", nullable: true })
+  originNodeId!: string | null;
+}

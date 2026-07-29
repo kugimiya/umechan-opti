@@ -29,6 +29,12 @@ export class Post {
   @Column()
   updatedAt!: number;
 
+  @Column({ type: "integer", default: 0 })
+  revision!: number;
+
+  @Column({ type: "text", nullable: true })
+  originNodeId!: string | null;
+
   @ManyToOne(() => Board, (board: Board) => board.posts)
   @JoinColumn({ name: "boardId" })
   board!: Board | null;
@@ -55,4 +61,3 @@ export class Post {
   @OneToMany(() => Post, (post: Post) => post.parent)
   replies!: Post[];
 }
-
