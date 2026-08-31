@@ -10,7 +10,7 @@ import { ReplyMap, threadReplyMapContext } from "@/utils/contexts/threadReplyMap
 import { PropsWithChildren, useState } from "react";
 import { MediaModalHostProvider } from "@/components/common/MediaModal/MediaModalHost";
 
-export const AppProviders = (props: PropsWithChildren<{}>) => {
+export const AppProviders = (props: PropsWithChildren) => {
   const [formContextValue, setFormContextValue] = useState<Omit<ModalPostFormContextType, 'set'>>(modalPostFormContextDefaultValue);
 
   return (

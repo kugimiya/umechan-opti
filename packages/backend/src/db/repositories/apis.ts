@@ -3,6 +3,8 @@ import { DataSource } from "typeorm";
 import { Board } from "../entities/Board";
 import { Post } from "../entities/Post";
 
+const whitelistTags = [ 'mod', 'cul', 'lib', 'rnd', 'mus', 'tch', 'vgm', 'vid' ];
+
 export const dbModelApis = (dataSource: DataSource) => ({
   boards: {
     getAll: async (moderated: boolean) => {
@@ -10,7 +12,7 @@ export const dbModelApis = (dataSource: DataSource) => ({
       const queryBuilder = boardRepository.createQueryBuilder("board");
 
       if (moderated) {
-        queryBuilder.where("board.tag NOT IN (:...bannedTags)", { bannedTags: bannedBoardTags });
+        queryBuilder.where("board.tag IN (:...whitelistTags)", { whitelistTags });
       }
 
       return queryBuilder.getMany();
@@ -105,7 +107,7 @@ export const dbModelApis = (dataSource: DataSource) => ({
         .where("thread.id = :postId", { postId });
 
       if (moderated) {
-        queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: bannedBoardTags });
+        queryBuilder.where("board.tag IN (:...whitelistTags)", { whitelistTags });
       }
 
       const thread = await queryBuilder.getOne();
@@ -128,7 +130,7 @@ export const dbModelApis = (dataSource: DataSource) => ({
         .andWhere("thread.isSticky = :isSticky", { isSticky: false });
 
       if (moderated) {
-        queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: bannedBoardTags });
+        queryBuilder.where("board.tag IN (:...whitelistTags)", { whitelistTags });
       }
 
       const threads = await queryBuilder
@@ -161,7 +163,7 @@ export const dbModelApis = (dataSource: DataSource) => ({
         .andWhere("thread.isSticky = :isSticky", { isSticky: false });
 
       if (moderated) {
-        queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: bannedBoardTags });
+        queryBuilder.where("board.tag IN (:...whitelistTags)", { whitelistTags });
       }
 
       return queryBuilder.getCount();

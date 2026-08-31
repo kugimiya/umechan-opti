@@ -53,7 +53,7 @@ export const ChatAppProvider: FC<Props> = ({ unmod, children }) => {
   const [aliasThreadId, setAliasThreadId] = useState<number | null>(null);
   const [aliasValue, setAliasValue] = useState("");
   const [folderDraft, setFolderDraft] = useState("");
-  const [poster, setPoster] = useState("");
+  const [poster] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<FileList | null>(null);

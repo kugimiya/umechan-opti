@@ -19,7 +19,7 @@ export const PostPointer = ({ children, postId, isUnmod }: Props) => {
   } = usePostPointer(postId, isUnmod);
 
   const renderPopover = () => {
-    let content = isLoading
+    const content = isLoading
       ? <>Загрузка...</>
       : post !== undefined
         ? <PostProto post={post} disableModal />

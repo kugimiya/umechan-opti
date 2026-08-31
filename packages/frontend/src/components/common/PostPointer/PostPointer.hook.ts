@@ -12,7 +12,7 @@ export const usePostPointer = (postId: number, isUnmod: UnmodFlag) => {
   const [isVisible, setVisibility] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const handleMouseEnter: MouseEventHandler<HTMLDivElement> = (event) => {
+  const handleMouseEnter: MouseEventHandler<HTMLDivElement> = () => {
     if (timer) {
       clearInterval(timer);
     }

@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "pnpm --filter @umechan/shared run build && concurrently \"pnpm --filter @umechan/shared run dev\" \"pnpm --filter epds run dev\" \"pnpm --filter umechan-opti run dev\"",
     "build": "pnpm -r run build",
-    "lint": "pnpm --filter umechan-opti run lint",
+    "lint": "pnpm --filter umechan-opti run lint && pnpm --filter epds run lint",
     "test": "pnpm --filter epds run test"
   },
   "devDependencies": {

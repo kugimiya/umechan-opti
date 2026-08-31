@@ -73,7 +73,7 @@ export const PostForm = () => {
             pushToLog(`error while uploading file: ${file.name} ${(error as Error).message}`);
           }
         }
-      } catch (err) {
+      } catch {
         pushToLog('image upload failed!');
       } finally {
         pushToLog('uploading done');
