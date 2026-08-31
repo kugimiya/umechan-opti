@@ -1,13 +1,28 @@
 import "reflect-metadata";
 import cluster from "node:cluster";
 import os from "node:os";
+import { AppDataSource } from "./db/dataSource";
 import { createDbConnection } from "./db/connection";
 import { runApi, runSyncLoop } from "./app/roles";
-import { handleForceSyncMessage, requestForceSyncFromPrimary } from "./cluster/ipc";
+import {
+  createWorkerP2pBridge,
+  handleForceSyncMessage,
+  handleP2pIpcMessage,
+  requestForceSyncFromPrimary,
+} from "./cluster/ipc";
 import { createSyncLock } from "./cluster/syncLock";
 import { createSyncService } from "./sync";
-import { pissykakaApi } from "./utils/config";
+import {
+  assertP2pIdentity,
+  isP2pReplica,
+  p2pNodeId,
+  p2pSyncToken,
+  pissykakaApi,
+} from "./utils/config";
 import { logger } from "./utils/logger";
+import { startP2pControlServer } from "./p2p/controlServer";
+import { runP2pClient } from "./p2p/client";
+import { setP2pHub } from "./p2p/hub";
 
 if (!process.env.DATABASE_URL) {
   console.error("DATABASE_URL environment variable is required!");
@@ -36,6 +51,7 @@ if (process.argv.includes("--help")) {
 
 const workerCount = Number(process.env.CLUSTER_WORKERS) || os.cpus().length;
 const noFullSync = process.argv.includes("--no-full-sync");
+const p2pEnabled = () => Boolean(p2pNodeId() && p2pSyncToken());
 
 const forkWorker = () => {
   cluster.fork({ SKIP_MIGRATIONS: "1" });
@@ -44,7 +60,14 @@ const forkWorker = () => {
 const runPrimary = async () => {
   logger.info(`[Cluster] Primary starting with ${workerCount} workers`);
 
-  await createDbConnection();
+  const db = await createDbConnection();
+
+  let hub = null as Awaited<ReturnType<typeof startP2pControlServer>>["hub"] | null;
+  if (p2pEnabled()) {
+    assertP2pIdentity();
+    const control = await startP2pControlServer(AppDataSource);
+    hub = control.hub;
+  }
 
   for (let i = 0; i < workerCount; i++) {
     forkWorker();
@@ -66,7 +89,9 @@ const runPrimary = async () => {
       logger.error(`[Cluster] Worker ${worker.process.pid} failed to start, not restarting`);
       return;
     }
-    logger.warn(`[Cluster] Worker ${worker.process.pid} exited (code=${code}, signal=${signal}), restarting`);
+    logger.warn(
+      `[Cluster] Worker ${worker.process.pid} exited (code=${code}, signal=${signal}), restarting`,
+    );
     forkWorker();
   });
 
@@ -81,17 +106,27 @@ const runPrimary = async () => {
   process.on("SIGINT", shutdown);
 
   const withSyncLock = createSyncLock();
-  const syncService = await createSyncService(pissykakaApi);
+  const syncService = isP2pReplica() ? undefined : await createSyncService(pissykakaApi);
 
   cluster.on("message", (worker, msg) => {
     handleForceSyncMessage(worker, msg, syncService, withSyncLock);
+    handleP2pIpcMessage(msg, hub);
   });
+
+  if (isP2pReplica()) {
+    logger.info("[Cluster] Primary running p2p replica client");
+    await runP2pClient({ dataSource: AppDataSource, settings: db.settings });
+    return;
+  }
 
   await runSyncLoop({ noFullSync }, syncService, withSyncLock);
 };
 
 const runWorker = async () => {
   logger.info(`[Cluster] Worker ${process.pid} starting API (api-only)`);
+  if (p2pEnabled()) {
+    setP2pHub(createWorkerP2pBridge());
+  }
   await runApi({ apiOnly: true, requestForceSync: requestForceSyncFromPrimary });
 };
 

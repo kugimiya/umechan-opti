@@ -1,11 +1,14 @@
 import createFastify from "fastify";
-import fastifyCors from '@fastify/cors';
+import fastifyCors from "@fastify/cors";
+import { AppDataSource } from "../db/dataSource";
 import { createDbConnection } from "../db/connection";
 import { logger } from "../utils/logger";
 import { bindBoardsRoutes } from "./routes/boards";
 import { bindMediaRoutes } from "./routes/media";
 import { bindUtilRoutes } from "./routes/util";
 import type { ApiServerSyncOptions } from "./syncOptions";
+import { bindP2pReadRoutes } from "../p2p/routes";
+import { p2pNodeId, p2pSyncToken } from "../p2p/config";
 
 export const createApiServer = async (
   listenPort: number,
@@ -32,6 +35,11 @@ export const createApiServer = async (
 
   bindUtilRoutes(fastify, sync);
   logger.info("Util routes binded");
+
+  if (p2pNodeId() && p2pSyncToken()) {
+    bindP2pReadRoutes(fastify, AppDataSource);
+    logger.info("P2P read routes binded");
+  }
 
   const startListen = async () => {
     await fastify.ready();

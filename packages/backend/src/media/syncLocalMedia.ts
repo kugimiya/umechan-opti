@@ -3,6 +3,7 @@ import { MediaType as MediaTypeEnum } from "@umechan/shared";
 import type { DbConnection } from "../db/connection";
 import type { Media } from "../db/entities/Media";
 import { downloadMediaFile } from "./download";
+import { hashLocalFile } from "./hash";
 import { originFileType, previewFileType } from "./paths";
 import { deleteFile, deleteFilesForMedia, fileExists } from "./storage";
 
@@ -17,6 +18,9 @@ export type IncomingMediaItem = {
 export type SyncedMediaItem = IncomingMediaItem & {
   localPath: string | null;
   localPreviewPath: string | null;
+  contentSha256: string | null;
+  previewSha256: string | null;
+  existingSyncId?: string;
 };
 
 const mediaKey = (item: { postId: number; mediaType: string; urlOrigin: string | null }) =>
@@ -54,7 +58,10 @@ export const syncLocalMedia = async (
 
   const incomingKeys = new Set(mediaItems.map(incomingKey));
   const existingByKey = new Map(
-    existingMedia.map((item) => [mediaKey({ postId: Number(item.postId), mediaType: item.mediaType, urlOrigin: item.urlOrigin }), item]),
+    existingMedia.map((item) => [
+      mediaKey({ postId: Number(item.postId), mediaType: item.mediaType, urlOrigin: item.urlOrigin }),
+      item,
+    ]),
   );
 
   for (const existing of existingMedia) {
@@ -76,6 +83,9 @@ export const syncLocalMedia = async (
         ...item,
         localPath: null,
         localPreviewPath: null,
+        contentSha256: null,
+        previewSha256: null,
+        existingSyncId: existingByKey.get(incomingKey(item))?.syncId,
       });
       continue;
     }
@@ -108,10 +118,16 @@ export const syncLocalMedia = async (
       localPreviewPath = null;
     }
 
+    const contentSha256 = (await hashLocalFile(localPath)) ?? existing?.contentSha256 ?? null;
+    const previewSha256 = (await hashLocalFile(localPreviewPath)) ?? existing?.previewSha256 ?? null;
+
     results.push({
       ...item,
       localPath,
       localPreviewPath,
+      contentSha256,
+      previewSha256,
+      existingSyncId: existing?.syncId,
     });
   }
 

@@ -13,7 +13,15 @@ export class Board {
   @Column({ type: "text" })
   name!: string;
 
+  @Column({ type: "integer", default: 0 })
+  updatedAt!: number;
+
+  @Column({ type: "integer", default: 0 })
+  revision!: number;
+
+  @Column({ type: "text", nullable: true })
+  originNodeId!: string | null;
+
   @OneToMany(() => Post, (post: Post) => post.board)
   posts!: Post[];
 }
-

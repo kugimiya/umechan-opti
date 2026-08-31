@@ -8,6 +8,11 @@ import { ChatFolder } from "../entities/ChatFolder";
 import { defaultLimit } from "../../utils/config";
 import { ProfileOwnPost } from "../entities/ProfileOwnPost";
 import { Media } from "../entities/Media";
+import { newSyncId } from "../../p2p/ids";
+import { logChanges } from "../../p2p/journal";
+import { p2pNodeId } from "../../p2p/config";
+import { getP2pHub } from "../../p2p/hub";
+import type { P2pReplicatedTable } from "../../p2p/types";
 
 const hashPassphrase = (passphrase: string) => {
   const salt = process.env.CHAT_PASSPHRASE_SALT ?? "umechan-chat";
@@ -21,18 +26,59 @@ const PISSYKAKA_IMAGE_DB = "image";
 
 type LastReplyPreview = { truncatedText: string; author: string };
 
+const journalUpsert = async (
+  dataSource: DataSource,
+  table: P2pReplicatedTable,
+  syncId: string,
+  updatedAt: number,
+) => {
+  const pointers = await logChanges(dataSource, [
+    {
+      table,
+      recordKey: syncId,
+      op: "upsert",
+      originNodeId: p2pNodeId() || "local",
+      updatedAt,
+    },
+  ]);
+  getP2pHub()?.broadcast(pointers);
+  getP2pHub()?.enqueueOutbox(pointers);
+};
+
+const journalDelete = async (dataSource: DataSource, table: P2pReplicatedTable, syncId: string) => {
+  const updatedAt = now();
+  const pointers = await logChanges(dataSource, [
+    {
+      table,
+      recordKey: syncId,
+      op: "delete",
+      originNodeId: p2pNodeId() || "local",
+      updatedAt,
+    },
+  ]);
+  getP2pHub()?.broadcast(pointers);
+  getP2pHub()?.enqueueOutbox(pointers);
+};
+
 export const dbModelChat = (dataSource: DataSource) => ({
   identify: async (passphrase: string) => {
     const profileRepo = dataSource.getRepository(ChatProfile);
     const passphraseHash = hashPassphrase(passphrase.trim());
     let profile = await profileRepo.findOne({ where: { passphraseHash } });
     if (!profile) {
-      profile = await profileRepo.save(profileRepo.create({
-        passphraseHash,
-        token: randomUUID(),
-        createdAt: now(),
-        updatedAt: now(),
-      }));
+      const ts = now();
+      profile = await profileRepo.save(
+        profileRepo.create({
+          passphraseHash,
+          token: randomUUID(),
+          syncId: newSyncId(),
+          createdAt: ts,
+          updatedAt: ts,
+          originNodeId: p2pNodeId() || "local",
+          revision: 0,
+        }),
+      );
+      await journalUpsert(dataSource, "ChatProfile", profile.syncId, ts);
     }
     return profile;
   },
@@ -78,10 +124,6 @@ export const dbModelChat = (dataSource: DataSource) => ({
       .andWhere("board.tag = :boardTag", { boardTag })
       .getCount();
   },
-  /**
-   * Для каждой доски: сколько корневых тредов имеют хотя бы один непрочитанный ответ
-   * (та же модель, что и метод unreadCountForThread); скрытые треды не считаем.
-   */
   countThreadsWithUnreadByBoardIds: async (profileId: number, boardIds: number[]) => {
     const map = new Map<number, number>(boardIds.map((id) => [Number(id), 0]));
     if (boardIds.length === 0) {
@@ -113,7 +155,9 @@ export const dbModelChat = (dataSource: DataSource) => ({
     const states = await dataSource.getRepository(ProfileThreadState).find({
       where: { profileId, threadId: In(threadIds) },
     });
-    const stateByThread = new Map<number, ProfileThreadState>(states.map((s) => [Number(s.threadId), s]));
+    const stateByThread = new Map<number, ProfileThreadState>(
+      states.map((s) => [Number(s.threadId), s]),
+    );
 
     const ownRows = await dataSource.getRepository(ProfileOwnPost).find({
       where: { profileId, threadId: In(threadIds) },
@@ -157,7 +201,6 @@ export const dbModelChat = (dataSource: DataSource) => ({
     }
     return map;
   },
-  /** Последний по id пост в треде (корень или ответ): обрезка текста и poster */
   lastReplyPreviewByThreadIds: async (threadIds: number[]) => {
     if (threadIds.length === 0) {
       return new Map<number, LastReplyPreview>();
@@ -200,7 +243,6 @@ export const dbModelChat = (dataSource: DataSource) => ({
       }),
     );
   },
-  /** Первая картинка PISSYKAKA_IMAGE в треде по порядку: OP, затем ответы по возрастанию id */
   firstPissykakaImageMediaByThreadIds: async (threadIds: number[]) => {
     if (threadIds.length === 0) {
       return new Map<number, Media | null>();
@@ -241,9 +283,12 @@ export const dbModelChat = (dataSource: DataSource) => ({
     });
   },
   unreadCountForThread: async (profileId: number, threadId: number, lastSeenPostId: number) => {
-    const ownPosts = await dataSource.getRepository(ProfileOwnPost).find({ where: { profileId, threadId } });
+    const ownPosts = await dataSource.getRepository(ProfileOwnPost).find({
+      where: { profileId, threadId },
+    });
     const ownIds = ownPosts.map((item) => item.postId);
-    const qb = dataSource.getRepository(Post)
+    const qb = dataSource
+      .getRepository(Post)
       .createQueryBuilder("post")
       .where("post.parentId = :threadId", { threadId })
       .andWhere("post.id > :lastSeenPostId", { lastSeenPostId });
@@ -256,109 +301,147 @@ export const dbModelChat = (dataSource: DataSource) => ({
     const repo = dataSource.getRepository(ProfileThreadState);
     let state = await repo.findOne({ where: { profileId, threadId } });
     if (!state) {
-      state = await repo.save(repo.create({
-        profileId,
-        threadId,
-        lastSeenPostId: null,
-        lastSeenAt: null,
-        hidden: false,
-        alias: null,
-        folderId: null,
-        createdAt: now(),
-        updatedAt: now(),
-      }));
+      const ts = now();
+      state = await repo.save(
+        repo.create({
+          profileId,
+          threadId,
+          syncId: newSyncId(),
+          lastSeenPostId: null,
+          lastSeenAt: null,
+          hidden: false,
+          alias: null,
+          folderId: null,
+          createdAt: ts,
+          updatedAt: ts,
+          originNodeId: p2pNodeId() || "local",
+          revision: 0,
+        }),
+      );
+      await journalUpsert(dataSource, "ProfileThreadState", state.syncId, ts);
     }
     return state;
   },
   markThreadRead: async (profileId: number, threadId: number, lastSeenPostId: number) => {
     const repo = dataSource.getRepository(ProfileThreadState);
     let state = await repo.findOne({ where: { profileId, threadId } });
+    const ts = now();
     if (!state) {
       state = repo.create({
         profileId,
         threadId,
+        syncId: newSyncId(),
         hidden: false,
         alias: null,
         folderId: null,
-        createdAt: now(),
-        updatedAt: now(),
+        createdAt: ts,
+        updatedAt: ts,
+        originNodeId: p2pNodeId() || "local",
+        revision: 0,
       });
     }
     state.lastSeenPostId = lastSeenPostId;
-    state.lastSeenAt = now();
-    state.updatedAt = now();
-    return repo.save(state);
+    state.lastSeenAt = ts;
+    state.updatedAt = ts;
+    state.originNodeId = p2pNodeId() || "local";
+    const saved = await repo.save(state);
+    await journalUpsert(dataSource, "ProfileThreadState", saved.syncId, ts);
+    return saved;
   },
   markAllReadByBoard: async (profileId: number, boardTag: string) => {
     const board = await dataSource.getRepository(Board).findOne({ where: { tag: boardTag } });
     if (!board) return;
-    const threads = await dataSource.getRepository(Post).createQueryBuilder("thread")
+    const threads = await dataSource
+      .getRepository(Post)
+      .createQueryBuilder("thread")
       .where("thread.parentId IS NULL")
       .andWhere("thread.boardId = :boardId", { boardId: board.id })
       .getMany();
     for (const thread of threads) {
-      const lastReply = await dataSource.getRepository(Post).createQueryBuilder("post")
+      const lastReply = await dataSource
+        .getRepository(Post)
+        .createQueryBuilder("post")
         .where("(post.parentId = :threadId OR post.id = :threadId)", { threadId: thread.id })
         .orderBy("post.id", "DESC")
         .getOne();
       const repo = dataSource.getRepository(ProfileThreadState);
       let state = await repo.findOne({ where: { profileId, threadId: thread.id } });
+      const ts = now();
       if (!state) {
         state = repo.create({
           profileId,
           threadId: thread.id,
+          syncId: newSyncId(),
           hidden: false,
           alias: null,
           folderId: null,
-          createdAt: now(),
-          updatedAt: now(),
+          createdAt: ts,
+          updatedAt: ts,
+          originNodeId: p2pNodeId() || "local",
+          revision: 0,
         });
       }
       state.lastSeenPostId = Number(lastReply?.id ?? thread.id);
-      state.lastSeenAt = now();
-      state.updatedAt = now();
-      await repo.save(state);
+      state.lastSeenAt = ts;
+      state.updatedAt = ts;
+      state.originNodeId = p2pNodeId() || "local";
+      const saved = await repo.save(state);
+      await journalUpsert(dataSource, "ProfileThreadState", saved.syncId, ts);
     }
   },
   setHidden: async (profileId: number, threadId: number, hidden: boolean) => {
     const repo = dataSource.getRepository(ProfileThreadState);
     let state = await repo.findOne({ where: { profileId, threadId } });
+    const ts = now();
     if (!state) {
       state = repo.create({
         profileId,
         threadId,
+        syncId: newSyncId(),
         lastSeenPostId: null,
         lastSeenAt: null,
         hidden: false,
         alias: null,
         folderId: null,
-        createdAt: now(),
-        updatedAt: now(),
+        createdAt: ts,
+        updatedAt: ts,
+        originNodeId: p2pNodeId() || "local",
+        revision: 0,
       });
     }
     state.hidden = hidden;
-    state.updatedAt = now();
-    return repo.save(state);
+    state.updatedAt = ts;
+    state.originNodeId = p2pNodeId() || "local";
+    const saved = await repo.save(state);
+    await journalUpsert(dataSource, "ProfileThreadState", saved.syncId, ts);
+    return saved;
   },
   setAlias: async (profileId: number, threadId: number, alias: string | null) => {
     const repo = dataSource.getRepository(ProfileThreadState);
     let state = await repo.findOne({ where: { profileId, threadId } });
+    const ts = now();
     if (!state) {
       state = repo.create({
         profileId,
         threadId,
+        syncId: newSyncId(),
         lastSeenPostId: null,
         lastSeenAt: null,
         hidden: false,
         alias: null,
         folderId: null,
-        createdAt: now(),
-        updatedAt: now(),
+        createdAt: ts,
+        updatedAt: ts,
+        originNodeId: p2pNodeId() || "local",
+        revision: 0,
       });
     }
     state.alias = alias && alias.trim().length > 0 ? alias.trim() : null;
-    state.updatedAt = now();
-    return repo.save(state);
+    state.updatedAt = ts;
+    state.originNodeId = p2pNodeId() || "local";
+    const saved = await repo.save(state);
+    await journalUpsert(dataSource, "ProfileThreadState", saved.syncId, ts);
+    return saved;
   },
   listFolders: async (profileId: number, boardId: number) => {
     return dataSource.getRepository(ChatFolder).find({
@@ -368,49 +451,78 @@ export const dbModelChat = (dataSource: DataSource) => ({
   },
   createFolder: async (profileId: number, boardId: number, name: string) => {
     const folderRepo = dataSource.getRepository(ChatFolder);
-    return folderRepo.save(folderRepo.create({
-      profileId,
-      boardId,
-      name: name.trim(),
-      createdAt: now(),
-      updatedAt: now(),
-    }));
+    const ts = now();
+    const folder = await folderRepo.save(
+      folderRepo.create({
+        profileId,
+        boardId,
+        syncId: newSyncId(),
+        name: name.trim(),
+        createdAt: ts,
+        updatedAt: ts,
+        originNodeId: p2pNodeId() || "local",
+        revision: 0,
+      }),
+    );
+    await journalUpsert(dataSource, "ChatFolder", folder.syncId, ts);
+    return folder;
   },
   renameFolder: async (profileId: number, folderId: number, name: string) => {
     const folderRepo = dataSource.getRepository(ChatFolder);
     const folder = await folderRepo.findOne({ where: { id: folderId, profileId } });
     if (!folder) return null;
+    const ts = now();
     folder.name = name.trim();
-    folder.updatedAt = now();
-    return folderRepo.save(folder);
+    folder.updatedAt = ts;
+    folder.originNodeId = p2pNodeId() || "local";
+    const saved = await folderRepo.save(folder);
+    await journalUpsert(dataSource, "ChatFolder", saved.syncId, ts);
+    return saved;
   },
   deleteFolder: async (profileId: number, folderId: number) => {
     const folderRepo = dataSource.getRepository(ChatFolder);
     const folder = await folderRepo.findOne({ where: { id: folderId, profileId } });
     if (!folder) return false;
-    await dataSource.getRepository(ProfileThreadState).update({ profileId, folderId }, { folderId: null, updatedAt: now() });
+    const ts = now();
+    const states = await dataSource.getRepository(ProfileThreadState).find({
+      where: { profileId, folderId },
+    });
+    await dataSource
+      .getRepository(ProfileThreadState)
+      .update({ profileId, folderId }, { folderId: null, updatedAt: ts });
+    for (const state of states) {
+      await journalUpsert(dataSource, "ProfileThreadState", state.syncId, ts);
+    }
     await folderRepo.delete({ id: folder.id });
+    await journalDelete(dataSource, "ChatFolder", folder.syncId);
     return true;
   },
   assignThreadFolder: async (profileId: number, threadId: number, folderId: number | null) => {
     const repo = dataSource.getRepository(ProfileThreadState);
     let state = await repo.findOne({ where: { profileId, threadId } });
+    const ts = now();
     if (!state) {
       state = repo.create({
         profileId,
         threadId,
+        syncId: newSyncId(),
         lastSeenPostId: null,
         lastSeenAt: null,
         hidden: false,
         alias: null,
         folderId: null,
-        createdAt: now(),
-        updatedAt: now(),
+        createdAt: ts,
+        updatedAt: ts,
+        originNodeId: p2pNodeId() || "local",
+        revision: 0,
       });
     }
     state.folderId = folderId;
-    state.updatedAt = now();
-    return repo.save(state);
+    state.updatedAt = ts;
+    state.originNodeId = p2pNodeId() || "local";
+    const saved = await repo.save(state);
+    await journalUpsert(dataSource, "ProfileThreadState", saved.syncId, ts);
+    return saved;
   },
   addOwnPost: async (profileId: number, threadId: number, postId: number) => {
     const repo = dataSource.getRepository(ProfileOwnPost);
@@ -418,12 +530,20 @@ export const dbModelChat = (dataSource: DataSource) => ({
     if (exists) {
       return exists;
     }
-    return repo.save(repo.create({
-      profileId,
-      threadId,
-      postId,
-      createdAt: now(),
-    }));
+    const ts = now();
+    const saved = await repo.save(
+      repo.create({
+        profileId,
+        threadId,
+        postId,
+        syncId: newSyncId(),
+        createdAt: ts,
+        updatedAt: ts,
+        originNodeId: p2pNodeId() || "local",
+        revision: 0,
+      }),
+    );
+    await journalUpsert(dataSource, "ProfileOwnPost", saved.syncId, ts);
+    return saved;
   },
 });
-
