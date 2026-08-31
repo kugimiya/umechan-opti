@@ -7,6 +7,7 @@ import { ChatFolder } from "../db/entities/ChatFolder";
 import { ProfileThreadState } from "../db/entities/ProfileThreadState";
 import { ProfileOwnPost } from "../db/entities/ProfileOwnPost";
 import { deleteFilesForMedia } from "../media/storage";
+import { stripLocalFilesForBoard } from "../db/repositories/media";
 import { logChanges } from "./journal";
 import { lwwWins } from "./lww";
 import type { RawRow } from "./raw";
@@ -17,6 +18,7 @@ const num = (v: unknown): number => Number(v);
 const str = (v: unknown): string => String(v ?? "");
 const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
 const numOrNull = (v: unknown): number | null => (v == null ? null : Number(v));
+const boolOr = (v: unknown, fallback: boolean): boolean => (v == null ? fallback : Boolean(v));
 
 export const applyDelete = async (
   dataSource: DataSource,
@@ -117,16 +119,21 @@ export const applyUpsert = async (
       const repo = dataSource.getRepository(Board);
       const existing = await repo.findOne({ where: { id: num(row.id) } });
       if (!lwwWins(existing, incomingMeta)) return false;
+      const nextIsPublic = boolOr(row.isPublic, existing?.isPublic ?? true);
       await repo.save(
         repo.create({
           id: num(row.id),
           tag: str(row.tag),
           name: str(row.name),
+          isPublic: nextIsPublic,
           updatedAt: incomingMeta.updatedAt,
           revision: num(row.revision ?? 0),
           originNodeId: incomingMeta.originNodeId,
         }),
       );
+      if (existing?.isPublic && !nextIsPublic) {
+        await stripLocalFilesForBoard(dataSource, num(row.id));
+      }
       return finish(true, String(row.id));
     }
     case "Post": {

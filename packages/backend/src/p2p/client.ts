@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { DataSource } from "typeorm";
 import { Media } from "../db/entities/Media";
+import { getMediaSyncIdsOnPrivateBoards } from "../media/boardPrivacy";
 import { ensureThreadDir, resolveAbsolutePath } from "../media/storage";
 import { logger } from "../utils/logger";
 import { applyPointerWithRow, applyUpsert } from "./apply";
@@ -191,7 +192,10 @@ const syncFiles = async (upstream: string, dataSource: DataSource) => {
     `${upstream}/p2p/files/index`,
   );
   if (status !== 200) return;
+  const mediaRows = await dataSource.getRepository(Media).find();
+  const skipSyncIds = await getMediaSyncIdsOnPrivateBoards(dataSource, mediaRows);
   for (const item of body.items) {
+    if (skipSyncIds.has(item.syncId)) continue;
     await ensureLocalFile(upstream, dataSource, item.syncId, item.role, item.sha256);
   }
 };
@@ -199,6 +203,8 @@ const syncFiles = async (upstream: string, dataSource: DataSource) => {
 const syncSingleMediaFiles = async (upstream: string, dataSource: DataSource, syncId: string) => {
   const media = await dataSource.getRepository(Media).findOne({ where: { syncId } });
   if (!media) return;
+  const skipSyncIds = await getMediaSyncIdsOnPrivateBoards(dataSource, [media]);
+  if (skipSyncIds.has(syncId)) return;
   if (media.contentSha256) {
     await ensureLocalFile(upstream, dataSource, syncId, "origin", media.contentSha256);
   }

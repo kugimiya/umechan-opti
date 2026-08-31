@@ -13,6 +13,7 @@ export type EpdsBoard = {
   id: number;
   tag: string;
   name: string;
+  isPublic?: boolean;
   /** Сколько тредов доски содержат непрочитанные ответы (сессия чата через cookie/query). */
   chatUnreadThreadsCount?: number;
 };

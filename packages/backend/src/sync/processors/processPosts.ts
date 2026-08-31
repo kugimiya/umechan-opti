@@ -32,12 +32,14 @@ const collectPostsWithThreadIds = (posts: ResponsePost[]) => {
 const collectMediaItems = (
   uniquePosts: ResponsePost[],
   threadIdByPostId: Map<number, number>,
+  privateBoardIds: Set<number>,
 ): IncomingMediaItem[] => {
   const mediaItems: IncomingMediaItem[] = [];
 
   for (const post of uniquePosts) {
     const threadId = threadIdByPostId.get(post.id);
     if (threadId === undefined) continue;
+    const skipDownload = privateBoardIds.has(post.board_id);
 
     if (post.media?.images?.length) {
       for (const item of post.media.images) {
@@ -47,6 +49,7 @@ const collectMediaItems = (
           mediaType: MediaType.Image,
           link: item.link,
           preview: item.preview,
+          skipDownload,
         });
       }
     }
@@ -59,6 +62,7 @@ const collectMediaItems = (
           mediaType: MediaType.YouTube,
           link: item.link,
           preview: item.preview,
+          skipDownload,
         });
       }
     }
@@ -71,6 +75,7 @@ const collectMediaItems = (
           mediaType: MediaType.Video,
           link: item.link,
           preview: item.preview,
+          skipDownload,
         });
       }
     }
@@ -94,7 +99,10 @@ export const processPosts = async (posts: ResponsePost[], db: DbConnection) => {
     updated = uniquePosts.filter((post) => existingIds.has(post.id)).length;
     created = uniquePosts.length - updated;
 
-    const mediaItems = collectMediaItems(uniquePosts, threadIdByPostId);
+    const privateBoardIds = await db.boards.getPrivateIds(
+      uniquePosts.map((post) => post.board_id),
+    );
+    const mediaItems = collectMediaItems(uniquePosts, threadIdByPostId, privateBoardIds);
     mediaChecked = mediaItems.length;
 
     const syncedMedia = await syncLocalMedia(

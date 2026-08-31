@@ -13,6 +13,9 @@ export class Board {
   @Column({ type: "text" })
   name!: string;
 
+  @Column({ type: "boolean", default: true })
+  isPublic!: boolean;
+
   @Column({ type: "integer", default: 0 })
   updatedAt!: number;
 

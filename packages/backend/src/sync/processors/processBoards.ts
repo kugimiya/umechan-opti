@@ -9,10 +9,14 @@ export const processBoards = async (boards: ResponseBoard[], db: DbConnection) =
   let updated = 0;
   let checked = 0;
 
-  for (let board of boards) {
+  for (const board of boards) {
     checked += 1;
-    if (await db.boards.isExist(board)) {
+    const existing = await db.boards.findById(board.id);
+    if (existing) {
       await db.boards.update(board);
+      if (existing.isPublic && board.is_public === false) {
+        await db.media.stripLocalFilesForBoard(board.id);
+      }
     } else {
       await db.boards.insert(board);
       created += 1;

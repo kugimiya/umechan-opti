@@ -13,6 +13,7 @@ export type IncomingMediaItem = {
   mediaType: MediaType;
   link: string | null;
   preview: string | null;
+  skipDownload?: boolean;
 };
 
 export type SyncedMediaItem = IncomingMediaItem & {
@@ -78,19 +79,23 @@ export const syncLocalMedia = async (
   const results: SyncedMediaItem[] = [];
 
   for (const item of mediaItems) {
-    if (item.mediaType === MediaTypeEnum.YouTube) {
+    const existing = existingByKey.get(incomingKey(item));
+
+    if (item.mediaType === MediaTypeEnum.YouTube || item.skipDownload) {
+      if (item.skipDownload && existing) {
+        await deleteFilesForMedia(existing);
+      }
       results.push({
         ...item,
         localPath: null,
         localPreviewPath: null,
-        contentSha256: null,
-        previewSha256: null,
-        existingSyncId: existingByKey.get(incomingKey(item))?.syncId,
+        contentSha256: item.skipDownload ? (existing?.contentSha256 ?? null) : null,
+        previewSha256: item.skipDownload ? (existing?.previewSha256 ?? null) : null,
+        existingSyncId: existing?.syncId,
       });
       continue;
     }
 
-    const existing = existingByKey.get(incomingKey(item));
     let localPath = existing?.localPath ?? null;
     let localPreviewPath = existing?.localPreviewPath ?? null;
 

@@ -14,6 +14,7 @@ const boardToRaw = (b: Board): RawRow => ({
   id: Number(b.id),
   tag: b.tag,
   name: b.name,
+  isPublic: b.isPublic,
   updatedAt: b.updatedAt,
   revision: b.revision,
   originNodeId: b.originNodeId,

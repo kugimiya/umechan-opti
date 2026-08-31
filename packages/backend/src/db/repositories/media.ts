@@ -1,6 +1,7 @@
 import type { MediaType } from "@umechan/shared";
 import { DataSource, In } from "typeorm";
 import { Media } from "../entities/Media";
+import { Post } from "../entities/Post";
 import { deleteFilesForMedia } from "../../media/storage";
 import { mediaSyncIdFromNaturalKey } from "../../p2p/ids";
 import { p2pNodeId } from "../../p2p/config";
@@ -14,6 +15,32 @@ const chunkArray = <T>(items: T[], chunkSize: number): T[][] => {
     chunks.push(items.slice(i, i + chunkSize));
   }
   return chunks;
+};
+
+export const stripLocalFilesForBoard = async (
+  dataSource: DataSource,
+  boardId: number,
+): Promise<void> => {
+  const postRows = await dataSource
+    .getRepository(Post)
+    .createQueryBuilder("post")
+    .select("post.id", "id")
+    .where("post.boardId = :boardId", { boardId })
+    .getRawMany<{ id: unknown }>();
+  const postIds = postRows.map((row) => Number(row.id)).filter((id) => Number.isFinite(id));
+  if (!postIds.length) return;
+
+  const mediaRepo = dataSource.getRepository(Media);
+  const rows: Media[] = [];
+  for (const chunk of chunkArray(postIds, SQL_IN_CHUNK_SIZE)) {
+    rows.push(...(await mediaRepo.find({ where: { postId: In(chunk) } })));
+  }
+
+  for (const row of rows) {
+    if (!row.localPath && !row.localPreviewPath) continue;
+    await deleteFilesForMedia(row);
+    await mediaRepo.update({ id: row.id }, { localPath: null, localPreviewPath: null });
+  }
 };
 
 export const dbModelMedia = (dataSource: DataSource) => ({
@@ -61,6 +88,9 @@ export const dbModelMedia = (dataSource: DataSource) => ({
     return mediaRepository.delete({
       postId,
     });
+  },
+  stripLocalFilesForBoard: async (boardId: number) => {
+    await stripLocalFilesForBoard(dataSource, boardId);
   },
   replaceForPosts: async (
     mediaItems: Array<{

@@ -4,6 +4,7 @@ import { Board } from "../entities/Board";
 import { logChanges } from "../../p2p/journal";
 import { p2pNodeId } from "../../p2p/config";
 import { getP2pHub } from "../../p2p/hub";
+import { getPrivateBoardIds } from "../../media/boardPrivacy";
 
 export const dbModelBoards = (dataSource: DataSource) => ({
   insert: async (board: ResponseBoard) => {
@@ -14,6 +15,7 @@ export const dbModelBoards = (dataSource: DataSource) => ({
       id: board.id,
       tag: board.tag,
       name: board.name,
+      isPublic: board.is_public !== false,
       updatedAt: now,
       originNodeId: origin,
       revision: 0,
@@ -40,6 +42,7 @@ export const dbModelBoards = (dataSource: DataSource) => ({
       {
         tag: board.tag,
         name: board.name,
+        isPublic: board.is_public !== false,
         updatedAt: now,
         originNodeId: origin,
       },
@@ -63,6 +66,10 @@ export const dbModelBoards = (dataSource: DataSource) => ({
     });
     return count > 0;
   },
+  findById: async (id: number) => {
+    return dataSource.getRepository(Board).findOne({ where: { id } });
+  },
+  getPrivateIds: async (ids: number[]) => getPrivateBoardIds(dataSource, ids),
   findByTag: async (tag: string) => {
     return dataSource.getRepository(Board).findOne({ where: { tag } });
   },

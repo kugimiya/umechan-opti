@@ -3,6 +3,7 @@ import type { FastifyInstance, FastifyRequest } from "fastify";
 import fs from "node:fs";
 import type { DataSource } from "typeorm";
 import { Media } from "../db/entities/Media";
+import { getMediaSyncIdsOnPrivateBoards } from "../media/boardPrivacy";
 import { resolveAbsolutePath } from "../media/storage";
 import { authorizeP2pRequest } from "./auth";
 import {
@@ -131,6 +132,7 @@ export const bindP2pReadRoutes = (fastify: FastifyInstance, dataSource: DataSour
       return;
     }
     const media = await dataSource.getRepository(Media).find();
+    const skipSyncIds = await getMediaSyncIdsOnPrivateBoards(dataSource, media);
     const items: Array<{
       syncId: string;
       role: "origin" | "preview";
@@ -138,6 +140,7 @@ export const bindP2pReadRoutes = (fastify: FastifyInstance, dataSource: DataSour
       size: number;
     }> = [];
     for (const m of media) {
+      if (skipSyncIds.has(m.syncId)) continue;
       if (m.contentSha256 && m.localPath) {
         const abs = resolveAbsolutePath(m.localPath);
         let size = 0;
@@ -185,6 +188,11 @@ export const bindP2pReadRoutes = (fastify: FastifyInstance, dataSource: DataSour
         .getRepository(Media)
         .findOne({ where: { syncId: request.params.syncId } });
       if (!media) {
+        reply.code(404).send({ error: "not_found" });
+        return;
+      }
+      const skipSyncIds = await getMediaSyncIdsOnPrivateBoards(dataSource, [media]);
+      if (skipSyncIds.has(media.syncId)) {
         reply.code(404).send({ error: "not_found" });
         return;
       }
