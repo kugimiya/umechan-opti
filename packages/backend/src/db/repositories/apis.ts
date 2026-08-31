@@ -1,33 +1,31 @@
 import { defaultLimit, defaultThreadSize, bannedBoardTags } from "../../utils/config";
-import { DataSource } from "typeorm";
+import { DataSource, type ObjectLiteral, type SelectQueryBuilder } from "typeorm";
 import { Board } from "../entities/Board";
 import { Post } from "../entities/Post";
 
-const whitelistTags = [ 'mod', 'cul', 'lib', 'rnd', 'mus', 'tch', 'vgm', 'vid' ];
+const applyModeratedBoardFilter = <T extends ObjectLiteral>(
+  queryBuilder: SelectQueryBuilder<T>,
+  boardAlias: string,
+  moderated: boolean,
+): void => {
+  if (!moderated) return;
+  queryBuilder.andWhere(`${boardAlias}.isPublic = :isPublic`, { isPublic: true });
+  if (bannedBoardTags.length === 0) return;
+  queryBuilder.andWhere(`${boardAlias}.tag NOT IN (:...bannedTags)`, { bannedTags: bannedBoardTags });
+};
 
 export const dbModelApis = (dataSource: DataSource) => ({
   boards: {
     getAll: async (moderated: boolean) => {
       const boardRepository = dataSource.getRepository(Board);
       const queryBuilder = boardRepository.createQueryBuilder("board");
-
-      if (moderated) {
-        queryBuilder.where("board.tag IN (:...whitelistTags)", { whitelistTags });
-      }
-
+      applyModeratedBoardFilter(queryBuilder, "board", moderated);
       return queryBuilder.getMany();
     },
     getByTag: async (moderated: boolean, tag: string) => {
       const boardRepository = dataSource.getRepository(Board);
-      const queryBuilder = boardRepository.createQueryBuilder("board");
-
-      if (moderated) {
-        queryBuilder.where("board.tag = :tag", { tag })
-          .andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: bannedBoardTags });
-      } else {
-        queryBuilder.where("board.tag = :tag", { tag });
-      }
-
+      const queryBuilder = boardRepository.createQueryBuilder("board").where("board.tag = :tag", { tag });
+      applyModeratedBoardFilter(queryBuilder, "board", moderated);
       return queryBuilder.getOne();
     },
   },
@@ -41,9 +39,7 @@ export const dbModelApis = (dataSource: DataSource) => ({
         .leftJoinAndSelect("post.board", "board")
         .where("post.id = :postId", { postId });
 
-      if (moderated) {
-        queryBuilder.andWhere("board.tag NOT IN (:...bannedTags)", { bannedTags: bannedBoardTags });
-      }
+      applyModeratedBoardFilter(queryBuilder, "board", moderated);
 
       return queryBuilder.getOne();
     },
@@ -55,12 +51,15 @@ export const dbModelApis = (dataSource: DataSource) => ({
       }
 
       const postRepository = dataSource.getRepository(Post);
-      const threads = await postRepository
+      const queryBuilder = postRepository
         .createQueryBuilder("thread")
         .leftJoinAndSelect("thread.board", "board")
         .leftJoinAndSelect("thread.media", "media")
         .where("thread.parentId IS NULL")
-        .andWhere("board.tag = :boardTag", { boardTag })
+        .andWhere("board.tag = :boardTag", { boardTag });
+      applyModeratedBoardFilter(queryBuilder, "board", moderated);
+
+      const threads = await queryBuilder
         .orderBy("thread.isSticky", "DESC")
         .addOrderBy("thread.updatedAt", "DESC")
         .skip(offset)
@@ -88,12 +87,13 @@ export const dbModelApis = (dataSource: DataSource) => ({
       }
 
       const postRepository = dataSource.getRepository(Post);
-      return postRepository
+      const queryBuilder = postRepository
         .createQueryBuilder("thread")
         .leftJoin("thread.board", "board")
         .where("thread.parentId IS NULL")
-        .andWhere("board.tag = :boardTag", { boardTag })
-        .getCount();
+        .andWhere("board.tag = :boardTag", { boardTag });
+      applyModeratedBoardFilter(queryBuilder, "board", moderated);
+      return queryBuilder.getCount();
     },
     getById: async (moderated: boolean, postId: number) => {
       const postRepository = dataSource.getRepository(Post);
@@ -106,9 +106,7 @@ export const dbModelApis = (dataSource: DataSource) => ({
         .leftJoinAndSelect("thread.board", "board")
         .where("thread.id = :postId", { postId });
 
-      if (moderated) {
-        queryBuilder.where("board.tag IN (:...whitelistTags)", { whitelistTags });
-      }
+      applyModeratedBoardFilter(queryBuilder, "board", moderated);
 
       const thread = await queryBuilder.getOne();
 
@@ -129,9 +127,7 @@ export const dbModelApis = (dataSource: DataSource) => ({
         .where("thread.parentId IS NULL")
         .andWhere("thread.isSticky = :isSticky", { isSticky: false });
 
-      if (moderated) {
-        queryBuilder.where("board.tag IN (:...whitelistTags)", { whitelistTags });
-      }
+      applyModeratedBoardFilter(queryBuilder, "board", moderated);
 
       const threads = await queryBuilder
         .orderBy("thread.updatedAt", "DESC")
@@ -162,9 +158,7 @@ export const dbModelApis = (dataSource: DataSource) => ({
         .where("thread.parentId IS NULL")
         .andWhere("thread.isSticky = :isSticky", { isSticky: false });
 
-      if (moderated) {
-        queryBuilder.where("board.tag IN (:...whitelistTags)", { whitelistTags });
-      }
+      applyModeratedBoardFilter(queryBuilder, "board", moderated);
 
       return queryBuilder.getCount();
     },
